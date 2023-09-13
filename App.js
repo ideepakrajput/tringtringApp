@@ -14,6 +14,8 @@ import Settings from "./screens/Settings";
 import Contact from "./screens/Contact";
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
+import Logout from "./screens/Logout";
+import Prediction from "./screens/Prediction";
 
 const Drawer = createDrawerNavigator();
 
@@ -41,7 +43,7 @@ export default function App() {
                       width: 130,
                     }}
                   />
-                  
+
                 </View>
                 <DrawerItemList {...props} />
               </SafeAreaView>
@@ -76,7 +78,18 @@ export default function App() {
           }}
           component={Home}
         />
-        
+        <Drawer.Screen
+          name="Prediction"
+          options={{
+            drawerLabel: "Prediction",
+            title: "Prediction",
+            drawerIcon: () => (
+              <SimpleLineIcons name="home" size={20} color="#808080" />
+            )
+          }}
+          component={Prediction}
+        />
+
         <Drawer.Screen
           name="Settings"
           options={{
@@ -106,7 +119,7 @@ export default function App() {
             drawerLabel: "Login",
             title: "Login",
             drawerIcon: () => (
-              <MaterialCommunityIcons name="login" size={20} color="#808080" />
+              <SimpleLineIcons name="login" size={20} color="#808080" />
             )
           }}
           component={Login}
@@ -121,6 +134,17 @@ export default function App() {
             )
           }}
           component={Signup}
+        />
+        <Drawer.Screen
+          name="Logout"
+          options={{
+            drawerLabel: "Logout",
+            title: "Logout",
+            drawerIcon: () => (
+              <SimpleLineIcons name="logout" size={20} color="#808080" />
+            )
+          }}
+          component={Logout}
         />
       </Drawer.Navigator>
     </NavigationContainer>
