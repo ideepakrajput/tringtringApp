@@ -1,25 +1,38 @@
 import "react-native-gesture-handler";
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image } from "react-native";
 import {
   SimpleLineIcons,
   MaterialCommunityIcons,
+  Ionicons,
   AntDesign
 } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 import { DrawerItemList, createDrawerNavigator } from "@react-navigation/drawer";
 import icon from "./assets/icon.png";
 import Home from "./screens/Home";
 import Settings from "./screens/Settings";
-import Contact from "./screens/Contact";
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
 import Logout from "./screens/Logout";
 import Prediction from "./screens/Prediction";
+import UserHistory from "./screens/userHistory";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Drawer = createDrawerNavigator();
 
 export default function App() {
+  const [token, setToken] = useState();
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    const gettoken = async () => {
+      setToken(await AsyncStorage.getItem("token"));
+      setUserData(await AsyncStorage.getItem("userData"));
+    }
+    gettoken();
+  }, []);
+
   return (
     <NavigationContainer>
       <Drawer.Navigator
@@ -84,10 +97,21 @@ export default function App() {
             drawerLabel: "Prediction",
             title: "Prediction",
             drawerIcon: () => (
-              <SimpleLineIcons name="home" size={20} color="#808080" />
+              <Ionicons name="add-outline" size={22} color="#808080" />
             )
           }}
           component={Prediction}
+        />
+        <Drawer.Screen
+          name="History"
+          options={{
+            drawerLabel: "History",
+            title: "History",
+            drawerIcon: () => (
+              <MaterialCommunityIcons name="history" size={22} color="#808080" />
+            )
+          }}
+          component={UserHistory}
         />
 
         <Drawer.Screen
@@ -102,17 +126,6 @@ export default function App() {
           component={Settings}
         />
 
-        <Drawer.Screen
-          name="Contact"
-          options={{
-            drawerLabel: "Contact",
-            title: "Contact",
-            drawerIcon: () => (
-              <MaterialCommunityIcons name="message-alert-outline" size={20} color="#808080" />
-            )
-          }}
-          component={Contact}
-        />
         <Drawer.Screen
           name="Login"
           options={{
@@ -135,17 +148,23 @@ export default function App() {
           }}
           component={Signup}
         />
-        <Drawer.Screen
-          name="Logout"
-          options={{
-            drawerLabel: "Logout",
-            title: "Logout",
-            drawerIcon: () => (
-              <SimpleLineIcons name="logout" size={20} color="#808080" />
-            )
-          }}
-          component={Logout}
-        />
+        {
+          userData === null ?
+            <>
+            </>
+            :
+            <Drawer.Screen
+              name="Logout"
+              options={{
+                drawerLabel: "Logout",
+                title: "Logout",
+                drawerIcon: () => (
+                  <SimpleLineIcons name="logout" size={20} color="#808080" />
+                )
+              }}
+              component={Logout}
+            />
+        }
       </Drawer.Navigator>
     </NavigationContainer>
   );

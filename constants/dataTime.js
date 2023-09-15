@@ -1,4 +1,4 @@
-export default function formatDateToDDMMYYYY(timestamp) {
+export function formatDateToDDMMYYYY(timestamp) {
     const date = new Date(timestamp);
     const day = date.getDay().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -7,7 +7,7 @@ export default function formatDateToDDMMYYYY(timestamp) {
     return `${day}-${month}-${year}`;
 }
 
-export default function formatDate(timestamp) {
+export function ordinalDateFormat(timestamp) {
     function addOrdinalSuffix(day) {
         if (day > 3 && day < 21) return day + 'th';
         switch (day % 10) {
