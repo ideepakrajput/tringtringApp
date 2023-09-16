@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { BASE_API_URL } from '../constants/baseApiUrl';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 import { ordinalDateFormat } from '../constants/dataTime';
@@ -14,7 +14,7 @@ let entireScreenWidth = Dimensions.get('window').width;
 
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
-const Prediction = ({ navigation }) => {
+const Prediction = () => {
     const [isPredicted, setisPredicted] = useState(false);
     const [predictionNumber, setPredictionNumber] = useState();
     const [yesterdayPredictionNumber, setYesterdayPredictionNumber] = useState();
@@ -23,6 +23,8 @@ const Prediction = ({ navigation }) => {
     const [isBefore830PM, setIsBefore830PM] = useState(false);
     const [wantEdit, setWantEdit] = useState(false);
     const [editCount, setEditCount] = useState(0);
+
+    const navigation = useNavigation();
 
     useFocusEffect(
         React.useCallback(() => {
@@ -137,7 +139,7 @@ const Prediction = ({ navigation }) => {
         try {
             if (predictionNumber && predictionNumber.length == 5) {
                 await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
-                navigation.navigate("UserHistory");
+                navigation.push("UserHistory");
                 if (wantEdit) {
                     setEditCount(editCount + 1);
                     Alert.alert("Prediction Number Updated Successfully");
