@@ -23,14 +23,12 @@ const Drawer = createDrawerNavigator();
 
 export default function App() {
   const [userData, setUserData] = useState(null);
-  useFocusEffect(
-    React.useCallback(() => {
-      const gettoken = async () => {
-        setUserData(await AsyncStorage.getItem("userData"));
-      }
-      gettoken();
-    }, [userData])
-  )
+  useEffect(() => {
+    const gettoken = async () => {
+      setUserData(await AsyncStorage.getItem("userData"));
+    }
+    gettoken();
+  }, [userData])
 
   return (
     <NavigationContainer>
@@ -78,80 +76,80 @@ export default function App() {
           }
         }}
       >
-        {
-          userData === null ?
-            <Drawer.Group>
-              <Drawer.Screen
-                name="Login"
-                options={{
-                  drawerLabel: "Login",
-                  title: "Login",
-                  drawerIcon: () => (
-                    <SimpleLineIcons name="login" size={20} color="#808080" />
-                  )
-                }}
-                component={Login}
-              />
-              <Drawer.Screen
-                name="Signup"
-                options={{
-                  drawerLabel: "Signup",
-                  title: "Signup",
-                  drawerIcon: () => (
-                    <AntDesign name="adduser" size={20} color="#808080" />
-                  )
-                }}
-                component={Signup}
-              />
-            </Drawer.Group>
-            :
-            <Drawer.Group>
-              <Drawer.Screen
-                name="Prediction"
-                options={{
-                  drawerLabel: "Prediction",
-                  title: "Prediction",
-                  drawerIcon: () => (
-                    <Ionicons name="add-outline" size={22} color="#808080" />
-                  )
-                }}
-                component={Prediction}
-              />
-              <Drawer.Screen
-                name="History"
-                options={{
-                  drawerLabel: "History",
-                  title: "History",
-                  drawerIcon: () => (
-                    <MaterialCommunityIcons name="history" size={22} color="#808080" />
-                  )
-                }}
-                component={UserHistory}
-              />
-              <Drawer.Screen
-                name="Settings"
-                options={{
-                  drawerLabel: "Settings",
-                  title: "Settings",
-                  drawerIcon: () => (
-                    <SimpleLineIcons name="settings" size={20} color="#808080" />
-                  )
-                }}
-                component={Settings}
-              />
-              <Drawer.Screen
-                name="Logout"
-                options={{
-                  drawerLabel: "Logout",
-                  title: "Logout",
-                  drawerIcon: () => (
-                    <SimpleLineIcons name="logout" size={20} color="#808080" />
-                  )
-                }}
-                component={Logout}
-              />
-            </Drawer.Group>
-        }
+        {/* {
+          userData === null ? */}
+        <Drawer.Group>
+          <Drawer.Screen
+            name="Login"
+            options={{
+              drawerLabel: "Login",
+              title: "Login",
+              drawerIcon: () => (
+                <SimpleLineIcons name="login" size={20} color="#808080" />
+              )
+            }}
+            component={Login}
+          />
+          <Drawer.Screen
+            name="Signup"
+            options={{
+              drawerLabel: "Signup",
+              title: "Signup",
+              drawerIcon: () => (
+                <AntDesign name="adduser" size={20} color="#808080" />
+              )
+            }}
+            component={Signup}
+          />
+        </Drawer.Group>
+        {/* : */}
+        <Drawer.Group>
+          <Drawer.Screen
+            name="Prediction"
+            options={{
+              drawerLabel: "Prediction",
+              title: "Prediction",
+              drawerIcon: () => (
+                <Ionicons name="add-outline" size={22} color="#808080" />
+              )
+            }}
+            component={Prediction}
+          />
+          <Drawer.Screen
+            name="History"
+            options={{
+              drawerLabel: "History",
+              title: "History",
+              drawerIcon: () => (
+                <MaterialCommunityIcons name="history" size={22} color="#808080" />
+              )
+            }}
+            component={UserHistory}
+          />
+          <Drawer.Screen
+            name="Settings"
+            options={{
+              drawerLabel: "Settings",
+              title: "Settings",
+              drawerIcon: () => (
+                <SimpleLineIcons name="settings" size={20} color="#808080" />
+              )
+            }}
+            component={Settings}
+          />
+          <Drawer.Screen
+            name="Logout"
+            options={{
+              drawerLabel: "Logout",
+              title: "Logout",
+              drawerIcon: () => (
+                <SimpleLineIcons name="logout" size={20} color="#808080" />
+              )
+            }}
+            component={Logout}
+          />
+        </Drawer.Group>
+        {/* } */}
       </Drawer.Navigator>
     </NavigationContainer>
   );
