@@ -8,7 +8,7 @@ const Logout = async ({ navigation }) => {
 
     Alert.alert("Logout Successfully. See You Soon !")
 
-    navigation.navigate("Home");
+    navigation.navigate("Login");
 
     return (
         <>

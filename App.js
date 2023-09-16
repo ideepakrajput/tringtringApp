@@ -11,7 +11,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 import { DrawerItemList, createDrawerNavigator } from "@react-navigation/drawer";
 import icon from "./assets/icon.png";
-import Home from "./screens/Home";
 import Settings from "./screens/Settings";
 import Login from "./screens/Login";
 import Signup from "./screens/Signup";
@@ -24,12 +23,14 @@ const Drawer = createDrawerNavigator();
 
 export default function App() {
   const [userData, setUserData] = useState(null);
-  useEffect(() => {
-    const gettoken = async () => {
-      setUserData(await AsyncStorage.getItem("userData"));
-    }
-    gettoken();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const gettoken = async () => {
+        setUserData(await AsyncStorage.getItem("userData"));
+      }
+      gettoken();
+    }, [userData])
+  )
 
   return (
     <NavigationContainer>
@@ -54,7 +55,6 @@ export default function App() {
                       width: 130,
                     }}
                   />
-
                 </View>
                 <DrawerItemList {...props} />
               </SafeAreaView>
@@ -78,22 +78,9 @@ export default function App() {
           }
         }}
       >
-        <Drawer.Screen
-          name="Home"
-          options={{
-            drawerLabel: "Home",
-            title: "Home",
-            drawerIcon: () => (
-              <SimpleLineIcons name="home" size={20} color="#808080" />
-            )
-          }}
-          component={Home}
-        />
-
-
         {
           userData === null ?
-            <>
+            <Drawer.Group>
               <Drawer.Screen
                 name="Login"
                 options={{
@@ -116,9 +103,9 @@ export default function App() {
                 }}
                 component={Signup}
               />
-            </>
+            </Drawer.Group>
             :
-            <>
+            <Drawer.Group>
               <Drawer.Screen
                 name="Prediction"
                 options={{
@@ -163,7 +150,7 @@ export default function App() {
                 }}
                 component={Logout}
               />
-            </>
+            </Drawer.Group>
         }
       </Drawer.Navigator>
     </NavigationContainer>

@@ -43,7 +43,7 @@ const Login = ({ navigation }) => {
 
 			Alert.alert("Login Successfully !");
 
-			navigation.navigate("Home");
+			navigation.navigate("Prediction");
 
 		} catch (error) {
 			Alert.alert(error.response.data.message);

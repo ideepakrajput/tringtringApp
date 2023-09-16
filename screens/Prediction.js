@@ -137,7 +137,7 @@ const Prediction = ({ navigation }) => {
         try {
             if (predictionNumber && predictionNumber.length == 5) {
                 await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
-                navigation.navigate("Home");
+                navigation.navigate("UserHistory");
                 if (wantEdit) {
                     setEditCount(editCount + 1);
                     Alert.alert("Prediction Number Updated Successfully");
