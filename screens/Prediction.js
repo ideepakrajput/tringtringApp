@@ -1,20 +1,19 @@
 import { View, Text, TextInput, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import COLORS from "../constants/colors";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { BASE_API_URL } from '../constants/baseApiUrl';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
-
+import { AuthContext } from '../context/authContext';
 import { ordinalDateFormat } from '../constants/dataTime';
 
 let entireScreenWidth = Dimensions.get('window').width;
 
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
-const Prediction = () => {
+const Prediction = ({ navigation }) => {
     const [isPredicted, setisPredicted] = useState(false);
     const [predictionNumber, setPredictionNumber] = useState();
     const [yesterdayPredictionNumber, setYesterdayPredictionNumber] = useState();
@@ -24,12 +23,14 @@ const Prediction = () => {
     const [wantEdit, setWantEdit] = useState(false);
     const [editCount, setEditCount] = useState(0);
 
-    const navigation = useNavigation();
+    //global state
+    const [state] = useContext(AuthContext);
+
 
     useFocusEffect(
         React.useCallback(() => {
             async function fetchData() {
-                const token = await AsyncStorage.getItem("token");
+                const token = state?.token;
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -128,7 +129,7 @@ const Prediction = () => {
     }
 
     const submitPrediction = async () => {
-        const token = await AsyncStorage.getItem("token");
+        const token = state?.token;
 
         const config = {
             headers: {
@@ -139,7 +140,7 @@ const Prediction = () => {
         try {
             if (predictionNumber && predictionNumber.length == 5) {
                 await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
-                navigation.push("UserHistory");
+                navigation.navigate("History");
                 if (wantEdit) {
                     setEditCount(editCount + 1);
                     Alert.alert("Prediction Number Updated Successfully");

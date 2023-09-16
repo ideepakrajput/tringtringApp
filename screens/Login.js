@@ -7,17 +7,19 @@ import {
 	TouchableOpacity,
 	Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import Button from "../components/Button";
 import axios from "axios";
+import { AuthContext } from "../context/authContext";
 import { BASE_API_URL } from "../constants/baseApiUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = ({ navigation }) => {
+	const [state, setState] = useContext(AuthContext);
 	const [isPasswordShown, setIsPasswordShown] = useState(false);
 	const [isChecked, setIsChecked] = useState(false);
 	const [phoneNumber, setPhoneNumber] = useState("");
@@ -36,10 +38,9 @@ const Login = ({ navigation }) => {
 				password
 			});
 
-			const token = resp.data.data.token;
+			setState(resp.data.data);
 
-			await AsyncStorage.setItem("token", token);
-			await AsyncStorage.setItem("userData", phoneNumber);
+			await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
 
 			Alert.alert("Login Successfully !");
 

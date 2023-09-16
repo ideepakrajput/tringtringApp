@@ -1,14 +1,11 @@
 import { View, Text, Dimensions, FlatList, ScrollView, ActivityIndicator } from 'react-native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import COLORS from "../constants/colors";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { BASE_API_URL } from '../constants/baseApiUrl';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
-
-import { ordinalDateFormat } from '../constants/dataTime';
+import { AuthContext } from '../context/authContext';
 
 let entireScreenWidth = Dimensions.get('window').width;
 
@@ -19,10 +16,12 @@ const UserHistory = ({ navigation }) => {
     const [isData, setIsData] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const [state] = useContext(AuthContext);
+
     useFocusEffect(
         React.useCallback(() => {
             async function fetchData() {
-                const token = await AsyncStorage.getItem("token");
+                const token = state?.token;
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`,
