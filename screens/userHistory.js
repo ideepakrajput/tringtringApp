@@ -61,8 +61,8 @@ const UserHistory = ({ navigation }) => {
 
 
     return (
-        <ScrollView horizontal style={styles.container}>
-            <View style={{ margin: 30, padding: 20, alignItems: 'center', justifyContent: 'center' }}>
+        <ScrollView horizontal vertical style={styles.container}>
+            <View style={{ flex: 1 }}>
                 <Text style={styles.text1}>Your Prediction History</Text>
                 {
                     loading ?
@@ -130,7 +130,8 @@ const styles = EStyleSheet.create({
         fontSize: "30rem",
         fontWeight: "bold",
         color: COLORS.black,
-        padding: "10rem",
+        marginTop: 10,
+        marginBottom: 10,
         textAlign: "center"
     },
 });
