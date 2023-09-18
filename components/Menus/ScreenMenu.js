@@ -14,9 +14,9 @@ import icon from "../../assets/icon.png";
 import Settings from "../../screens/Settings";
 import Login from "../../screens/Login";
 import Signup from "../../screens/Signup";
-import Logout from "../../screens/Logout";
 import Prediction from "../../screens/Prediction";
 import UserHistory from "../../screens/userHistory";
+
 const ScreenMenu = () => {
   //global state
   const [state, setState] = useContext(AuthContext);

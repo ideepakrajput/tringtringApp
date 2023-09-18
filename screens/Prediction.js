@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Dimensions, Alert, KeyboardAvoidingView } from 'react-native';
 import React, { useContext, useState } from 'react';
 import COLORS from "../constants/colors";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -167,190 +167,196 @@ const Prediction = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            {
-                isBefore830PM ?
-                    <>
-
-                        <View style={{ flex: 1, alignItems: "center" }}>
-                            {isPredicted ?
-                                <Text
-                                    style={styles.text1}
-                                >
-                                    YOU HAVE ALREADY PREDICTED
-                                </Text>
-                                :
-                                <>
-                                    {
-                                        wantEdit ?
-                                            <Text
-                                                style={styles.text1}
-                                            >
-                                                UPDATE YOUR 5 DIGIT PREDICTION NUMBER
-                                            </Text>
-                                            :
-                                            <Text
-                                                style={styles.text1}
-                                            >
-                                                ENTER YOUR 5 DIGIT PREDICTION NUMBER
-                                            </Text>
-                                    }
-                                </>
-                            }
-
-                            <Text
-                                style={styles.text2}
-                            >
-                                FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST
-                            </Text>
-                        </View>
-                        <View style={{ flex: 2, alignItems: "center" }}>
-
-                            {isPredicted ?
-                                <>
-                                    <Text style={styles.text1}>
-                                        Your Prediction Number is {todayPredictionNumber}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={{ flex: 1 }}
+                enabled="true"
+            >
+                {
+                    isBefore830PM ?
+                        <>
+                            <View style={{ flex: 1, alignItems: "center" }}>
+                                {isPredicted ?
+                                    <Text
+                                        style={styles.text1}
+                                    >
+                                        YOU HAVE ALREADY PREDICTED
                                     </Text>
-                                    {
-                                        editCount === 3 ?
-                                            <>
-                                                <Text style={styles.text1}>You have reached your daily edit limit</Text>
-                                            </>
-                                            :
-                                            <>
-                                                <Text style={styles.text2}>Want to edit your prediction number </Text>
-                                                <Text style={styles.text2}>{3 - editCount} edit Left </Text>
-                                                <TouchableOpacity
-                                                    style={{
-                                                        margin: 10,
-                                                        backgroundColor: "green",
-                                                        borderRadius: 15,
-                                                        padding: 10,
-                                                        width: 125
-                                                    }}
-                                                    onPress={handleWantEdit}
+                                    :
+                                    <>
+                                        {
+                                            wantEdit ?
+                                                <Text
+                                                    style={styles.text1}
                                                 >
-                                                    <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Edit</Text>
-                                                </TouchableOpacity>
-                                            </>
-                                    }
-                                </>
-                                :
-                                <>
-                                    <TextInput
-                                        style={styles.textInput}
-                                        maxLength={5}
-                                        autoFocus={true}
-                                        keyboardType='numeric'
-                                        placeholder=' - - - - -'
-                                        value={predictionNumber}
-                                        onChangeText={(text) => setPredictionNumber(text)}
-                                    >
-                                    </TextInput>
-                                    <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
-                                    <TouchableOpacity
-                                        style={{
-                                            margin: 10,
-                                            backgroundColor: "green",
-                                            borderRadius: 15,
-                                            padding: 10,
-                                            width: 125
-                                        }}
-                                        onPress={submitPrediction}
-                                    >
-                                        <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
-                                    </TouchableOpacity>
-                                </>
-                            }
-                        </View>
-                    </>
-                    :
-                    <>
-                        <View style={{ flex: 2, alignItems: "center" }}>
-                            <Text style={{ fontSize: 30, color: "red", textAlign: "center" }}>All entries are closed for today. You can come back and predict for tomorrow after 12 Midnight.</Text>
-                        </View>
-                    </>
-            }
-            <View style={{ flex: 2, alignItems: "center" }}>
-                <Text
-                    style={{
-                        fontSize: 20,
-                        fontWeight: "bold",
-                        paddingTop: 10
-                    }}
-                >Yesterday's Winning Number ({ordinalDateFormat(currentDate)})</Text>
-                <Text
-                    style={{
-                        letterSpacing: 15,
-                        fontSize: 50
-                    }}
-                >{yesterdayWinningNumber}</Text>
-                <Text
-                    style={{
-                        fontSize: 20,
-                        fontWeight: "bold",
-                        backgroundColor: "grey",
-                        width: 250,
-                        textAlign: "center",
-                        padding: 10,
-                        borderRadius: 15,
-                        margin: 10
-                    }}
-                >Your Prediction {yesterdayPredictionNumber}</Text>
-            </View>
+                                                    UPDATE YOUR 5 DIGIT PREDICTION NUMBER
+                                                </Text>
+                                                :
+                                                <Text
+                                                    style={styles.text1}
+                                                >
+                                                    ENTER YOUR 5 DIGIT PREDICTION NUMBER
+                                                </Text>
+                                        }
+                                    </>
+                                }
 
-            <View style={{ flex: 2, alignItems: "center" }}>
-                <Image
-                    source={require("../assets/facebook.png")}
-                    style={{
-                        height: 50,
-                        width: 50,
-                        marginTop: 20
-                    }}
-                    resizeMode="contain"
-                >
-                </Image>
+                                <Text
+                                    style={styles.text2}
+                                >
+                                    FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST
+                                </Text>
+                            </View>
+                            <View style={{ flex: 2, alignItems: "center" }}>
 
-                <Text
-                    style={{
-                        fontSize: 20,
-                        textAlign: "center",
-                        padding: 10,
-                    }}
-                >WATCH THE DRAW VIDEO</Text>
-            </View>
-            <View style={{ flex: 2, justifyContent: "flex-end", alignItems: "center", backgroundColor: "#F8DE22", padding: 20 }}>
-                <Text
-                    style={{
-                        fontSize: 30,
-                        textAlign: "center",
-                        fontWeight: 'bold'
-                    }}>
-                    GET TO WIN
-                </Text>
-                <Text
-                    style={{
-                        fontSize: 30,
-                        textAlign: "center",
-                        fontWeight: 'bold'
-                    }}>
-                    AMAZING PRIZES !!!
-                </Text>
-                <Text
-                    style={{
-                        fontSize: 20,
-                        fontWeight: "bold",
-                        backgroundColor: "red",
-                        color: "white",
-                        width: 300,
-                        textAlign: "center",
-                        padding: 10,
-                        borderRadius: 15,
-                        margin: 10
-                    }}
-                >
-                    VIEW LIST OF PRIZES
-                </Text>
-            </View>
+                                {isPredicted ?
+                                    <>
+                                        <Text style={styles.text1}>
+                                            Your Prediction Number is {todayPredictionNumber}
+                                        </Text>
+                                        {
+                                            editCount === 3 ?
+                                                <>
+                                                    <Text style={styles.text1}>You have reached your daily edit limit</Text>
+                                                </>
+                                                :
+                                                <>
+                                                    <Text style={styles.text2}>Want to edit your prediction number </Text>
+                                                    <Text style={styles.text2}>{3 - editCount} edit Left </Text>
+                                                    <TouchableOpacity
+                                                        style={{
+                                                            margin: 10,
+                                                            backgroundColor: "green",
+                                                            borderRadius: 15,
+                                                            padding: 10,
+                                                            width: 125
+                                                        }}
+                                                        onPress={handleWantEdit}
+                                                    >
+                                                        <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Edit</Text>
+                                                    </TouchableOpacity>
+                                                </>
+                                        }
+                                    </>
+                                    :
+                                    <>
+                                        <TextInput
+                                            style={styles.textInput}
+                                            maxLength={5}
+                                            autoFocus={true}
+                                            keyboardType='numeric'
+                                            placeholder=' - - - - -'
+                                            value={predictionNumber}
+                                            onChangeText={(text) => setPredictionNumber(text)}
+                                        >
+                                        </TextInput>
+                                        <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
+                                        <TouchableOpacity
+                                            style={{
+                                                margin: 10,
+                                                backgroundColor: "green",
+                                                borderRadius: 15,
+                                                padding: 10,
+                                                width: 125
+                                            }}
+                                            onPress={submitPrediction}
+                                        >
+                                            <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
+                                        </TouchableOpacity>
+                                    </>
+                                }
+                            </View>
+                        </>
+                        :
+                        <>
+                            <View style={{ flex: 2, alignItems: "center" }}>
+                                <Text style={{ fontSize: 30, color: "red", textAlign: "center" }}>All entries are closed for today. You can come back and predict for tomorrow after 12 Midnight.</Text>
+                            </View>
+                        </>
+                }
+                <View style={{ flex: 2, alignItems: "center" }}>
+                    <Text
+                        style={{
+                            fontSize: 20,
+                            fontWeight: "bold",
+                            paddingTop: 10,
+                            textAlign: "center"
+                        }}
+                    >Yesterday's Winning Number ({ordinalDateFormat(currentDate)})</Text>
+                    <Text
+                        style={{
+                            letterSpacing: 15,
+                            fontSize: 50
+                        }}
+                    >{yesterdayWinningNumber}</Text>
+                    <Text
+                        style={{
+                            fontSize: 20,
+                            fontWeight: "bold",
+                            backgroundColor: "grey",
+                            width: 250,
+                            textAlign: "center",
+                            padding: 10,
+                            borderRadius: 15,
+                            margin: 10
+                        }}
+                    >Your Prediction {yesterdayPredictionNumber}</Text>
+                </View>
+
+                <View style={{ flex: 2, alignItems: "center" }}>
+                    <Image
+                        source={require("../assets/facebook.png")}
+                        style={{
+                            height: 50,
+                            width: 50,
+                            marginTop: 30
+                        }}
+                        resizeMode="contain"
+                    >
+                    </Image>
+
+                    <Text
+                        style={{
+                            fontSize: 20,
+                            textAlign: "center",
+                            padding: 10,
+                        }}
+                    >WATCH THE DRAW VIDEO</Text>
+                </View>
+                <View style={{ flex: 2, justifyContent: "flex-end", alignItems: "center", backgroundColor: "#F8DE22", padding: 20 }}>
+                    <Text
+                        style={{
+                            fontSize: 30,
+                            textAlign: "center",
+                            fontWeight: 'bold'
+                        }}>
+                        GET TO WIN
+                    </Text>
+                    <Text
+                        style={{
+                            fontSize: 30,
+                            textAlign: "center",
+                            fontWeight: 'bold'
+                        }}>
+                        AMAZING PRIZES !!!
+                    </Text>
+                    <Text
+                        style={{
+                            fontSize: 20,
+                            fontWeight: "bold",
+                            backgroundColor: "red",
+                            color: "white",
+                            width: 300,
+                            textAlign: "center",
+                            padding: 10,
+                            borderRadius: 15,
+                            margin: 10
+                        }}
+                    >
+                        VIEW LIST OF PRIZES
+                    </Text>
+                </View>
+            </KeyboardAvoidingView>
         </SafeAreaView >
     )
 }
@@ -361,6 +367,7 @@ const styles = EStyleSheet.create({
         fontSize: "21rem",
         fontWeight: "bold",
         color: COLORS.black,
+        textAlign: "center",
         padding: "4rem"
     },
     text2: {

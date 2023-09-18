@@ -6,6 +6,7 @@ import {
 	TextInput,
 	TouchableOpacity,
 	Alert,
+	ActivityIndicator,
 } from "react-native";
 import React, { useState, useContext } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,6 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = ({ navigation }) => {
 	const [state, setState] = useContext(AuthContext);
+	const [loading, setLoading] = useState(true);
 	const [isPasswordShown, setIsPasswordShown] = useState(false);
 	const [isChecked, setIsChecked] = useState(false);
 	const [phoneNumber, setPhoneNumber] = useState("");
@@ -33,6 +35,8 @@ const Login = ({ navigation }) => {
 				Alert.alert("please fill the password !");
 			}
 
+			setLoading(false);
+
 			const resp = await axios.post(`${BASE_API_URL}api/user/login`, {
 				phoneNumber,
 				password
@@ -42,11 +46,12 @@ const Login = ({ navigation }) => {
 
 			await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
 
+
+			navigation.navigate("History");
 			Alert.alert("Login Successfully !");
 
-			navigation.navigate("Prediction");
-
 		} catch (error) {
+			setLoading(true);
 			Alert.alert(error.response.data.message);
 		}
 	}
@@ -191,15 +196,19 @@ const Login = ({ navigation }) => {
 					<Text>Remenber Me</Text>
 				</View>
 
-				<Button
-					title="Login"
-					filled
-					style={{
-						marginTop: 18,
-						marginBottom: 4,
-					}}
-					onPress={handleLogin}
-				/>
+				{loading ?
+					<Button
+						title="Login"
+						filled
+						style={{
+							marginTop: 18,
+							marginBottom: 4,
+						}}
+						onPress={handleLogin}
+					/>
+					:
+					<ActivityIndicator size="large" ></ActivityIndicator>
+				}
 
 				<View
 					style={{
