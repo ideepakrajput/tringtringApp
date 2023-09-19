@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,6 +15,11 @@ import Checkbox from "expo-checkbox";
 import Button from "../components/Button";
 import { BASE_API_URL } from "../constants/baseApiUrl";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+
+WebBrowser.maybeCompleteAuthSession();
 
 const Signup = ({ navigation }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
@@ -25,6 +30,59 @@ const Signup = ({ navigation }) => {
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [ip, setIp] = useState("");
+
+  const [token, setToken] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: "641271354850-j48bfubrgpibbv8p18hep9iiqolb9fhh.apps.googleusercontent.com",
+    expoClientId: "641271354850-cskndlb8h4ir0g5vptm8b9c9jqfrroaj.apps.googleusercontent.com",
+  });
+
+  useEffect(() => {
+    handleEffect();
+  }, [response, token]);
+
+  async function handleEffect() {
+    const user = await getLocalUser();
+    console.log("user", user);
+    if (!user) {
+      if (response?.type === "success") {
+        setToken(response.authentication.accessToken);
+        getUserInfo(response.authentication.accessToken);
+        Alert.alert("Registered Successfully !");
+        navigation.navigate("Prediction");
+      }
+    } else {
+      setUserInfo(user);
+      console.log("loaded locally");
+      navigation.navigate("Prediction");
+    }
+  }
+
+  const getLocalUser = async () => {
+    const data = await AsyncStorage.getItem("@user");
+    if (!data) return null;
+    return JSON.parse(data);
+  };
+
+  const getUserInfo = async (token) => {
+    if (!token) return;
+    try {
+      const response = await fetch(
+        "https://www.googleapis.com/userinfo/v2/me",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const user = await response.json();
+      await AsyncStorage.setItem("@user", JSON.stringify(user));
+      setUserInfo(user);
+    } catch (error) {
+      Alert.alert(error.response.data.message);
+    }
+  };
 
 
   const handleSignup = async () => {
@@ -41,7 +99,7 @@ const Signup = ({ navigation }) => {
         Alert.alert("Please create your password !");
       }
 
-      axios.get("https://api.ipify.org/?format=json").then((res) => {
+      await axios.get("https://api.ipify.org/?format=json").then((res) => {
         setIp(res.data.ip);
       });
 
@@ -54,7 +112,7 @@ const Signup = ({ navigation }) => {
         ip_address: ip
       });
 
-      Alert.alert("User created Successfully !");
+      Alert.alert("Registered Successfully !");
       navigation.navigate("Login");
     } catch (error) {
       Alert.alert(error.response.data.message);
@@ -378,7 +436,7 @@ const Signup = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => console.log("Pressed")}
+            onPress={() => promptAsync()}
             style={{
               flex: 1,
               alignItems: "center",

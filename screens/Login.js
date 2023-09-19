@@ -8,7 +8,7 @@ import {
 	Alert,
 	ActivityIndicator,
 } from "react-native";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,6 +19,11 @@ import { AuthContext } from "../context/authContext";
 import { BASE_API_URL } from "../constants/baseApiUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+
+WebBrowser.maybeCompleteAuthSession();
+
 const Login = ({ navigation }) => {
 	const [state, setState] = useContext(AuthContext);
 	const [loading, setLoading] = useState(true);
@@ -26,6 +31,60 @@ const Login = ({ navigation }) => {
 	const [isChecked, setIsChecked] = useState(false);
 	const [phoneNumber, setPhoneNumber] = useState("");
 	const [password, setPassword] = useState("");
+
+	const [token, setToken] = useState("");
+	const [userInfo, setUserInfo] = useState(null);
+
+	const [request, response, promptAsync] = Google.useAuthRequest({
+		androidClientId: "641271354850-j48bfubrgpibbv8p18hep9iiqolb9fhh.apps.googleusercontent.com",
+
+		expoClientId: "641271354850-cskndlb8h4ir0g5vptm8b9c9jqfrroaj.apps.googleusercontent.com",
+	});
+
+	useEffect(() => {
+		handleEffect();
+	}, [response, token]);
+
+	async function handleEffect() {
+		const user = await getLocalUser();
+		console.log("user", user);
+		if (!user) {
+			if (response?.type === "success") {
+				// setToken(response.authentication.accessToken);
+				getUserInfo(response.authentication.accessToken);
+				Alert.alert("Login Successfully !");
+				navigation.navigate("Prediction");
+			}
+		} else {
+			setUserInfo(user);
+			console.log("loaded locally");
+			navigation.navigate("Prediction");
+		}
+	}
+
+	const getLocalUser = async () => {
+		const data = await AsyncStorage.getItem("@user");
+		if (!data) return null;
+		return JSON.parse(data);
+	};
+
+	const getUserInfo = async (token) => {
+		if (!token) return;
+		try {
+			const response = await fetch(
+				"https://www.googleapis.com/userinfo/v2/me",
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
+
+			const user = await response.json();
+			await AsyncStorage.setItem("@user", JSON.stringify(user));
+			setUserInfo(user);
+		} catch (error) {
+			Alert.alert(error.response.data.message);
+		}
+	};
 
 	const handleLogin = async () => {
 		try {
@@ -47,7 +106,7 @@ const Login = ({ navigation }) => {
 			await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
 
 
-			navigation.navigate("History");
+			navigation.navigate("Prediction");
 			Alert.alert("Login Successfully !");
 
 		} catch (error) {
@@ -270,7 +329,10 @@ const Login = ({ navigation }) => {
 					</TouchableOpacity>
 
 					<TouchableOpacity
-						onPress={() => console.log("Pressed")}
+						disabled={!request}
+						onPress={() => {
+							promptAsync();
+						}}
 						style={{
 							flex: 1,
 							alignItems: "center",

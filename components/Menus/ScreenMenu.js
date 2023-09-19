@@ -17,16 +17,27 @@ import Signup from "../../screens/Signup";
 import Prediction from "../../screens/Prediction";
 import UserHistory from "../../screens/userHistory";
 
+
 const ScreenMenu = () => {
   //global state
   const [state, setState] = useContext(AuthContext);
   //auth condition true false
-  const authenticatedUser = state?.user && state?.token;
+  let authenticatedUserByGoogle = "null";
+
+  const getLocalUser = async () => {
+    const data = await AsyncStorage.getItem("@user");
+    authenticatedUserByGoogle = data?.user && data?.id;
+
+  };
+
+
+  authenticatedUser = state?.user && state?.token;
   const Drawer = createDrawerNavigator();
 
   const handleLogout = async () => {
     setState({ token: "", user: null });
     await AsyncStorage.removeItem("@auth");
+    await AsyncStorage.removeItem("@user");
     alert("logout Successfully");
   };
 
@@ -86,7 +97,7 @@ const ScreenMenu = () => {
       }}
     >
 
-      {authenticatedUser ? (
+      {authenticatedUser || authenticatedUserByGoogle ? (
         <>
           <Drawer.Screen
             name="Prediction"
