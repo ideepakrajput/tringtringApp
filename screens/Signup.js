@@ -45,18 +45,14 @@ const Signup = ({ navigation }) => {
 
   async function handleEffect() {
     const user = await getLocalUser();
-    console.log("user", user);
     if (!user) {
       if (response?.type === "success") {
         setToken(response.authentication.accessToken);
         getUserInfo(response.authentication.accessToken);
         Alert.alert("Registered Successfully !");
-        navigation.navigate("Prediction");
       }
     } else {
       setUserInfo(user);
-      console.log("loaded locally");
-      navigation.navigate("Prediction");
     }
   }
 

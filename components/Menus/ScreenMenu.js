@@ -1,5 +1,5 @@
 import { View, Text, Image } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   SimpleLineIcons,
   MaterialCommunityIcons,
@@ -17,22 +17,23 @@ import Signup from "../../screens/Signup";
 import Prediction from "../../screens/Prediction";
 import UserHistory from "../../screens/userHistory";
 
+let authenticatedUserByGoogle;
 
 const ScreenMenu = () => {
   //global state
   const [state, setState] = useContext(AuthContext);
-  //auth condition true false
-  let authenticatedUserByGoogle = "null";
 
+  //auth condition true false
   const getLocalUser = async () => {
     const data = await AsyncStorage.getItem("@user");
-    authenticatedUserByGoogle = data?.user && data?.id;
-
+    authenticatedUserByGoogle = JSON.parse(data)?.verified_email;
   };
 
+  const authenticatedUser = state?.user && state?.token;
 
-  authenticatedUser = state?.user && state?.token;
-  const Drawer = createDrawerNavigator();
+  useEffect(() => {
+    getLocalUser();
+  }, [authenticatedUserByGoogle]);
 
   const handleLogout = async () => {
     setState({ token: "", user: null });
@@ -40,6 +41,8 @@ const ScreenMenu = () => {
     await AsyncStorage.removeItem("@user");
     alert("logout Successfully");
   };
+
+  const Drawer = createDrawerNavigator();
 
   return (
     <Drawer.Navigator
@@ -66,7 +69,7 @@ const ScreenMenu = () => {
               </View>
               <DrawerItemList {...props} />
               {
-                authenticatedUser ?
+                authenticatedUser || authenticatedUserByGoogle ?
                   <DrawerItem
                     label={() => <Text>Logout</Text>}
                     icon={() => <SimpleLineIcons name="logout" size={20} color="#808080" />}
