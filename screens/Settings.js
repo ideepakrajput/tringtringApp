@@ -1,7 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { Text, View, Button, Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import SelectPicker from '../components/SelectPicker';
+import NotificationSwitch from '../components/NotificationSwitch';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { AuthContext } from '../context/authContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -16,6 +22,15 @@ export default function App() {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const [state] = useContext(AuthContext);
+  const [isEnabled, setIsEnabled] = useState(null);
+
+  const options = ["English", "Hindi", "Telugu", "Tamil", "Marathi", "Kannada", "Malyalam", "Bengali"];
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  const handleSelect = (option) => {
+    setSelectedOption(option);
+  };
 
   useEffect(() => {
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
@@ -34,13 +49,65 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    // Load the user's preference from AsyncStorage
+    loadNotificationPreference();
+  }, []);
+
+  const loadNotificationPreference = async () => {
+    try {
+      const preference = await AsyncStorage.getItem('notificationPreference');
+      if (preference !== null) {
+        setIsEnabled(preference === 'true');
+      }
+    } catch (error) {
+      console.error('Error loading notification preference:', error);
+    }
+  };
+
+  const token = state?.token;
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const handleSettings = async (e) => {
+    e.preventDefault();
+    await axios.post(`${BASE_API_URL}api/user/settings`, {
+      language: selectedOption,
+      notificationsEnabled: isEnabled
+    }, config).then(() => {
+      alert("Your settings has been updated");
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
   return (
     <View
       style={{
         flex: 1,
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'space-around',
+        marginHorizontal: 20
       }}>
+
+
+      <View>
+        <SelectPicker options={options} onSelect={handleSelect} />
+        <Text style={{ fontSize: 30, marginTop: 20 }}>Notifications</Text>
+        <NotificationSwitch />
+        <TouchableOpacity
+          style={{ backgroundColor: "#F4E869", padding: 10, borderRadius: 15, marginTop: 20 }}
+          onPress={handleSettings}
+        >
+          <Text style={{ fontSize: 20, color: "white", textAlign: "center" }}>Save Settings</Text>
+        </TouchableOpacity>
+      </View>
+
+
       <Text>Your expo push token: {expoPushToken}</Text>
       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
         <Text>Title: {notification && notification.request.content.title} </Text>
@@ -94,8 +161,9 @@ async function registerForPushNotificationsAsync() {
     }
     // Learn more about projectId:
     // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
-    token = (await Notifications.getExpoPushTokenAsync({ projectId: 'your-project-id' })).data;
+    token = (await Notifications.getExpoPushTokenAsync({ projectId: '72bad700-de75-45e7-8a36-492269f53e30' })).data;
     console.log(token);
+    setExpoPushToken(token);
   } else {
     alert('Must use physical device for Push Notifications');
   }
