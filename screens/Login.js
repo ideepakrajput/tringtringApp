@@ -52,6 +52,7 @@ const Login = ({ navigation }) => {
 				// setToken(response.authentication.accessToken);
 				getUserInfo(response.authentication.accessToken);
 				Alert.alert("Login Successfully !");
+				navigation.navigate("InputNo");
 			}
 		} else {
 			setUserInfo(user);
@@ -100,7 +101,6 @@ const Login = ({ navigation }) => {
 			setState(resp.data.data);
 
 			await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
-
 
 			navigation.navigate("Prediction");
 			Alert.alert("Login Successfully !");
