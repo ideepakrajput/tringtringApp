@@ -29,6 +29,79 @@ export default function App() {
 
   const options = ["English", "Hindi", "Telugu", "Tamil", "Marathi", "Kannada", "Malyalam", "Bengali"];
   const [selectedOption, setSelectedOption] = useState(null);
+  const { isPredicted } = useContext(AuthContext);
+
+  async function schedulePushNotification() {
+    const trigger = {
+      hour: 10, // Hour in 24-hour format
+      minute: 0,
+      repeats: true, // Repeat daily
+    };
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Predict and Win",
+        body: `Aaj tring tring nhi kiya kya ????
+      Predict your number to win exiting prizes !!`,
+      },
+      trigger
+    });
+  }
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      // Learn more about projectId:
+      // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+      token = (await Notifications.getExpoPushTokenAsync({ projectId: '72bad700-de75-45e7-8a36-492269f53e30' })).data;
+      console.log(token);
+      setExpoPushToken(token);
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+
+    return token;
+  }
+
+  async function schedulePushNotification7PM() {
+    const trigger = {
+      hour: 19, // Hour in 24-hour format
+      minute: 0,
+      repeats: true, // Repeat daily
+    };
+
+    if (!isPredicted) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Predict and Win",
+          body: `Aaj tring tring nhi kiya kya ????
+      Predict your number to win exiting prizes !!`,
+        },
+        trigger
+      });
+    }
+  }
+
 
   const handleSelect = (option) => {
     setSelectedOption(option);
@@ -56,6 +129,25 @@ export default function App() {
     // Load the user's preference from AsyncStorage
     loadNotificationPreference();
   }, []);
+
+  useEffect(() => {
+    schedulePushNotification();
+
+    const intervalId = setInterval(schedulePushNotification, 60000);
+
+    return () => {
+      clearInterval(intervalId);
+    }
+  }, [])
+  useEffect(() => {
+    schedulePushNotification7PM();
+
+    const intervalId = setInterval(schedulePushNotification7PM, 60000);
+
+    return () => {
+      clearInterval(intervalId);
+    }
+  }, [])
 
   const loadNotificationPreference = async () => {
     try {
@@ -108,51 +200,4 @@ export default function App() {
       </View>
     </View>
   );
-}
-
-async function schedulePushNotification() {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Predict and Win",
-      body: `Aaj tring tring nhi kiya kya ????
-      Predict your number to win exiting prizes !!`,
-      data: { data: 'goes here' },
-    },
-    trigger: { seconds: 2 },
-  });
-}
-
-async function registerForPushNotificationsAsync() {
-  let token;
-
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
-      return;
-    }
-    // Learn more about projectId:
-    // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
-    token = (await Notifications.getExpoPushTokenAsync({ projectId: '72bad700-de75-45e7-8a36-492269f53e30' })).data;
-    console.log(token);
-    setExpoPushToken(token);
-  } else {
-    alert('Must use physical device for Push Notifications');
-  }
-
-  return token;
 }
