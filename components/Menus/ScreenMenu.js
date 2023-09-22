@@ -16,6 +16,7 @@ import Login from "../../screens/Login";
 import Signup from "../../screens/Signup";
 import Prediction from "../../screens/Prediction";
 import UserHistory from "../../screens/userHistory";
+import PrizesData from "../../screens/PrizesData";
 
 let authenticatedUserByGoogle;
 
@@ -123,6 +124,17 @@ const ScreenMenu = () => {
               )
             }}
             component={UserHistory}
+          />
+          <Drawer.Screen
+            name="Prizes"
+            options={{
+              drawerLabel: "Prizes",
+              title: "Prizes",
+              drawerIcon: () => (
+                <MaterialCommunityIcons name="cash-multiple" size={22} color="#808080" />
+              )
+            }}
+            component={PrizesData}
           />
           <Drawer.Screen
             name="Settings"

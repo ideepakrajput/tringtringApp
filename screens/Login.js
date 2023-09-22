@@ -18,13 +18,14 @@ import axios from "axios";
 import { AuthContext } from "../context/authContext";
 import { BASE_API_URL } from "../constants/baseApiUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { useNavigation } from '@react-navigation/native';
+import * as RootNavigation from '../RootNavigation';
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 
 WebBrowser.maybeCompleteAuthSession();
 
-const Login = ({ navigation }) => {
+const Login = () => {
 	const { state, setState } = useContext(AuthContext);
 	const [loading, setLoading] = useState(true);
 	const [isPasswordShown, setIsPasswordShown] = useState(false);
@@ -34,6 +35,8 @@ const Login = ({ navigation }) => {
 
 	const [token, setToken] = useState("");
 	const [userInfo, setUserInfo] = useState(null);
+
+	const navigation = useNavigation();
 
 	const [request, response, promptAsync] = Google.useAuthRequest({
 		androidClientId: "641271354850-j48bfubrgpibbv8p18hep9iiqolb9fhh.apps.googleusercontent.com",
@@ -51,8 +54,7 @@ const Login = ({ navigation }) => {
 			if (response?.type === "success") {
 				// setToken(response.authentication.accessToken);
 				getUserInfo(response.authentication.accessToken);
-				Alert.alert("Login Successfully !");
-				navigation.navigate("InputNo");
+				RootNavigation.navigate("InputNo");
 			}
 		} else {
 			setUserInfo(user);
@@ -102,8 +104,7 @@ const Login = ({ navigation }) => {
 
 			await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
 
-			navigation.navigate("Prediction");
-			Alert.alert("Login Successfully !");
+			RootNavigation.navigate("Prediction");
 
 		} catch (error) {
 			setLoading(true);

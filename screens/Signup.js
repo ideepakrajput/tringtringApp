@@ -49,7 +49,6 @@ const Signup = ({ navigation }) => {
       if (response?.type === "success") {
         setToken(response.authentication.accessToken);
         getUserInfo(response.authentication.accessToken);
-        Alert.alert("Registered Successfully !");
       }
     } else {
       setUserInfo(user);
@@ -108,7 +107,6 @@ const Signup = ({ navigation }) => {
         ip_address: ip
       });
 
-      Alert.alert("Registered Successfully !");
       navigation.navigate("Login");
     } catch (error) {
       Alert.alert(error.response.data.message);
