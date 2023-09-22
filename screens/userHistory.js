@@ -16,7 +16,7 @@ const UserHistory = ({ navigation }) => {
     const [isData, setIsData] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const [state] = useContext(AuthContext);
+    const { state } = useContext(AuthContext);
 
     useFocusEffect(
         React.useCallback(() => {

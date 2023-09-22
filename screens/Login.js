@@ -25,7 +25,7 @@ import * as Google from "expo-auth-session/providers/google";
 WebBrowser.maybeCompleteAuthSession();
 
 const Login = ({ navigation }) => {
-	const [state, setState] = useContext(AuthContext);
+	const { state, setState } = useContext(AuthContext);
 	const [loading, setLoading] = useState(true);
 	const [isPasswordShown, setIsPasswordShown] = useState(false);
 	const [isChecked, setIsChecked] = useState(false);

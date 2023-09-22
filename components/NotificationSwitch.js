@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../context/authContext';
 
 const NotificationSwitch = () => {
-    const [isEnabled, setIsEnabled] = useState(false);
+    const { isEnabled, setIsEnabled } = useContext(AuthContext);
 
     useEffect(() => {
         // Load the user's preference from AsyncStorage

@@ -21,7 +21,7 @@ let authenticatedUserByGoogle;
 
 const ScreenMenu = () => {
   //global state
-  const [state, setState] = useContext(AuthContext);
+  const { state, setState } = useContext(AuthContext);
 
   //auth condition true false
   const getLocalUser = async () => {

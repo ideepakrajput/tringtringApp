@@ -14,7 +14,7 @@ let entireScreenWidth = Dimensions.get('window').width;
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
 const Prediction = ({ navigation }) => {
-    const [isPredicted, setisPredicted] = useState(false);
+    const { isPredicted, setisPredicted } = useContext(AuthContext);
     const [predictionNumber, setPredictionNumber] = useState();
     const [yesterdayPredictionNumber, setYesterdayPredictionNumber] = useState();
     const [yesterdayWinningNumber, setYesterdayWinningNumber] = useState();
@@ -24,7 +24,7 @@ const Prediction = ({ navigation }) => {
     const [editCount, setEditCount] = useState(0);
 
     //global state
-    const [state] = useContext(AuthContext);
+    const { state } = useContext(AuthContext);
 
 
     useFocusEffect(

@@ -11,6 +11,10 @@ const AuthProvider = ({ children }) => {
     user: null,
     token: "",
   });
+  //predicted for today
+  const [isPredicted, setisPredicted] = useState(false);
+  //notification
+  const [isEnabled, setIsEnabled] = useState(null);
 
   // initial local storage data
   useEffect(() => {
@@ -23,13 +27,8 @@ const AuthProvider = ({ children }) => {
     loadLocalStorageData();
   }, []);
 
-  // let token = state && state.token;
-
-  // default axios setting
-  // axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
   return (
-    <AuthContext.Provider value={[state, setState]}>
+    <AuthContext.Provider value={{ state, setState, isPredicted, setisPredicted, isEnabled, setIsEnabled }}>
       {children}
     </AuthContext.Provider>
   );

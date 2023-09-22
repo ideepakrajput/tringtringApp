@@ -7,6 +7,8 @@ import NotificationSwitch from '../components/NotificationSwitch';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { AuthContext } from '../context/authContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { BASE_API_URL } from "../constants/baseApiUrl";
 
 
 Notifications.setNotificationHandler({
@@ -22,8 +24,8 @@ export default function App() {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  const [state] = useContext(AuthContext);
-  const [isEnabled, setIsEnabled] = useState(null);
+  const { state, setState } = useContext(AuthContext);
+  const { isEnabled, setIsEnabled } = useContext(AuthContext);
 
   const options = ["English", "Hindi", "Telugu", "Tamil", "Marathi", "Kannada", "Malyalam", "Bengali"];
   const [selectedOption, setSelectedOption] = useState(null);
@@ -31,6 +33,7 @@ export default function App() {
   const handleSelect = (option) => {
     setSelectedOption(option);
   };
+
 
   useEffect(() => {
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
@@ -73,8 +76,7 @@ export default function App() {
     },
   };
 
-  const handleSettings = async (e) => {
-    e.preventDefault();
+  async function handleSettings() {
     await axios.post(`${BASE_API_URL}api/user/settings`, {
       language: selectedOption,
       notificationsEnabled: isEnabled
@@ -89,12 +91,10 @@ export default function App() {
     <View
       style={{
         flex: 1,
-        alignItems: 'flex-start',
-        justifyContent: 'space-around',
-        marginHorizontal: 20
+        alignItems: "center",
+        justifyContent: 'flex-start',
+        marginVertical: 50
       }}>
-
-
       <View>
         <SelectPicker options={options} onSelect={handleSelect} />
         <Text style={{ fontSize: 30, marginTop: 20 }}>Notifications</Text>
@@ -103,23 +103,9 @@ export default function App() {
           style={{ backgroundColor: "#F4E869", padding: 10, borderRadius: 15, marginTop: 20 }}
           onPress={handleSettings}
         >
-          <Text style={{ fontSize: 20, color: "white", textAlign: "center" }}>Save Settings</Text>
+          <Text style={{ fontSize: 25, fontWeight: "bold", color: "white", textAlign: "center" }}>Save Settings</Text>
         </TouchableOpacity>
       </View>
-
-
-      <Text>Your expo push token: {expoPushToken}</Text>
-      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Title: {notification && notification.request.content.title} </Text>
-        <Text>Body: {notification && notification.request.content.body}</Text>
-        <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
-      </View>
-      <Button
-        title="Press to schedule a notification"
-        onPress={async () => {
-          await schedulePushNotification();
-        }}
-      />
     </View>
   );
 }
