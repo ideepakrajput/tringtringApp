@@ -212,7 +212,7 @@ const Prediction = ({ navigation }) => {
                                 {isPredicted ?
                                     <>
                                         <Text style={styles.text1}>
-                                            Your Prediction Number is {todayPredictionNumber}
+                                            Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
                                         </Text>
                                         {
                                             editCount === 3 ?
@@ -222,15 +222,9 @@ const Prediction = ({ navigation }) => {
                                                 :
                                                 <>
                                                     <Text style={styles.text2}>Want to edit your prediction number </Text>
-                                                    <Text style={styles.text2}>{3 - editCount} edit Left </Text>
+                                                    <Text style={styles.text2}><Text style={{ color: "#F8DE22" }}>{3 - editCount} edit Left </Text> </Text>
                                                     <TouchableOpacity
-                                                        style={{
-                                                            margin: 10,
-                                                            backgroundColor: "green",
-                                                            borderRadius: 15,
-                                                            padding: 10,
-                                                            width: 125
-                                                        }}
+                                                        style={styles.button}
                                                         onPress={handleWantEdit}
                                                     >
                                                         <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Edit</Text>
@@ -252,13 +246,7 @@ const Prediction = ({ navigation }) => {
                                         </TextInput>
                                         <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
                                         <TouchableOpacity
-                                            style={{
-                                                margin: 10,
-                                                backgroundColor: "green",
-                                                borderRadius: 15,
-                                                padding: 10,
-                                                width: 125
-                                            }}
+                                            style={styles.button}
                                             onPress={submitPrediction}
                                         >
                                             <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
@@ -276,12 +264,7 @@ const Prediction = ({ navigation }) => {
                 }
                 <View style={{ flex: 2, alignItems: "center" }}>
                     <Text
-                        style={{
-                            fontSize: 20,
-                            fontWeight: "bold",
-                            paddingTop: 10,
-                            textAlign: "center"
-                        }}
+                        style={styles.text1}
                     >Yesterday's Winning Number ({ordinalDateFormat(currentDate)})</Text>
                     <Text
                         style={{
@@ -316,28 +299,16 @@ const Prediction = ({ navigation }) => {
                     </Image>
 
                     <Text
-                        style={{
-                            fontSize: 20,
-                            textAlign: "center",
-                            padding: 10,
-                        }}
+                        style={styles.text2}
                     >WATCH THE DRAW VIDEO</Text>
                 </View>
                 <View style={{ flex: 2, justifyContent: "flex-end", alignItems: "center", backgroundColor: "#F8DE22", padding: 20 }}>
                     <Text
-                        style={{
-                            fontSize: 30,
-                            textAlign: "center",
-                            fontWeight: 'bold'
-                        }}>
+                        style={styles.text3}>
                         GET TO WIN
                     </Text>
                     <Text
-                        style={{
-                            fontSize: 30,
-                            textAlign: "center",
-                            fontWeight: 'bold'
-                        }}>
+                        style={styles.text3}>
                         AMAZING PRIZES !!!
                     </Text>
                     <Text
@@ -376,6 +347,20 @@ const styles = EStyleSheet.create({
         color: COLORS.black,
         padding: "4rem",
         textAlign: "center"
+    },
+    text3: {
+        fontSize: "30rem",
+        fontWeight: "bold",
+        color: COLORS.black,
+        padding: "4rem",
+        textAlign: "center"
+    },
+    button: {
+        margin: 10,
+        backgroundColor: "green",
+        borderRadius: 15,
+        padding: 10,
+        width: 125
     },
     container: {
         flex: 1, flexDirection: "column", justifyContent: "space-around", backgroundColor: COLORS.white
