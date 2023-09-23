@@ -32,7 +32,9 @@ const Prediction = ({ navigation }) => {
         React.useCallback(() => {
 
             async function getEditCount() {
-                setEditCount(parseFloat(await AsyncStorage.getItem("count")));
+                await axios.get(`${BASE_API_URL}api/user/edit_count`, config).then((res) => {
+                    setEditCount(res.data.editCount);
+                })
             }
             getEditCount();
 
@@ -149,13 +151,10 @@ const Prediction = ({ navigation }) => {
                 await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
                 navigation.navigate("History");
                 if (wantEdit) {
-                    const getCount = parseFloat(await AsyncStorage.getItem("count"));
-                    updatedEditCount = getCount + 1;
-                    await AsyncStorage.setItem("count", updatedEditCount.toString());
+                    await axios.post(`${BASE_API_URL}api/user/edit_count`, {}, config);
                     Alert.alert("Prediction Number Updated Successfully");
                 }
                 else {
-                    await AsyncStorage.setItem("count", "0");
                     Alert.alert("Prediction Number Added Successfully");
 
                 }
