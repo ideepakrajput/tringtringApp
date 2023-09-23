@@ -35,11 +35,11 @@ const PrizesData = () => {
                         <View style={styles.row}>
                             <View style={styles.cell}>
                                 <Text style={styles.cellTextInput}>
-                                    <FontAwesome name="circle" size={40} color="green" />
-                                    <FontAwesome name="circle" size={40} color="green" />
-                                    <FontAwesome name="circle" size={40} color="green" />
-                                    <FontAwesome name="circle" size={40} color="green" />
-                                    <FontAwesome name="circle" size={40} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
                                 </Text>
                             </View>
                             <View style={styles.cell}>
@@ -49,10 +49,10 @@ const PrizesData = () => {
                         <View style={styles.row}>
                             <View style={styles.cell}>
                                 <Text style={styles.cellTextInput}>
-                                    <FontAwesome name="circle" size={40} color="green" />
-                                    <FontAwesome name="circle" size={40} color="green" />
-                                    <FontAwesome name="circle" size={40} color="green" />
-                                    <FontAwesome name="circle" size={40} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
                                 </Text>
                             </View>
                             <View style={styles.cell}>
@@ -62,9 +62,9 @@ const PrizesData = () => {
                         <View style={styles.row}>
                             <View style={styles.cell}>
                                 <Text style={styles.cellTextInput}>
-                                    <FontAwesome name="circle" size={40} color="green" />
-                                    <FontAwesome name="circle" size={40} color="green" />
-                                    <FontAwesome name="circle" size={40} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
+                                    <FontAwesome name="circle" size={25} color="green" />
                                 </Text>
                             </View>
                             <View style={styles.cell}>
@@ -74,7 +74,7 @@ const PrizesData = () => {
                     </View>
                     <View>
                         <Text style={styles.text3}>Terms & Conditions Apply:</Text>
-                        <Text style={styles.text2}>* 1st Prize if more than 1 user predicts same number the amount would be split equally.</Text>
+                        <Text style={styles.text2}>*1st Prize if more than 1 user predicts same number the amount would be split equally.</Text>
                         <Text style={styles.text2}>*2nd & 3rd Prize would be given for first 10 winners only.</Text>
                     </View>
                 </>
