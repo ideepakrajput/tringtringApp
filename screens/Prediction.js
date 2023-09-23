@@ -8,6 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
 import { ordinalDateFormat } from '../constants/dataTime';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let entireScreenWidth = Dimensions.get('window').width;
 
@@ -21,7 +22,7 @@ const Prediction = ({ navigation }) => {
     const [todayPredictionNumber, setTodayPredictionNumber] = useState(null);
     const [isBefore830PM, setIsBefore830PM] = useState(false);
     const [wantEdit, setWantEdit] = useState(false);
-    const [editCount, setEditCount] = useState(0);
+    const [editCount, setEditCount] = useState(Number);
 
     //global state
     const { state } = useContext(AuthContext);
@@ -29,6 +30,12 @@ const Prediction = ({ navigation }) => {
 
     useFocusEffect(
         React.useCallback(() => {
+
+            async function getEditCount() {
+                setEditCount(parseFloat(await AsyncStorage.getItem("count")));
+            }
+            getEditCount();
+
             async function fetchData() {
                 const token = state?.token;
                 const config = {
@@ -142,10 +149,13 @@ const Prediction = ({ navigation }) => {
                 await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
                 navigation.navigate("History");
                 if (wantEdit) {
-                    setEditCount(editCount + 1);
+                    const getCount = parseFloat(await AsyncStorage.getItem("count"));
+                    updatedEditCount = getCount + 1;
+                    await AsyncStorage.setItem("count", updatedEditCount.toString());
                     Alert.alert("Prediction Number Updated Successfully");
                 }
                 else {
+                    await AsyncStorage.setItem("count", "0");
                     Alert.alert("Prediction Number Added Successfully");
 
                 }
@@ -217,7 +227,7 @@ const Prediction = ({ navigation }) => {
                                         {
                                             editCount === 3 ?
                                                 <>
-                                                    <Text style={styles.text1}>You have reached your daily edit limit</Text>
+                                                    <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached your daily edit limit</Text></Text>
                                                 </>
                                                 :
                                                 <>
