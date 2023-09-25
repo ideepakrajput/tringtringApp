@@ -121,7 +121,7 @@ const Signup = ({ navigation }) => {
             style={{
               fontSize: 22,
               fontWeight: "bold",
-              marginVertical: 1,
+              marginTop: 20,
               color: COLORS.black,
             }}
           >
@@ -357,7 +357,7 @@ const Signup = ({ navigation }) => {
             color={isChecked ? COLORS.primary : undefined}
           />
 
-          <Text>I aggree to the terms and conditions</Text>
+          <Text>I agree to the terms and conditions</Text>
         </View>
 
         <Button
@@ -402,32 +402,6 @@ const Signup = ({ navigation }) => {
             justifyContent: "center",
           }}
         >
-          <TouchableOpacity
-            onPress={() => console.log("Pressed")}
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "row",
-              height: 52,
-              borderWidth: 1,
-              borderColor: COLORS.grey,
-              marginRight: 4,
-              borderRadius: 10,
-            }}
-          >
-            <Image
-              source={require("../assets/facebook.png")}
-              style={{
-                height: 36,
-                width: 36,
-                marginRight: 8,
-              }}
-              resizeMode="contain"
-            />
-
-            <Text>Facebook</Text>
-          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => promptAsync()}

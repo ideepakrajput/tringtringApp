@@ -18,6 +18,8 @@ import Prediction from "../../screens/Prediction";
 import UserHistory from "../../screens/userHistory";
 import PrizesData from "../../screens/PrizesData";
 
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 let authenticatedUserByGoogle;
 
 const ScreenMenu = () => {
@@ -44,65 +46,67 @@ const ScreenMenu = () => {
   };
 
   const Drawer = createDrawerNavigator();
+  const Stack = createNativeStackNavigator();
 
   return (
-    <Drawer.Navigator
-      drawerContent={
-        (props) => {
-          return (
-            <SafeAreaView>
-              <View
-                style={{
-                  width: '100%',
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderBottomColor: "#f4f4f4",
-                  borderBottomWidth: 1
-                }}
-              >
-                <Image
-                  source={icon}
-                  style={{
-                    height: 130,
-                    width: 130,
-                  }}
-                />
-              </View>
-              <DrawerItemList {...props} />
-              {
-                authenticatedUser || authenticatedUserByGoogle ?
-                  <DrawerItem
-                    label={() => <Text>Logout</Text>}
-                    icon={() => <SimpleLineIcons name="logout" size={20} color="#808080" />}
-                    onPress={handleLogout}
-                  />
-                  :
-                  <></>
-              }
-            </SafeAreaView>
-          )
-        }
-      }
-      screenOptions={{
-        drawerStyle: {
-          backgroundColor: "#fff",
-          width: 250
-        },
-        headerStyle: {
-          backgroundColor: "#F8DE22",
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "bold"
-        },
-        drawerLabelStyle: {
-          color: "#111"
-        }
-      }}
-    >
-
+    <>
       {authenticatedUser || authenticatedUserByGoogle ? (
-        <>
+        <Drawer.Navigator
+          drawerContent={
+            (props) => {
+              return (
+                <SafeAreaView>
+                  <View
+                    style={{
+                      width: '100%',
+                      justifyContent: "center",
+                      alignItems: "center",
+                      borderBottomColor: "#f4f4f4",
+                      borderBottomWidth: 1
+                    }}
+                  >
+                    <Image
+                      source={icon}
+                      style={{
+                        height: 130,
+                        width: 130,
+                      }}
+                    />
+                  </View>
+                  <DrawerItemList {...props} />
+                  {
+                    authenticatedUser || authenticatedUserByGoogle ?
+                      <DrawerItem
+                        label={() => <Text>Logout</Text>}
+                        icon={() => <SimpleLineIcons name="logout" size={20} color="#808080" />}
+                        onPress={handleLogout}
+                      />
+                      :
+                      <></>
+                  }
+                </SafeAreaView>
+              )
+            }
+          }
+          screenOptions={{
+            drawerStyle: {
+              backgroundColor: "#fff",
+              width: 250
+            },
+            headerStyle: {
+              backgroundColor: "#F8DE22",
+            },
+            headerTintColor: "#fff",
+            headerTitleStyle: {
+              fontWeight: "bold"
+            },
+            drawerLabelStyle: {
+              color: "#111"
+            }
+          }}
+        >
+
+          {/*  */}
           <Drawer.Screen
             name="Prediction"
             options={{
@@ -147,10 +151,11 @@ const ScreenMenu = () => {
             }}
             component={Settings}
           />
-        </>
-      ) : (
-        <>
-          <Drawer.Screen
+        </Drawer.Navigator>
+      )
+        :
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen
             name="Login"
             options={{
               drawerLabel: "Login",
@@ -161,7 +166,7 @@ const ScreenMenu = () => {
             }}
             component={Login}
           />
-          <Drawer.Screen
+          <Stack.Screen
             name="Signup"
             options={{
               drawerLabel: "Signup",
@@ -172,10 +177,10 @@ const ScreenMenu = () => {
             }}
             component={Signup}
           />
-        </>
-      )}
-    </Drawer.Navigator>
+        </Stack.Navigator>
+      }
+    </ >
   );
-};
+}
 
 export default ScreenMenu;

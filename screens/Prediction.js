@@ -30,7 +30,12 @@ const Prediction = ({ navigation }) => {
 
     useFocusEffect(
         React.useCallback(() => {
-
+            const token = state?.token;
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
             async function getEditCount() {
                 await axios.get(`${BASE_API_URL}api/user/edit_count`, config).then((res) => {
                     setEditCount(res.data.editCount);
@@ -39,12 +44,6 @@ const Prediction = ({ navigation }) => {
             getEditCount();
 
             async function fetchData() {
-                const token = state?.token;
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                };
                 await axios.get(`${BASE_API_URL}api/winning/user/prediction_number`, config).then((res) => {
                     const data = res.data;
 
@@ -231,7 +230,7 @@ const Prediction = ({ navigation }) => {
                                                 :
                                                 <>
                                                     <Text style={styles.text2}>Want to edit your prediction number </Text>
-                                                    <Text style={styles.text2}><Text style={{ color: "#F8DE22" }}>{3 - editCount} edit Left </Text> </Text>
+                                                    <Text style={styles.text2}><Text style={{ color: "#F8DE22" }}>{3 - editCount} more chances </Text> </Text>
                                                     <TouchableOpacity
                                                         style={styles.button}
                                                         onPress={handleWantEdit}
@@ -281,23 +280,38 @@ const Prediction = ({ navigation }) => {
                             fontSize: 50
                         }}
                     >{yesterdayWinningNumber}</Text>
-                    <Text
-                        style={{
-                            fontSize: 20,
-                            fontWeight: "bold",
-                            backgroundColor: "grey",
-                            width: 250,
-                            textAlign: "center",
-                            padding: 10,
-                            borderRadius: 15,
-                            margin: 10
-                        }}
-                    >Your Prediction {yesterdayPredictionNumber}</Text>
+                    {yesterdayPredictionNumber != null ?
+                        <Text
+                            style={{
+                                fontSize: 20,
+                                fontWeight: "bold",
+                                backgroundColor: "grey",
+                                width: 250,
+                                textAlign: "center",
+                                padding: 10,
+                                borderRadius: 15,
+                                margin: 10
+                            }}
+                        >Your Prediction {yesterdayPredictionNumber}</Text>
+                        :
+                        <Text
+                            style={{
+                                fontSize: 20,
+                                fontWeight: "bold",
+                                backgroundColor: "grey",
+                                width: 250,
+                                textAlign: "center",
+                                padding: 10,
+                                borderRadius: 15,
+                                margin: 10
+                            }}
+                        >You have not made any prediction yesterday</Text>
+                    }
                 </View>
 
                 <View style={{ flex: 2, alignItems: "center" }}>
                     <Image
-                        source={require("../assets/facebook.png")}
+                        source={require("../assets/utubelogo.png")}
                         style={{
                             height: 50,
                             width: 50,
