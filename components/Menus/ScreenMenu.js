@@ -19,6 +19,7 @@ import UserHistory from "../../screens/userHistory";
 import PrizesData from "../../screens/PrizesData";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import OtpSignIn from "../../screens/OtpSignIn";
 
 let authenticatedUserByGoogle;
 
@@ -155,6 +156,17 @@ const ScreenMenu = () => {
       )
         :
         <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="OtpSignIn"
+            options={{
+              drawerLabel: "OtpSignIn",
+              title: "OtpSignIn",
+              drawerIcon: () => (
+                <AntDesign name="adduser" size={20} color="#808080" />
+              )
+            }}
+            component={OtpSignIn}
+          />
           <Stack.Screen
             name="Login"
             options={{
