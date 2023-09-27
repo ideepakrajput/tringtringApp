@@ -5,11 +5,12 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HeaderMenu = () => {
-  const [state, setState] = useContext(AuthContext);
+  const { state, setState } = useContext(AuthContext);
   //logout
   const handleLogout = async () => {
     setState({ token: "", user: null });
     await AsyncStorage.removeItem("@auth");
+    await AsyncStorage.removeItem("@user");
     alert("logout Successfully");
   };
 
@@ -28,7 +29,7 @@ const HeaderMenu = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    margin: 10,
+    margin: 15,
     justifyContent: "space-between",
   },
   iconStyle: {

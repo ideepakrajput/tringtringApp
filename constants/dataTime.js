@@ -7,6 +7,27 @@ export function formatDateToDDMMYYYY(timestamp) {
     return `${day}-${month}-${year}`;
 }
 
+export function formatTimestampToTimeDate(timestamp) {
+    const date = new Date(timestamp);
+
+    // Get the time in HH:MM AM/PM format
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    const timeString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+
+    // Get the date in DD:MM:YYYY format
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Month is zero-based
+    const year = date.getFullYear();
+    const dateString = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year}`;
+
+    // Combine time and date
+    return `${timeString} ${dateString}`;
+}
+
 export function ordinalDateFormat(timestamp) {
     function addOrdinalSuffix(day) {
         if (day > 3 && day < 21) return day + 'th';

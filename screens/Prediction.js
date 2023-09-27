@@ -7,8 +7,8 @@ import { BASE_API_URL } from '../constants/baseApiUrl';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
-import { ordinalDateFormat } from '../constants/dataTime';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { formatTimestampToTimeDate, ordinalDateFormat } from '../constants/dataTime';
+import FooterMenu from '../components/Menus/FooterMenu';
 
 let entireScreenWidth = Dimensions.get('window').width;
 
@@ -17,6 +17,7 @@ EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 const Prediction = ({ navigation }) => {
     const { isPredicted, setisPredicted } = useContext(AuthContext);
     const [predictionNumber, setPredictionNumber] = useState();
+    // const [predictionData, setData] = useState();
     const [yesterdayPredictionNumber, setYesterdayPredictionNumber] = useState();
     const [yesterdayWinningNumber, setYesterdayWinningNumber] = useState();
     const [todayPredictionNumber, setTodayPredictionNumber] = useState(null);
@@ -27,6 +28,16 @@ const Prediction = ({ navigation }) => {
     //global state
     const { state } = useContext(AuthContext);
 
+    const predictionData = [
+        {
+            prediction_number: 22222,
+            transaction_date: ""
+        },
+        {
+            prediction_number: 22222,
+            transaction_date: ""
+        },
+    ]
 
     useFocusEffect(
         React.useCallback(() => {
@@ -46,6 +57,13 @@ const Prediction = ({ navigation }) => {
             async function fetchData() {
                 await axios.get(`${BASE_API_URL}api/winning/user/prediction_number`, config).then((res) => {
                     const data = res.data;
+                    data.sort((a, b) => {
+                        return new Date(b.transaction_date) - new Date(a.transaction_date);
+                    });
+                    // setData(data.slice(0, 2));
+                    // console.log('====================================');
+                    // console.log(predictionData);
+                    // console.log('====================================');
 
                     const currentDate = new Date().toISOString().split('T')[0];
 
@@ -174,184 +192,138 @@ const Prediction = ({ navigation }) => {
     currentDate.setDate(currentDate.getDate() - 1);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={{ flex: 1, justifyContent: "space-evenly" }}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
                 enabled="true"
             >
-                {
-                    isBefore830PM ?
-                        <>
-                            <View style={{ flex: 1, alignItems: "center" }}>
-                                {isPredicted ?
-                                    <Text
-                                        style={styles.text1}
-                                    >
-                                        YOU HAVE ALREADY PREDICTED
-                                    </Text>
-                                    :
-                                    <>
-                                        {
-                                            wantEdit ?
-                                                <Text
-                                                    style={styles.text1}
-                                                >
-                                                    UPDATE YOUR 5 DIGIT PREDICTION NUMBER
-                                                </Text>
-                                                :
-                                                <Text
-                                                    style={styles.text1}
-                                                >
-                                                    ENTER YOUR 5 DIGIT PREDICTION NUMBER
-                                                </Text>
-                                        }
-                                    </>
-                                }
-
-                                <Text
-                                    style={styles.text2}
-                                >
-                                    FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST
-                                </Text>
-                            </View>
-                            <View style={{ flex: 2, alignItems: "center" }}>
-
-                                {isPredicted ?
-                                    <>
-                                        <Text style={styles.text1}>
-                                            Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
+                <View style={{ flex: 3 }}>
+                    {
+                        isBefore830PM ?
+                            <>
+                                <View style={{ flex: 1, alignItems: "center" }}>
+                                    {isPredicted ?
+                                        <Text
+                                            style={styles.text1}
+                                        >
+                                            YOU HAVE ALREADY PREDICTED
                                         </Text>
-                                        {
-                                            editCount === 3 ?
-                                                <>
-                                                    <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached your daily edit limit</Text></Text>
-                                                </>
-                                                :
-                                                <>
-                                                    <Text style={styles.text2}>Want to edit your prediction number </Text>
-                                                    <Text style={styles.text2}><Text style={{ color: "#F8DE22" }}>{3 - editCount} more chances </Text> </Text>
-                                                    <TouchableOpacity
-                                                        style={styles.button}
-                                                        onPress={handleWantEdit}
+                                        :
+                                        <>
+                                            {
+                                                wantEdit ?
+                                                    <Text
+                                                        style={styles.text1}
                                                     >
-                                                        <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Edit</Text>
-                                                    </TouchableOpacity>
-                                                </>
-                                        }
-                                    </>
-                                    :
-                                    <>
-                                        <TextInput
-                                            style={styles.textInput}
-                                            maxLength={5}
-                                            autoFocus={true}
-                                            keyboardType='numeric'
-                                            placeholder=' - - - - -'
-                                            value={predictionNumber}
-                                            onChangeText={(text) => setPredictionNumber(text)}
-                                        >
-                                        </TextInput>
-                                        <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
-                                        <TouchableOpacity
-                                            style={styles.button}
-                                            onPress={submitPrediction}
-                                        >
-                                            <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
-                                        </TouchableOpacity>
-                                    </>
-                                }
-                            </View>
-                        </>
-                        :
-                        <>
-                            <View style={{ flex: 2, alignItems: "center" }}>
-                                <Text style={{ fontSize: 30, color: "red", textAlign: "center" }}>All entries are closed for today. You can come back and predict for tomorrow after 12 Midnight.</Text>
-                            </View>
-                        </>
-                }
-                <View style={{ flex: 2, alignItems: "center" }}>
-                    <Text
-                        style={styles.text1}
-                    >Yesterday's Winning Number ({ordinalDateFormat(currentDate)})</Text>
-                    <Text
-                        style={{
-                            letterSpacing: 15,
-                            fontSize: 50
-                        }}
-                    >{yesterdayWinningNumber}</Text>
-                    {yesterdayPredictionNumber != null ?
-                        <Text
-                            style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                backgroundColor: "grey",
-                                width: 250,
-                                textAlign: "center",
-                                padding: 10,
-                                borderRadius: 15,
-                                margin: 10
-                            }}
-                        >Your Prediction {yesterdayPredictionNumber}</Text>
-                        :
-                        <Text
-                            style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                backgroundColor: "grey",
-                                width: 250,
-                                textAlign: "center",
-                                padding: 10,
-                                borderRadius: 15,
-                                margin: 10
-                            }}
-                        >You have not made any prediction yesterday</Text>
+                                                        UPDATE YOUR 5 DIGIT PREDICTION NUMBER
+                                                    </Text>
+                                                    :
+                                                    <Text
+                                                        style={styles.text1}
+                                                    >
+                                                        ENTER YOUR 5 DIGIT PREDICTION NUMBER
+                                                    </Text>
+                                            }
+                                        </>
+                                    }
+
+                                    <Text
+                                        style={styles.text2}
+                                    >
+                                        FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST
+                                    </Text>
+                                </View>
+                                <View style={{ flex: 2, alignItems: "center" }}>
+
+                                    {isPredicted ?
+                                        <>
+                                            <Text style={styles.text1}>
+                                                Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
+                                            </Text>
+                                            {
+                                                editCount === 3 ?
+                                                    <>
+                                                        <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached your daily edit limit</Text></Text>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <Text style={styles.text2}>Want to edit your prediction number </Text>
+                                                        <Text style={styles.text2}><Text style={{ color: "#F8DE22" }}>{3 - editCount} more chances </Text> </Text>
+                                                        <TouchableOpacity
+                                                            style={styles.button}
+                                                            onPress={handleWantEdit}
+                                                        >
+                                                            <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Edit</Text>
+                                                        </TouchableOpacity>
+                                                    </>
+                                            }
+                                        </>
+                                        :
+                                        <>
+                                            <TextInput
+                                                style={styles.textInput}
+                                                maxLength={5}
+                                                autoFocus={true}
+                                                keyboardType='numeric'
+                                                placeholder=' - - - - -'
+                                                value={predictionNumber}
+                                                onChangeText={(text) => setPredictionNumber(text)}
+                                            >
+                                            </TextInput>
+                                            <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
+                                            <TouchableOpacity
+                                                style={styles.button}
+                                                onPress={submitPrediction}
+                                            >
+                                                <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
+                                            </TouchableOpacity>
+                                        </>
+                                    }
+                                </View>
+                            </>
+                            :
+                            <>
+                                <View style={{ flex: 2, alignItems: "center" }}>
+                                    <Text style={{ fontSize: 30, color: "red", textAlign: "center" }}>All entries are closed for today. You can come back and predict for tomorrow after 12 Midnight.</Text>
+                                </View>
+                            </>
                     }
                 </View>
-
-                <View style={{ flex: 2, alignItems: "center" }}>
-                    <Image
-                        source={require("../assets/utubelogo.png")}
-                        style={{
-                            height: 50,
-                            width: 50,
-                            marginTop: 30
-                        }}
-                        resizeMode="contain"
-                    >
-                    </Image>
-
-                    <Text
-                        style={styles.text2}
-                    >WATCH THE DRAW VIDEO</Text>
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.text1}>My Predictions</Text>
+                    {predictionData.map((index, item) => {
+                        <View key={index} style={{ columnGap: 3 }}>
+                            <Text style={styles.text1}>{index + 1}</Text>
+                            <Text style={styles.text1}>{item.prediction_number}</Text>
+                            <Text style={styles.text1}>{yesterdayPredictionNumber}</Text>
+                            <Text style={styles.text1}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
+                        </View>
+                    })}
                 </View>
-                <View style={{ flex: 2, justifyContent: "flex-end", alignItems: "center", backgroundColor: "#F8DE22", padding: 20 }}>
-                    <Text
-                        style={styles.text3}>
-                        GET TO WIN
-                    </Text>
-                    <Text
-                        style={styles.text3}>
-                        AMAZING PRIZES !!!
-                    </Text>
-                    <Text
-                        style={{
-                            fontSize: 20,
-                            fontWeight: "bold",
-                            backgroundColor: "red",
-                            color: "white",
-                            width: 300,
-                            textAlign: "center",
-                            padding: 10,
-                            borderRadius: 15,
-                            margin: 10
-                        }}
-                    >
-                        VIEW LIST OF PRIZES
-                    </Text>
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.text1}>Yesterday Winning Number</Text>
+                    <View style={{ flexDirection: "row", backgroundColor: "#00BF63", alignItems: "center", justifyContent: "space-around", borderRadius: 50 }}>
+                        <Text style={styles.winning_number}>{yesterdayWinningNumber != null ? { yesterdayWinningNumber } : "N/A"}</Text>
+                        <Image
+                            source={require("../assets/utubelogo.png")}
+                            style={{
+                                height: 60,
+                                width: 60,
+                            }}
+                        >
+                        </Image>
+                        <View>
+                            <Text style={styles.text2}>Your Prediction</Text>
+                            <Text style={styles.winning_number}>{yesterdayPredictionNumber != null ? { yesterdayPredictionNumber } : "N/A"}</Text>
+                        </View>
+                    </View>
+                </View>
+                <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                    <FooterMenu />
                 </View>
             </KeyboardAvoidingView>
-        </SafeAreaView >
+        </SafeAreaView>
     )
 }
 
@@ -362,20 +334,24 @@ const styles = EStyleSheet.create({
         fontWeight: "bold",
         color: COLORS.black,
         textAlign: "center",
-        padding: "4rem"
     },
     text2: {
         fontSize: "15rem",
         fontWeight: "bold",
         color: COLORS.black,
-        padding: "4rem",
         textAlign: "center"
+    },
+    winning_number: {
+        fontSize: "25rem",
+        fontWeight: "bold",
+        color: COLORS.white,
+        padding: "7rem",
+        textAlign: "center",
     },
     text3: {
         fontSize: "30rem",
         fontWeight: "bold",
         color: COLORS.black,
-        padding: "4rem",
         textAlign: "center"
     },
     button: {

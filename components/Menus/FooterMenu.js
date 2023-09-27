@@ -10,37 +10,40 @@ const FooterMenu = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-        <FontAwesome5
-          name="home"
-          style={styles.iconStyle}
-          color={route.name === "Home" && "orange"}
-        />
-        <Text>Home</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Post")}>
+      <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
         <FontAwesome5
           name="plus-square"
           style={styles.iconStyle}
-          color={route.name === "Post" && "orange"}
+          color={route.name === "PrizesData" && "orange"}
         />
-        <Text>Post</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Myposts")}>
+      <TouchableOpacity onPress={() => navigation.navigate("UserHistory")}>
         <FontAwesome5
-          name="list"
+          name="history"
           style={styles.iconStyle}
-          color={route.name === "Myposts" && "orange"}
+          color={route.name === "UserHistory" && "orange"}
         />
-        <Text>My Posts</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Account")}>
+      <TouchableOpacity onPress={() => navigation.navigate("Prediction")}>
+        <FontAwesome5
+          name="home"
+          style={styles.iconStyle}
+          color={route.name === "Prediction" && "orange"}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("Prediction")}>
+        <FontAwesome5
+          name="share-square"
+          style={styles.iconStyle}
+          color={route.name === "Share" && "orange"}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
         <FontAwesome5
           name="user"
           style={styles.iconStyle}
-          color={route.name === "Account" && "orange"}
+          color={route.name === "Settings" && "orange"}
         />
-        <Text>Account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -49,7 +52,7 @@ const FooterMenu = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    margin: 10,
+    margin: 15,
     justifyContent: "space-between",
   },
   iconStyle: {

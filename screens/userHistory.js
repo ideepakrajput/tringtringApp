@@ -6,7 +6,8 @@ import { BASE_API_URL } from '../constants/baseApiUrl';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
-
+import FooterMenu from '../components/Menus/FooterMenu';
+import { formatTimestampToTimeDate } from '../constants/dataTime';
 let entireScreenWidth = Dimensions.get('window').width;
 
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
@@ -52,7 +53,7 @@ const UserHistory = ({ navigation }) => {
     const renderItem = ({ item }) => {
         return (
             <View style={styles.row}>
-                <Text style={styles.cell}>{item.transaction_date.substring(0, 10)}</Text>
+                <Text style={styles.cell}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
                 <Text style={styles.cell}>{item.prediction_number}</Text>
                 <Text style={styles.cell}>{item.winning_number || 'N/A'}</Text>
             </View>
@@ -61,9 +62,16 @@ const UserHistory = ({ navigation }) => {
 
 
     return (
-        <ScrollView horizontal vertical style={styles.container}>
-            <View style={{ flex: 1 }}>
-                <Text style={styles.text1}>Your Prediction History</Text>
+        <>
+            <Text style={styles.text1}>Your Prediction History</Text>
+            <View style={styles.table}>
+                <View style={styles.row}>
+                    <Text style={styles.headerCell}>Date & Time</Text>
+                    <Text style={styles.headerCell}>Prediction Number</Text>
+                    <Text style={styles.headerCell}>Winning Number</Text>
+                </View>
+            </View>
+            <ScrollView style={styles.container}>
                 {
                     loading ?
                         <>
@@ -72,21 +80,12 @@ const UserHistory = ({ navigation }) => {
                         :
                         <>
                             {
-                                isData
-                                    ?
-                                    <View style={styles.table}>
-                                        <View style={styles.row}>
-                                            <Text style={styles.headerCell}>Date</Text>
-                                            <Text style={styles.headerCell}>Prediction Number</Text>
-                                            <Text style={styles.headerCell}>Winning Number</Text>
-                                        </View>
-
-                                        <FlatList
-                                            data={data}
-                                            renderItem={renderItem}
-                                            keyExtractor={(item) => item._id}
-                                        />
-                                    </View>
+                                isData ?
+                                    <FlatList
+                                        data={data}
+                                        renderItem={renderItem}
+                                        keyExtractor={(item) => item._id}
+                                    />
                                     :
                                     <>
                                         <Text style={styles.text1}>You have not made any prediction yet.</Text>
@@ -95,14 +94,17 @@ const UserHistory = ({ navigation }) => {
                             }
                         </>
                 }
+            </ScrollView>
+            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                <FooterMenu />
             </View>
-        </ScrollView>
+        </>
     );
 };
 
 const styles = EStyleSheet.create({
     container: {
-        flex: 1,
+        flex: 5,
     },
     table: {
         borderWidth: 1,
@@ -118,12 +120,12 @@ const styles = EStyleSheet.create({
     cell: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-around',
     },
     headerCell: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-around',
         fontWeight: 'bold',
     },
     text1: {

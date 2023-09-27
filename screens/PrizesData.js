@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { FontAwesome } from '@expo/vector-icons';
-
+import FooterMenu from '../components/Menus/FooterMenu';
 const PrizesData = () => {
 
     const [showComponent, setShowComponent] = useState('A');
@@ -72,11 +72,11 @@ const PrizesData = () => {
                             </View>
                         </View>
                     </View>
-                    <View>
+                    {/* <View>
                         <Text style={styles.text3}>Terms & Conditions Apply:</Text>
                         <Text style={styles.text2}>*1st Prize if more than 1 user predicts same number the amount would be split equally.</Text>
                         <Text style={styles.text2}>*2nd & 3rd Prize would be given for first 10 winners only.</Text>
-                    </View>
+                    </View> */}
                 </>
             );
             break;
@@ -97,7 +97,7 @@ const PrizesData = () => {
     }
 
     return (
-        <View>
+        <SafeAreaView style={{ flex: 1 }}>
             <View style={{ alignItems: "center" }}>
                 <Text style={styles.text3}>List of Prizes you can win !</Text>
             </View>
@@ -107,7 +107,10 @@ const PrizesData = () => {
                 <TouchableOpacity onPress={handleComponentC} style={styles.button}><Text style={styles.text1}>YEARLY</Text></TouchableOpacity>
             </View>
             {content}
-        </View>
+            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+                <FooterMenu />
+            </View>
+        </SafeAreaView>
     );
 };
 

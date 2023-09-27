@@ -9,7 +9,7 @@ import { AuthContext } from '../context/authContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_API_URL } from "../constants/baseApiUrl";
-
+import FooterMenu from '../components/Menus/FooterMenu';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -27,6 +27,14 @@ export default function App() {
   const { state, setState } = useContext(AuthContext);
   const { isEnabled, setIsEnabled } = useContext(AuthContext);
 
+  const [resultAnnounced, setResultAnnounced] = useState(false);
+  const [userWin, setUserWin] = useState(false);
+  const [userFriendJoined, setUserFriendJoined] = useState(false);
+  const [people, setPeople] = useState(88989);
+  const [matchDigits, setMatchDigits] = useState(5);
+  const [userName, setUserName] = useState("User");
+  const [notificationSent, setNotificationSent] = useState(false);
+
   const options = ["English", "Hindi", "Telugu", "Tamil", "Marathi", "Kannada", "Malyalam", "Bengali"];
   const [selectedOption, setSelectedOption] = useState(null);
   const { isPredicted } = useContext(AuthContext);
@@ -38,14 +46,17 @@ export default function App() {
       repeats: true, // Repeat daily
     };
 
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Predict and Win",
-        body: `Aaj tring tring nhi kiya kya ????
+    if (!notificationSent) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Predict and Win",
+          body: `Aaj tring tring nhi kiya kya ????
       Predict your number to win exiting prizes !!`,
-      },
-      trigger
-    });
+        },
+        trigger
+      });
+    }
+    setNotificationSent(true);
   }
 
   async function registerForPushNotificationsAsync() {
@@ -67,10 +78,6 @@ export default function App() {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
-      if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
-        return;
-      }
       // Learn more about projectId:
       // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
       token = (await Notifications.getExpoPushTokenAsync({ projectId: '72bad700-de75-45e7-8a36-492269f53e30' })).data;
@@ -85,7 +92,7 @@ export default function App() {
 
   async function schedulePushNotification7PM() {
     const trigger = {
-      hour: 19, // Hour in 24-hour format
+      hour: 18, // Hour in 24-hour format
       minute: 0,
       repeats: true, // Repeat daily
     };
@@ -94,13 +101,54 @@ export default function App() {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: "Predict and Win",
-          body: `Aaj tring tring nhi kiya kya ????
-      Predict your number to win exiting prizes !!`,
+          body: `Did you forget to predict and match five digits for a chance to claim the bounty? ${people} people hava already made their prediction. Don't miss out!"`,
         },
         trigger
       });
     }
   }
+
+  async function resultNotification() {
+    if (!resultAnnounced) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Predict and Win",
+          body: `Today's prediction results are in, and you've matched ${matchDigits} digits. Keep the winning spirit alive, predict tomorrow's, and continue your streak!`,
+        },
+        trigger: null
+      });
+    }
+    setResultAnnounced(true);
+  }
+  resultNotification();
+
+  async function userWinNotication() {
+    if (!userWin) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Predict and Win",
+          body: `🎉 Great news, ${userName}! You've just won in today's Tring Tring prediction round. The winning number is [Winning Number]. 🥳 Claim your exciting prize now and enjoy your winnings! Tap here to redeem your reward. 🎁`,
+        },
+        trigger: null
+      });
+    }
+    setUserWin(true);
+  }
+  userWinNotication();
+
+  async function userFriendJoinedNotiification() {
+    if (!userFriendJoined) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Predict and Win",
+          body: `Hurray! You've received a bonus of 5 prediction chances because your friend joined Tring-Tring. You can use these extra chances whenever you like.`,
+        },
+        trigger: null
+      });
+    }
+    setUserFriendJoined(true);
+  }
+  userFriendJoinedNotiification();
 
 
   const handleSelect = (option) => {
@@ -128,6 +176,9 @@ export default function App() {
   useEffect(() => {
     // Load the user's preference from AsyncStorage
     loadNotificationPreference();
+    userWinNotication();
+    userFriendJoinedNotiification();
+    resultNotification();
   }, []);
 
   useEffect(() => {
@@ -185,7 +236,6 @@ export default function App() {
         flex: 1,
         alignItems: "center",
         justifyContent: 'flex-start',
-        marginVertical: 50
       }}>
       <View>
         <SelectPicker options={options} onSelect={handleSelect} />
@@ -197,6 +247,9 @@ export default function App() {
         >
           <Text style={{ fontSize: 25, fontWeight: "bold", color: "white", textAlign: "center" }}>Save Settings</Text>
         </TouchableOpacity>
+      </View>
+      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+        <FooterMenu />
       </View>
     </View>
   );
