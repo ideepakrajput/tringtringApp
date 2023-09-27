@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, Image, Dimensions, Alert, KeyboardAvoidingView } from 'react-native';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import COLORS from "../constants/colors";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -8,16 +8,19 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
 import { formatTimestampToTimeDate, ordinalDateFormat } from '../constants/dataTime';
+import { Table, Row } from 'react-native-table-component';
 import FooterMenu from '../components/Menus/FooterMenu';
+import { AntDesign } from '@expo/vector-icons';
 
 let entireScreenWidth = Dimensions.get('window').width;
 
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
+
 const Prediction = ({ navigation }) => {
     const { isPredicted, setisPredicted } = useContext(AuthContext);
     const [predictionNumber, setPredictionNumber] = useState();
-    // const [predictionData, setData] = useState();
+    const [predictionData, setPredictionData] = useState([]);
     const [yesterdayPredictionNumber, setYesterdayPredictionNumber] = useState();
     const [yesterdayWinningNumber, setYesterdayWinningNumber] = useState();
     const [todayPredictionNumber, setTodayPredictionNumber] = useState(null);
@@ -25,19 +28,7 @@ const Prediction = ({ navigation }) => {
     const [wantEdit, setWantEdit] = useState(false);
     const [editCount, setEditCount] = useState(Number);
 
-    //global state
     const { state } = useContext(AuthContext);
-
-    const predictionData = [
-        {
-            prediction_number: 22222,
-            transaction_date: ""
-        },
-        {
-            prediction_number: 22222,
-            transaction_date: ""
-        },
-    ]
 
     useFocusEffect(
         React.useCallback(() => {
@@ -57,14 +48,6 @@ const Prediction = ({ navigation }) => {
             async function fetchData() {
                 await axios.get(`${BASE_API_URL}api/winning/user/prediction_number`, config).then((res) => {
                     const data = res.data;
-                    data.sort((a, b) => {
-                        return new Date(b.transaction_date) - new Date(a.transaction_date);
-                    });
-                    // setData(data.slice(0, 2));
-                    // console.log('====================================');
-                    // console.log(predictionData);
-                    // console.log('====================================');
-
                     const currentDate = new Date().toISOString().split('T')[0];
 
                     // Calculate yesterday's date by subtracting one day from the current date
@@ -149,6 +132,43 @@ const Prediction = ({ navigation }) => {
         }, [])
     )
 
+    useEffect(() => {
+        // Fetch your data asynchronously and update the state
+        const token = state?.token;
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const fetchData = async () => {
+            try {
+                // Replace this with your actual data fetching logic
+                const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config)
+                const sortedData = await result.data.sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date));
+
+                // Extract the last three updated prediction_number and created_date_time
+                const lastThreePredictions = sortedData.slice(0, 3).map(item => ({
+                    prediction_number: item.prediction_number,
+                    transaction_date: item.transaction_date,
+                }));
+
+                // Table data
+                const tableData = lastThreePredictions.map(prediction => [
+                    prediction.prediction_number,
+                    formatTimestampToTimeDate(prediction.transaction_date),
+                ]);
+
+                setPredictionData(tableData);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, [predictionData]); // Empty dependency array ensures the effect runs only once on mount
+
+
     function handleWantEdit() {
         setWantEdit(true);
         setisPredicted(false);
@@ -166,9 +186,10 @@ const Prediction = ({ navigation }) => {
         try {
             if (predictionNumber && predictionNumber.length == 5) {
                 await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
-                navigation.navigate("History");
+                navigation.navigate("UserHistory");
                 if (wantEdit) {
-                    await axios.post(`${BASE_API_URL}api/user/edit_count`, {}, config);
+                    const incrementValue = 1;
+                    await axios.post(`${BASE_API_URL}api/user/edit_count`, { incrementValue }, config);
                     Alert.alert("Prediction Number Updated Successfully");
                 }
                 else {
@@ -191,6 +212,8 @@ const Prediction = ({ navigation }) => {
     const currentDate = new Date();
     currentDate.setDate(currentDate.getDate() - 1);
 
+
+
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: "space-evenly" }}>
             <KeyboardAvoidingView
@@ -199,6 +222,15 @@ const Prediction = ({ navigation }) => {
                 enabled="true"
             >
                 <View style={{ flex: 3 }}>
+                    <View style={{ flexDirection: "row", justifyContent: "flex-end", marginRight: 20, marginBottom: 10 }}>
+                        <View style={{ flexDirection: "row", justifyContent: "flex-end", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, columnGap: 10, borderRadius: 50, backgroundColor: "#00BF63" }}>
+                            <View>
+                                <Text style={styles.text2}>{3 - editCount}</Text>
+                                <Text style={styles.text2}>Predictions</Text>
+                            </View>
+                            <AntDesign name="pluscircleo" size={30} color="white" />
+                        </View>
+                    </View>
                     {
                         isBefore830PM ?
                             <>
@@ -286,20 +318,22 @@ const Prediction = ({ navigation }) => {
                             <>
                                 <View style={{ flex: 2, alignItems: "center" }}>
                                     <Text style={{ fontSize: 30, color: "red", textAlign: "center" }}>All entries are closed for today. You can come back and predict for tomorrow after 12 Midnight.</Text>
+                                    <Text style={styles.text1}>
+                                        Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
+                                    </Text>
                                 </View>
                             </>
                     }
                 </View>
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 2, justifyContent: "center", alignItems: "center" }}>
                     <Text style={styles.text1}>My Predictions</Text>
-                    {predictionData.map((index, item) => {
-                        <View key={index} style={{ columnGap: 3 }}>
-                            <Text style={styles.text1}>{index + 1}</Text>
-                            <Text style={styles.text1}>{item.prediction_number}</Text>
-                            <Text style={styles.text1}>{yesterdayPredictionNumber}</Text>
-                            <Text style={styles.text1}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
-                        </View>
-                    })}
+                    <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                        {predictionData
+                            .map((rowData, index) => (
+
+                                <Row key={index} data={rowData} />
+                            ))}
+                    </Table>
                 </View>
                 <View style={{ flex: 1 }}>
                     <Text style={styles.text1}>Yesterday Winning Number</Text>
@@ -315,7 +349,7 @@ const Prediction = ({ navigation }) => {
                         </Image>
                         <View>
                             <Text style={styles.text2}>Your Prediction</Text>
-                            <Text style={styles.winning_number}>{yesterdayPredictionNumber != null ? { yesterdayPredictionNumber } : "N/A"}</Text>
+                            <Text style={styles.winning_number}>{yesterdayWinningNumber != null ? { yesterdayWinningNumber } : "N/A"}</Text>
                         </View>
                     </View>
                 </View>
@@ -323,7 +357,7 @@ const Prediction = ({ navigation }) => {
                     <FooterMenu />
                 </View>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </SafeAreaView >
     )
 }
 
@@ -367,7 +401,9 @@ const styles = EStyleSheet.create({
     textInput: {
         color: "green", fontSize: "36rem", borderWidth: 2, marginVertical: 10, paddingHorizontal: 10, width: "150rem", borderRadius: 15, borderColor: "green",
         textAlign: "center",
-    }
+    },
+    head: { height: 40, backgroundColor: '#808B97' },
+    text: { margin: 6 },
 })
 
 export default Prediction;

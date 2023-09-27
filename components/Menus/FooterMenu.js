@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 
 const FooterMenu = () => {
   // hooks
@@ -11,8 +11,8 @@ const FooterMenu = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
-        <FontAwesome5
-          name="plus-square"
+        <MaterialCommunityIcons
+          name="cash-multiple"
           style={styles.iconStyle}
           color={route.name === "PrizesData" && "orange"}
         />

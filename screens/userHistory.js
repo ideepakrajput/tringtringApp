@@ -53,9 +53,9 @@ const UserHistory = ({ navigation }) => {
     const renderItem = ({ item }) => {
         return (
             <View style={styles.row}>
-                <Text style={styles.cell}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
+                <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
                 <Text style={styles.cell}>{item.prediction_number}</Text>
-                <Text style={styles.cell}>{item.winning_number || 'N/A'}</Text>
+                <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "right" }}>{item.winning_number || 'N/A'}</Text>
             </View>
         );
     };
@@ -66,12 +66,12 @@ const UserHistory = ({ navigation }) => {
             <Text style={styles.text1}>Your Prediction History</Text>
             <View style={styles.table}>
                 <View style={styles.row}>
-                    <Text style={styles.headerCell}>Date & Time</Text>
+                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "left" }}>Date & Time</Text>
                     <Text style={styles.headerCell}>Prediction Number</Text>
-                    <Text style={styles.headerCell}>Winning Number</Text>
+                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "right" }}>Winning Number</Text>
                 </View>
             </View>
-            <ScrollView style={styles.container}>
+            <View style={styles.container}>
                 {
                     loading ?
                         <>
@@ -94,7 +94,7 @@ const UserHistory = ({ navigation }) => {
                             }
                         </>
                 }
-            </ScrollView>
+            </View>
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
                 <FooterMenu />
             </View>
@@ -104,7 +104,8 @@ const UserHistory = ({ navigation }) => {
 
 const styles = EStyleSheet.create({
     container: {
-        flex: 5,
+        flex: 6,
+        justifyContent: "center",
     },
     table: {
         borderWidth: 1,
@@ -120,13 +121,14 @@ const styles = EStyleSheet.create({
     cell: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'space-around',
+        justifyContent: 'center',
+        textAlign: "center",
     },
     headerCell: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'space-around',
+        justifyContent: 'center',
         fontWeight: 'bold',
+        textAlign: "center"
     },
     text1: {
         fontSize: "30rem",

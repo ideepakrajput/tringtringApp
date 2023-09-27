@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_API_URL } from "../constants/baseApiUrl";
 import FooterMenu from '../components/Menus/FooterMenu';
+import ProfileDetailsCard from '../components/ProfileDetails';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -108,47 +109,47 @@ export default function App() {
     }
   }
 
-  async function resultNotification() {
-    if (!resultAnnounced) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Predict and Win",
-          body: `Today's prediction results are in, and you've matched ${matchDigits} digits. Keep the winning spirit alive, predict tomorrow's, and continue your streak!`,
-        },
-        trigger: null
-      });
-    }
-    setResultAnnounced(true);
-  }
-  resultNotification();
+  // async function resultNotification() {
+  //   if (!resultAnnounced) {
+  //     await Notifications.scheduleNotificationAsync({
+  //       content: {
+  //         title: "Predict and Win",
+  //         body: `Today's prediction results are in, and you've matched ${matchDigits} digits. Keep the winning spirit alive, predict tomorrow's, and continue your streak!`,
+  //       },
+  //       trigger: null
+  //     });
+  //   }
+  //   setResultAnnounced(true);
+  // }
+  // resultNotification();
 
-  async function userWinNotication() {
-    if (!userWin) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Predict and Win",
-          body: `🎉 Great news, ${userName}! You've just won in today's Tring Tring prediction round. The winning number is [Winning Number]. 🥳 Claim your exciting prize now and enjoy your winnings! Tap here to redeem your reward. 🎁`,
-        },
-        trigger: null
-      });
-    }
-    setUserWin(true);
-  }
-  userWinNotication();
+  // async function userWinNotication() {
+  //   if (!userWin) {
+  //     await Notifications.scheduleNotificationAsync({
+  //       content: {
+  //         title: "Predict and Win",
+  //         body: `🎉 Great news, ${userName}! You've just won in today's Tring Tring prediction round. The winning number is [Winning Number]. 🥳 Claim your exciting prize now and enjoy your winnings! Tap here to redeem your reward. 🎁`,
+  //       },
+  //       trigger: null
+  //     });
+  //   }
+  //   setUserWin(true);
+  // }
+  // userWinNotication();
 
-  async function userFriendJoinedNotiification() {
-    if (!userFriendJoined) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Predict and Win",
-          body: `Hurray! You've received a bonus of 5 prediction chances because your friend joined Tring-Tring. You can use these extra chances whenever you like.`,
-        },
-        trigger: null
-      });
-    }
-    setUserFriendJoined(true);
-  }
-  userFriendJoinedNotiification();
+  // async function userFriendJoinedNotiification() {
+  //   if (!userFriendJoined) {
+  //     await Notifications.scheduleNotificationAsync({
+  //       content: {
+  //         title: "Predict and Win",
+  //         body: `Hurray! You've received a bonus of 5 prediction chances because your friend joined Tring-Tring. You can use these extra chances whenever you like.`,
+  //       },
+  //       trigger: null
+  //     });
+  //   }
+  //   setUserFriendJoined(true);
+  // }
+  // userFriendJoinedNotiification();
 
 
   const handleSelect = (option) => {
@@ -176,9 +177,9 @@ export default function App() {
   useEffect(() => {
     // Load the user's preference from AsyncStorage
     loadNotificationPreference();
-    userWinNotication();
-    userFriendJoinedNotiification();
-    resultNotification();
+    // userWinNotication();
+    // userFriendJoinedNotiification();
+    // resultNotification();
   }, []);
 
   useEffect(() => {
@@ -231,26 +232,28 @@ export default function App() {
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: 'flex-start',
-      }}>
-      <View>
-        <SelectPicker options={options} onSelect={handleSelect} />
-        <Text style={{ fontSize: 30, marginTop: 20 }}>Notifications</Text>
-        <NotificationSwitch />
-        <TouchableOpacity
-          style={{ backgroundColor: "#F4E869", padding: 10, borderRadius: 15, marginTop: 20 }}
-          onPress={handleSettings}
-        >
-          <Text style={{ fontSize: 25, fontWeight: "bold", color: "white", textAlign: "center" }}>Save Settings</Text>
-        </TouchableOpacity>
+    <>
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+        }}>
+        <View>
+          <ProfileDetailsCard />
+          <SelectPicker options={options} onSelect={handleSelect} />
+          <Text style={{ fontSize: 30, marginTop: 20 }}>Notifications</Text>
+          <NotificationSwitch />
+          <TouchableOpacity
+            style={{ backgroundColor: "#F4E869", padding: 10, borderRadius: 15, marginTop: 20 }}
+            onPress={handleSettings}
+          >
+            <Text style={{ fontSize: 25, fontWeight: "bold", color: "white", textAlign: "center" }}>Save Settings</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={{ flex: 1, justifyContent: "flex-end" }}>
         <FooterMenu />
       </View>
-    </View>
+    </>
   );
 }

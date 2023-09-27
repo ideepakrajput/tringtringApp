@@ -72,11 +72,11 @@ const PrizesData = () => {
                             </View>
                         </View>
                     </View>
-                    {/* <View>
+                    <View>
                         <Text style={styles.text3}>Terms & Conditions Apply:</Text>
                         <Text style={styles.text2}>*1st Prize if more than 1 user predicts same number the amount would be split equally.</Text>
                         <Text style={styles.text2}>*2nd & 3rd Prize would be given for first 10 winners only.</Text>
-                    </View> */}
+                    </View>
                 </>
             );
             break;
@@ -102,9 +102,25 @@ const PrizesData = () => {
                 <Text style={styles.text3}>List of Prizes you can win !</Text>
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginVertical: 20 }}>
-                <TouchableOpacity onPress={handleComponentA} style={styles.button}><Text style={styles.text1}>DAILY</Text></TouchableOpacity>
-                <TouchableOpacity onPress={handleComponentB} style={styles.button}><Text style={styles.text1}>MONTHLY</Text></TouchableOpacity>
-                <TouchableOpacity onPress={handleComponentC} style={styles.button}><Text style={styles.text1}>YEARLY</Text></TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleComponentA}
+                    style={[styles.button, showComponent === 'A' ? styles.activeTabStyle : styles.inactiveTabStyle]}
+                >
+                    <Text style={[styles.text1, showComponent === 'A' ? styles.activeTextStyle : styles.inactiveTextStyle]}>DAILY</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleComponentB}
+                    style={[styles.button, showComponent === 'B' ? styles.activeTabStyle : styles.inactiveTabStyle]}
+                >
+                    <Text style={[styles.text1, showComponent === 'B' ? styles.activeTextStyle : styles.inactiveTextStyle]}>MONTHLY</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={handleComponentC}
+                    style={[styles.button, showComponent === 'C' ? styles.activeTabStyle : styles.inactiveTabStyle]}
+                >
+                    <Text style={[styles.text1, showComponent === 'C' ? styles.activeTextStyle : styles.inactiveTextStyle]}>YEARLY</Text>
+                </TouchableOpacity>
+
             </View>
             {content}
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
@@ -116,20 +132,20 @@ const PrizesData = () => {
 
 const styles = EStyleSheet.create({
     text1: {
-        fontSize: "21rem",
+        fontSize: "15rem",
         fontWeight: "bold",
         color: "black",
         padding: "5rem",
     },
     text2: {
-        fontSize: "21rem",
+        fontSize: "20rem",
         fontWeight: "bold",
         color: "black",
         padding: "4rem",
         marginLeft: 15
     },
     text3: {
-        fontSize: "30rem",
+        fontSize: "25rem",
         fontWeight: "bold",
         color: "black",
         padding: "4rem",
@@ -178,8 +194,23 @@ const styles = EStyleSheet.create({
     cellText: {
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: "25rem"
+        fontSize: "20rem"
     },
+    activeTabStyle: {
+        backgroundColor: 'green', // Example active tab background color
+        color: 'white', // Example active tab text color
+    },
+    activeTextStyle: {
+        color: 'white', // Example active tab text color
+    },
+    inactiveTextStyle: {
+        color: 'black', // Example active tab text color
+    },
+    inactiveTabStyle: {
+        borderWidth: 2,
+        textAlign: "center",
+        borderRadius: 10,
+    }
 });
 
 export default PrizesData;
