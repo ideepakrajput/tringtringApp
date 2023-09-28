@@ -10,7 +10,6 @@ import { AuthContext } from '../context/authContext';
 import { formatTimestampToTimeDate, ordinalDateFormat } from '../constants/dataTime';
 import { Table, Row } from 'react-native-table-component';
 import FooterMenu from '../components/Menus/FooterMenu';
-import { AntDesign } from '@expo/vector-icons';
 
 let entireScreenWidth = Dimensions.get('window').width;
 
@@ -19,14 +18,14 @@ EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
 const Prediction = ({ navigation }) => {
     const { isPredicted, setisPredicted } = useContext(AuthContext);
-    const [predictionNumber, setPredictionNumber] = useState();
+    const [predictionNumber, setPredictionNumber] = useState("");
     const [predictionData, setPredictionData] = useState([]);
     const [yesterdayPredictionNumber, setYesterdayPredictionNumber] = useState();
     const [yesterdayWinningNumber, setYesterdayWinningNumber] = useState();
     const [todayPredictionNumber, setTodayPredictionNumber] = useState(null);
     const [isBefore830PM, setIsBefore830PM] = useState(false);
     const [wantEdit, setWantEdit] = useState(false);
-    const [editCount, setEditCount] = useState(Number);
+    const { editCount, setEditCount } = useContext(AuthContext);
 
     const { state } = useContext(AuthContext);
 
@@ -38,12 +37,6 @@ const Prediction = ({ navigation }) => {
                     Authorization: `Bearer ${token}`,
                 },
             };
-            async function getEditCount() {
-                await axios.get(`${BASE_API_URL}api/user/edit_count`, config).then((res) => {
-                    setEditCount(res.data.editCount);
-                })
-            }
-            getEditCount();
 
             async function fetchData() {
                 await axios.get(`${BASE_API_URL}api/winning/user/prediction_number`, config).then((res) => {
@@ -222,15 +215,6 @@ const Prediction = ({ navigation }) => {
                 enabled="true"
             >
                 <View style={{ flex: 3 }}>
-                    <View style={{ flexDirection: "row", justifyContent: "flex-end", marginRight: 20, marginBottom: 10 }}>
-                        <View style={{ flexDirection: "row", justifyContent: "flex-end", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, columnGap: 10, borderRadius: 50, backgroundColor: "#00BF63" }}>
-                            <View>
-                                <Text style={styles.text2}>{3 - editCount}</Text>
-                                <Text style={styles.text2}>Predictions</Text>
-                            </View>
-                            <AntDesign name="pluscircleo" size={30} color="white" />
-                        </View>
-                    </View>
                     {
                         isBefore830PM ?
                             <>

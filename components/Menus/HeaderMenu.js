@@ -1,11 +1,14 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import React, { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { AntDesign } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import EStyleSheet from "react-native-extended-stylesheet";
+
 
 const HeaderMenu = () => {
   const { state, setState } = useContext(AuthContext);
+  const { editCount, setEditCount } = useContext(AuthContext);
   //logout
   const handleLogout = async () => {
     setState({ token: "", user: null });
@@ -15,27 +18,21 @@ const HeaderMenu = () => {
   };
 
   return (
-    <View>
-      <TouchableOpacity onPress={handleLogout}>
-        <FontAwesome5
-          name="sign-out-alt"
-          color={"red"}
-          style={styles.iconStyle}
-        />
-      </TouchableOpacity>
+    <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, columnGap: 10, borderRadius: 50, backgroundColor: "#00BF63" }}>
+      <View>
+        <Text style={styles.text2}>{3 - editCount}</Text>
+        <Text style={styles.text2}>Predictions</Text>
+      </View>
+      <AntDesign name="pluscircleo" size={30} color="white" />
     </View>
   );
 };
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    margin: 15,
-    justifyContent: "space-between",
-  },
-  iconStyle: {
-    marginBottom: 3,
-    alignSelf: "center",
-    fontSize: 25,
+const styles = EStyleSheet.create({
+  text2: {
+    fontSize: "15rem",
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center"
   },
 });
 

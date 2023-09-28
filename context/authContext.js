@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { BASE_API_URL } from '../constants/baseApiUrl';
 //context
 const AuthContext = createContext();
 
@@ -15,6 +16,7 @@ const AuthProvider = ({ children }) => {
   const [isPredicted, setisPredicted] = useState(false);
   //notification
   const [isEnabled, setIsEnabled] = useState(null);
+  const [editCount, setEditCount] = useState(Number);
 
   // initial local storage data
   useEffect(() => {
@@ -23,12 +25,21 @@ const AuthProvider = ({ children }) => {
       let loginData = JSON.parse(data);
 
       setState({ ...state, user: loginData?.phoneNumber, token: loginData?.token });
+      const token = loginData?.token;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      await axios.get(`${BASE_API_URL}api/user/edit_count`, config).then((res) => {
+        setEditCount(res.data.editCount);
+      })
     };
     loadLocalStorageData();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ state, setState, isPredicted, setisPredicted, isEnabled, setIsEnabled }}>
+    <AuthContext.Provider value={{ state, setState, isPredicted, setisPredicted, isEnabled, setIsEnabled, editCount, setEditCount }}>
       {children}
     </AuthContext.Provider>
   );
