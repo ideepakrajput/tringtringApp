@@ -43,7 +43,8 @@ const ProfileDetailsCard = () => {
 const styles = StyleSheet.create({
     card: {
         backgroundColor: '#fff',
-        padding: 20,
+        paddingHorizontal: 55,
+        paddingVertical: 20,
         borderRadius: 10,
         elevation: 3,
         shadowColor: '#000',
@@ -53,12 +54,12 @@ const styles = StyleSheet.create({
         margin: 10,
     },
     label: {
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 5,
     },
     text: {
-        fontSize: 16,
+        fontSize: 20,
         marginBottom: 15,
     },
 });

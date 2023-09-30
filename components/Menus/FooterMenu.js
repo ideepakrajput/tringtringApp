@@ -31,11 +31,11 @@ const FooterMenu = () => {
           color={route.name === "Prediction" && "orange"}
         />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Prediction")}>
+      <TouchableOpacity onPress={() => navigation.navigate("ReferAndEarn")}>
         <FontAwesome5
           name="share-square"
           style={styles.iconStyle}
-          color={route.name === "Share" && "orange"}
+          color={route.name === "ReferAndEarn" && "orange"}
         />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("Settings")}>

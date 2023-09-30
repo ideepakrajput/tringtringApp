@@ -20,7 +20,7 @@ const HeaderMenu = () => {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, columnGap: 10, borderRadius: 50, backgroundColor: "#00BF63" }}>
       <View>
-        <Text style={styles.text2}>{3 - editCount}</Text>
+        <Text style={styles.text2}>{editCount}</Text>
         <Text style={styles.text2}>Predictions</Text>
       </View>
       <AntDesign name="pluscircleo" size={30} color="white" />

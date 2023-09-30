@@ -12,6 +12,7 @@ import icon from "../../assets/icon.png";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HeaderMenu from "./HeaderMenu";
 import { Image } from "react-native";
+import ReferAndEarn from "../../screens/ReferAndEarn";
 
 let authenticatedUserByGoogle;
 
@@ -58,6 +59,15 @@ const ScreenMenu = () => {
           <Stack.Screen
             name="Settings"
             component={Settings}
+            options={{
+              headerTitleAlign: "center",
+              headerTitle: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
+              headerRight: () => <HeaderMenu />,
+            }}
+          />
+          <Stack.Screen
+            name="ReferAndEarn"
+            component={ReferAndEarn}
             options={{
               headerTitleAlign: "center",
               headerTitle: () => <Image style={{ width: 80, height: 50 }} source={icon} />,

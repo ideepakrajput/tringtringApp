@@ -20,7 +20,7 @@ const SelectPicker = ({ options, onSelect }) => {
     return (
         <View>
             <TouchableOpacity onPress={toggleModal}>
-                <Text style={{ fontSize: 30, marginBottom: 10 }}>Language</Text>
+                <Text style={{ fontSize: 25, fontWeight: "bold", marginBottom: 10 }}>Language</Text>
                 <View style={{ flexDirection: 'row', gap: 6 }}>
                     <Text style={{ fontSize: 20 }}>{selectedOption || 'Select Your Language'}</Text>
                     <AntDesign name="caretdown" size={20} color="black" />

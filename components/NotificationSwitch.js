@@ -2,6 +2,7 @@ import React, { useEffect, useContext } from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../context/authContext';
+import * as Notifications from 'expo-notifications';
 
 const NotificationSwitch = () => {
     const { isEnabled, setIsEnabled } = useContext(AuthContext);
@@ -25,6 +26,24 @@ const NotificationSwitch = () => {
     const saveNotificationPreference = async (value) => {
         try {
             await AsyncStorage.setItem('notificationPreference', value.toString());
+            if (value) {
+                Notifications.setNotificationHandler({
+                    handleNotification: async () => ({
+                        shouldShowAlert: true,
+                        shouldPlaySound: true,
+                        shouldSetBadge: true,
+                    }),
+                });
+            }
+            else {
+                Notifications.setNotificationHandler({
+                    handleNotification: async () => ({
+                        shouldShowAlert: false,
+                        shouldPlaySound: false,
+                        shouldSetBadge: false,
+                    }),
+                });
+            }
         } catch (error) {
             console.error('Error saving notification preference:', error);
         }
@@ -39,8 +58,8 @@ const NotificationSwitch = () => {
         <View style={styles.container}>
             <Text style={{ fontSize: 20 }}>Receive Notifications</Text>
             <Switch
-                trackColor={{ false: '#767577', true: '#81b0ff' }}
-                thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+                trackColor={{ false: '#767577', true: '#00BF63' }}
+                thumbColor={isEnabled ? '#00BF63' : '#f4f3f4'}
                 onValueChange={toggleSwitch}
                 value={isEnabled}
                 style={{ fontSize: 20 }}

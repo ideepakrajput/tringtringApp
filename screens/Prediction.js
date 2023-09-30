@@ -108,18 +108,8 @@ const Prediction = ({ navigation }) => {
             // Update the time check every minute
             const intervalId = setInterval(checkTime, 60000);
 
-            const now = new Date();
-            const midnight = new Date(now);
-            midnight.setHours(24, 0, 0, 0);
-            const timeUntilMidnight = midnight - now;
-
-            const dailyResetTimer = setInterval(() => {
-                setEditCount(0);
-            }, timeUntilMidnight); // Reset daily
-
             // Cleanup the timer when the component unmounts
             return () => {
-                clearInterval(dailyResetTimer);
                 clearInterval(intervalId);
             }
         }, [])
@@ -159,7 +149,7 @@ const Prediction = ({ navigation }) => {
         };
 
         fetchData();
-    }, [predictionData]); // Empty dependency array ensures the effect runs only once on mount
+    }, []); // Empty dependency array ensures the effect runs only once on mount
 
 
     function handleWantEdit() {
@@ -181,11 +171,12 @@ const Prediction = ({ navigation }) => {
                 await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
                 navigation.navigate("UserHistory");
                 if (wantEdit) {
-                    const incrementValue = 1;
-                    await axios.post(`${BASE_API_URL}api/user/edit_count`, { incrementValue }, config);
+                    const decrementValue = 1;
+                    await axios.post(`${BASE_API_URL}api/user/edit_count`, { decrementValue }, config);
                     Alert.alert("Prediction Number Updated Successfully");
                 }
                 else {
+                    await axios.post(`${BASE_API_URL}api/user/per_day_edit_count`, { incrementValue: 3 }, config);
                     Alert.alert("Prediction Number Added Successfully");
 
                 }
@@ -258,14 +249,14 @@ const Prediction = ({ navigation }) => {
                                                 Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
                                             </Text>
                                             {
-                                                editCount === 3 ?
+                                                editCount <= 0 ?
                                                     <>
                                                         <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached your daily edit limit</Text></Text>
                                                     </>
                                                     :
                                                     <>
                                                         <Text style={styles.text2}>Want to edit your prediction number </Text>
-                                                        <Text style={styles.text2}><Text style={{ color: "#F8DE22" }}>{3 - editCount} more chances </Text> </Text>
+                                                        <Text style={styles.text2}><Text style={{ color: "#F8DE22" }}>{editCount} more chances </Text> </Text>
                                                         <TouchableOpacity
                                                             style={styles.button}
                                                             onPress={handleWantEdit}
@@ -309,12 +300,11 @@ const Prediction = ({ navigation }) => {
                             </>
                     }
                 </View>
-                <View style={{ flex: 2, justifyContent: "center", alignItems: "center" }}>
+                <View style={{ flex: 2 }}>
                     <Text style={styles.text1}>My Predictions</Text>
-                    <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                    <Table borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
                         {predictionData
                             .map((rowData, index) => (
-
                                 <Row key={index} data={rowData} />
                             ))}
                     </Table>
@@ -333,7 +323,7 @@ const Prediction = ({ navigation }) => {
                         </Image>
                         <View>
                             <Text style={styles.text2}>Your Prediction</Text>
-                            <Text style={styles.winning_number}>{yesterdayWinningNumber != null ? { yesterdayWinningNumber } : "N/A"}</Text>
+                            <Text style={styles.winning_number}>{yesterdayPredictionNumber}</Text>
                         </View>
                     </View>
                 </View>
