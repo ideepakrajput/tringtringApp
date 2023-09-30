@@ -25,6 +25,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 const Login = ({ navigation }) => {
 	const { state, setState } = useContext(AuthContext);
+	const { setAuthenticatedUser } = useContext(AuthContext);
 	const [loading, setLoading] = useState(true);
 	const [isPasswordShown, setIsPasswordShown] = useState(false);
 	const [isChecked, setIsChecked] = useState(false);
@@ -95,6 +96,8 @@ const Login = ({ navigation }) => {
 				phoneNumber,
 				password
 			});
+
+			setAuthenticatedUser(true);
 
 			setState(resp.data.data);
 

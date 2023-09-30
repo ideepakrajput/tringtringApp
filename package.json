@@ -17,13 +17,17 @@
     "api": "^6.1.1",
     "axios": "^1.5.0",
     "expo": "~48.0.9",
+    "expo-asset": "~8.9.1",
     "expo-auth-session": "~4.0.3",
     "expo-checkbox": "~2.3.1",
     "expo-contacts": "~12.0.1",
     "expo-crypto": "~12.2.1",
+    "expo-dev-client": "~2.2.1",
     "expo-device": "~5.2.1",
+    "expo-file-system": "~15.2.2",
     "expo-linear-gradient": "~12.1.2",
     "expo-notifications": "~0.18.1",
+    "expo-sharing": "~11.2.2",
     "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
     "expo-web-browser": "~12.1.1",
@@ -37,10 +41,7 @@
     "react-native-screens": "~3.20.0",
     "react-native-table-component": "^1.2.2",
     "react-native-web": "~0.18.10",
-    "react-navigation": "^4.4.4",
-    "expo-sharing": "~11.2.2",
-    "expo-file-system": "~15.2.2",
-    "expo-asset": "~8.9.1"
+    "react-navigation": "^4.4.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

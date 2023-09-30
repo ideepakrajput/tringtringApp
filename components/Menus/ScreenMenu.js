@@ -18,7 +18,7 @@ let authenticatedUserByGoogle;
 
 const ScreenMenu = () => {
   //global state
-  const { state } = useContext(AuthContext);
+  const { authenticatedUser } = useContext(AuthContext);
 
   //auth condition true false
   const getLocalUser = async () => {
@@ -26,7 +26,6 @@ const ScreenMenu = () => {
     authenticatedUserByGoogle = JSON.parse(data)?.verified_email;
   };
 
-  const authenticatedUser = state?.user && state?.token;
 
   useEffect(() => {
     getLocalUser();

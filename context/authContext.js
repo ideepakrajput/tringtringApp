@@ -17,6 +17,7 @@ const AuthProvider = ({ children }) => {
   //notification
   const [isEnabled, setIsEnabled] = useState(null);
   const [editCount, setEditCount] = useState(Number);
+  const [authenticatedUser, setAuthenticatedUser] = useState(false);
 
   // initial local storage data
   useEffect(() => {
@@ -25,6 +26,9 @@ const AuthProvider = ({ children }) => {
       let loginData = JSON.parse(data);
 
       setState({ ...state, user: loginData?.phoneNumber, token: loginData?.token });
+
+      setAuthenticatedUser(loginData?.phoneNumber && loginData?.token);
+
       const token = loginData?.token;
       const config = {
         headers: {
@@ -36,10 +40,10 @@ const AuthProvider = ({ children }) => {
       })
     };
     loadLocalStorageData();
-  }, []);
+  }, [state]);
 
   return (
-    <AuthContext.Provider value={{ state, setState, isPredicted, setisPredicted, isEnabled, setIsEnabled, editCount, setEditCount }}>
+    <AuthContext.Provider value={{ authenticatedUser, setAuthenticatedUser, state, setState, isPredicted, setisPredicted, isEnabled, setIsEnabled, editCount, setEditCount }}>
       {children}
     </AuthContext.Provider>
   );

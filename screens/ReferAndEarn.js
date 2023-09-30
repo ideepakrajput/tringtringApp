@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Share, TextInput } from 'react-native';
 import * as Contacts from 'expo-contacts';
-import * as Sharing from 'expo-sharing';
-import { Asset } from 'expo-asset';
-import * as FileSystem from 'expo-file-system';
+// import * as Sharing from 'expo-sharing';
+// import { Asset } from 'expo-asset';
+// import * as FileSystem from 'expo-file-system';
 import FooterMenu from '../components/Menus/FooterMenu';
 
 const image = require('../assets/icon.png');
@@ -58,9 +58,9 @@ const InviteFriends = () => {
         try {
             const result = await Share.share({
                 title: "Tring Tring",
-                url: "https://www.tring-tring.netlify.app",
+                url: "https://tring-tring.netlify.app/",
                 message:
-                    'Hey ${name}! , I am using Tring Tring to PREDICT and WIN daily !!!\nJoin by my referral get bonus money and more predictions.',
+                    `https://tring-tring.netlify.app/ \nHey ${name}! , I am using Tring Tring to PREDICT and WIN daily !!!\nJoin by my referral get bonus money and more predictions.`,
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {

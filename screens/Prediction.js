@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image, Dimensions, Alert, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Dimensions, Alert, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import React, { useContext, useState, useEffect } from 'react';
 import COLORS from "../constants/colors";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,6 +26,7 @@ const Prediction = ({ navigation }) => {
     const [isBefore830PM, setIsBefore830PM] = useState(false);
     const [wantEdit, setWantEdit] = useState(false);
     const { editCount, setEditCount } = useContext(AuthContext);
+    const [isloading, setIsLoading] = useState(false);
 
     const { state } = useContext(AuthContext);
 
@@ -64,7 +65,9 @@ const Prediction = ({ navigation }) => {
                     });
 
                 }).catch((err) => {
-                    Alert.alert(err.response.data.message);
+                    console.log('====================================');
+                    console.log(err.response.data.message);
+                    console.log('====================================');
                 });
 
                 await axios.get(`${BASE_API_URL}api/winning/winning_numbers`)
@@ -149,7 +152,7 @@ const Prediction = ({ navigation }) => {
         };
 
         fetchData();
-    }, []); // Empty dependency array ensures the effect runs only once on mount
+    }, [predictionData]); // Empty dependency array ensures the effect runs only once on mount
 
 
     function handleWantEdit() {
@@ -158,6 +161,7 @@ const Prediction = ({ navigation }) => {
     }
 
     const submitPrediction = async () => {
+        setIsLoading(true);
         const token = state?.token;
 
         const config = {
@@ -173,22 +177,31 @@ const Prediction = ({ navigation }) => {
                 if (wantEdit) {
                     const decrementValue = 1;
                     await axios.post(`${BASE_API_URL}api/user/edit_count`, { decrementValue }, config);
+                    const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
+                    setEditCount(updatedEditCount.data.editCount);
+                    setIsLoading(false);
                     Alert.alert("Prediction Number Updated Successfully");
                 }
                 else {
                     await axios.post(`${BASE_API_URL}api/user/per_day_edit_count`, { incrementValue: 3 }, config);
+                    const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
+                    setEditCount(updatedEditCount.data.editCount);
+                    setIsLoading(false);
                     Alert.alert("Prediction Number Added Successfully");
 
                 }
             }
             else if (!predictionNumber) {
+                setIsLoading(false);
                 Alert.alert("Please enter your prediction number !")
             }
             else if (predictionNumber.length < 5) {
+                setIsLoading(false);
                 Alert.alert("Please enter 5 digit number !")
             }
 
         } catch (error) {
+            setIsLoading(false);
             Alert.alert(error.response.data.message);
         }
     }
@@ -279,12 +292,15 @@ const Prediction = ({ navigation }) => {
                                             >
                                             </TextInput>
                                             <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
-                                            <TouchableOpacity
-                                                style={styles.button}
-                                                onPress={submitPrediction}
-                                            >
-                                                <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
-                                            </TouchableOpacity>
+                                            {
+                                                isloading ? <ActivityIndicator></ActivityIndicator> :
+                                                    <TouchableOpacity
+                                                        style={styles.button}
+                                                        onPress={submitPrediction}
+                                                    >
+                                                        <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
+                                                    </TouchableOpacity>
+                                            }
                                         </>
                                     }
                                 </View>
