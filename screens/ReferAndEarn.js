@@ -2,9 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Share, TextInput } from 'react-native';
 import * as Contacts from 'expo-contacts';
-// import * as Sharing from 'expo-sharing';
-// import { Asset } from 'expo-asset';
-// import * as FileSystem from 'expo-file-system';
 import FooterMenu from '../components/Menus/FooterMenu';
 
 const image = require('../assets/icon.png');
@@ -36,29 +33,9 @@ const InviteFriends = () => {
     );
 
     const handleShare = async (name) => {
-        //     const asset = Asset.fromModule(image);
-        //     await asset.downloadAsync();
-        //     const tmpFile = FileSystem.cacheDirectory + 'icon.png';
-
-        //     try {
-        //         const isAvailable = await Sharing.isAvailableAsync();
-        //         if (isAvailable) {
-        //             FileSystem.copyAsync({ from: asset.localUri, to: tmpFile });
-        //             Sharing.shareAsync(tmpFile, {
-        //                 dialogTitle: 'Hey there ! ',
-        //             });
-        //         } else {
-        //             alert('Sharing is not available on your device');
-        //         }
-
-        //     } catch (e) {
-        //         console.error(e);
-        //     }
-        // };
         try {
             const result = await Share.share({
-                title: "Tring Tring",
-                url: "https://tring-tring.netlify.app/",
+                title: `Tring Tring`,
                 message:
                     `https://tring-tring.netlify.app/ \nHey ${name}! , I am using Tring Tring to PREDICT and WIN daily !!!\nJoin by my referral get bonus money and more predictions.`,
             });
@@ -86,7 +63,7 @@ const InviteFriends = () => {
     };
 
 
-    const renderItem = ({ item }) => (
+    const MemoizedContactItem = React.memo(({ item, handleShare }) => (
         <View style={styles.contactItem}>
             {item.image ? (
                 <Image source={{ uri: item.image.uri }} style={styles.contactImage} />
@@ -104,6 +81,10 @@ const InviteFriends = () => {
                 <Text style={styles.shareButtonText}>Share</Text>
             </TouchableOpacity>
         </View>
+    ));
+
+    const renderItem = ({ item }) => (
+        <MemoizedContactItem item={item} handleShare={handleShare} />
     );
 
     return (
@@ -117,7 +98,7 @@ const InviteFriends = () => {
                 />
                 <FlatList
                     data={filteredContacts}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item.id.toString()}
                     renderItem={renderItem}
                     contentContainerStyle={styles.contactList}
                 />

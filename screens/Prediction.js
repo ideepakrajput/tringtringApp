@@ -328,7 +328,7 @@ const Prediction = ({ navigation }) => {
                 <View style={{ flex: 1 }}>
                     <Text style={styles.text1}>Yesterday Winning Number</Text>
                     <View style={{ flexDirection: "row", backgroundColor: "#00BF63", alignItems: "center", justifyContent: "space-around", borderRadius: 50 }}>
-                        <Text style={styles.winning_number}>{yesterdayWinningNumber != null ? { yesterdayWinningNumber } : "N/A"}</Text>
+                        <Text style={styles.winning_number}>{yesterdayWinningNumber}</Text>
                         <Image
                             source={require("../assets/utubelogo.png")}
                             style={{
