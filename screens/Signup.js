@@ -19,6 +19,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 
+
+
+
+
+
+import DropDownPicker from 'react-native-dropdown-picker';
+
+
 WebBrowser.maybeCompleteAuthSession();
 
 const Signup = ({ navigation }) => {
@@ -33,6 +41,15 @@ const Signup = ({ navigation }) => {
 
   const [token, setToken] = useState("");
   const [userInfo, setUserInfo] = useState(null);
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    { label: 'Male', value: 'male' },
+    { label: 'Female', value: 'female' },
+    { label: 'Others', value: 'others' }
+  ]);
+  const [selectedValue, setSelectedValue] = useState(null);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: "641271354850-j48bfubrgpibbv8p18hep9iiqolb9fhh.apps.googleusercontent.com",
@@ -173,6 +190,7 @@ const Signup = ({ navigation }) => {
           </View>
         </View>
 
+
         <View style={{ marginBottom: 12 }}>
           <Text
             style={{
@@ -242,10 +260,23 @@ const Signup = ({ navigation }) => {
               borderRadius: 8,
               alignItems: "center",
               justifyContent: "center",
-              paddingLeft: 22,
+              // paddingLeft: 22,
             }}
           >
-            <TextInput
+            <DropDownPicker
+              open={open}
+              value={value}
+              items={items}
+              defaultValue={selectedValue}
+              setOpen={setOpen}
+              onSelectItem={(item) => {
+                setGender(item.value)
+              }}
+              setValue={setValue}
+              theme="DARK"
+              setItems={setItems}
+            />
+            {/* <TextInput
               placeholder="Enter your gender"
               placeholderTextColor={COLORS.black}
               style={{
@@ -253,7 +284,7 @@ const Signup = ({ navigation }) => {
               }}
               value={gender}
               onChangeText={(text) => setGender(text)}
-            />
+            /> */}
           </View>
         </View>
 
@@ -291,6 +322,7 @@ const Signup = ({ navigation }) => {
               value={age}
               onChangeText={(text) => setAge(text)}
             />
+
           </View>
         </View>
 
