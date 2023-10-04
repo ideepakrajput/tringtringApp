@@ -13,6 +13,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HeaderMenu from "./HeaderMenu";
 import { Image } from "react-native";
 import ReferAndEarn from "../../screens/ReferAndEarn";
+import ForgetPassword from "../../screens/ForgetPassword";
 
 let authenticatedUserByGoogle;
 
@@ -97,6 +98,11 @@ const ScreenMenu = () => {
           />
         </>
       )}
+      <Stack.Screen
+        name="ForgetPassword"
+        component={ForgetPassword}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }

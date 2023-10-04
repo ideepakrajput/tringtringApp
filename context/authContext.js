@@ -35,9 +35,11 @@ const AuthProvider = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
       };
-      await axios.get(`${BASE_API_URL}api/user/edit_count`, config).then((res) => {
-        setEditCount(res.data.editCount);
-      })
+      if (token) {
+        await axios.get(`${BASE_API_URL}api/user/edit_count`, config).then((res) => {
+          setEditCount(res.data.editCount);
+        })
+      }
     };
     loadLocalStorageData();
   }, [state]);

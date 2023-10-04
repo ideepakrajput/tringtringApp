@@ -343,6 +343,29 @@ const Login = ({ navigation }) => {
 						</Text>
 					</Pressable>
 				</View>
+				<View
+					style={{
+						flexDirection: "row",
+						justifyContent: "center",
+						marginVertical: 16,
+					}}
+				>
+					<Text style={{ fontSize: 16, color: COLORS.black }}>
+						Have You forget your password ?{" "}
+					</Text>
+					<Pressable onPress={() => navigation.navigate("ForgetPassword")}>
+						<Text
+							style={{
+								fontSize: 16,
+								color: COLORS.primary,
+								fontWeight: "bold",
+								marginLeft: 6,
+							}}
+						>
+							Forget Password
+						</Text>
+					</Pressable>
+				</View>
 			</View>
 		</SafeAreaView>
 	);

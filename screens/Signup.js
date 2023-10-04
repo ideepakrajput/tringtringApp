@@ -20,13 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 
-
-
-
-
-
 import DropDownPicker from 'react-native-dropdown-picker';
-
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -177,7 +171,7 @@ const Signup = ({ navigation }) => {
             style={{
               fontSize: 22,
               fontWeight: "bold",
-              marginTop: 20,
+              marginTop: 10,
               color: COLORS.black,
             }}
           >
@@ -510,7 +504,7 @@ const Signup = ({ navigation }) => {
           style={{
             flexDirection: "row",
             justifyContent: "center",
-            marginVertical: 22,
+            marginVertical: 8,
           }}
         >
           <Text style={{ fontSize: 16, color: COLORS.black }}>
