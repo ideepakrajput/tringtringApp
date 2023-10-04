@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  StyleSheet,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -41,7 +42,12 @@ const Signup = ({ navigation }) => {
 
   const [token, setToken] = useState("");
   const [userInfo, setUserInfo] = useState(null);
-
+  //OTP
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [sentOtp, setSentOtp] = useState('');
+  const [verified, setVerified] = useState(false);
+  //OTP
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([
@@ -129,7 +135,40 @@ const Signup = ({ navigation }) => {
       Alert.alert(error.response.data.message);
     }
   };
+  //OTP
+  const handleSendOtp = async () => {
+    // Validate phone number (you can add your validation logic)
+    if (!phoneNumber) {
+      Alert.alert('Error', 'Please enter a valid phone number.');
+      return;
+    }
+    if (phoneNumber.length < 10) {
+      Alert.alert("Error, Please add a valid phone number.");
+    }
+    const randomNumber = Math.floor(1000 + Math.random() * 9000);
 
+    const fourDigitOTP = ('000' + randomNumber).slice(-4);
+    setSentOtp(fourDigitOTP);
+    console.log('====================================');
+    console.log(fourDigitOTP);
+    console.log(sentOtp);
+    console.log('====================================');
+
+    await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
+    setIsOtpSent(true);
+  };
+
+  const handleVerifyOtp = () => {
+    // Simulate OTP verification logic
+    const expectedOtp = sentOtp; // Replace with the actual OTP received or generated
+    if (otp === expectedOtp) {
+      Alert.alert('Success', 'OTP verified successfully!');
+      setVerified(true);
+    } else {
+      Alert.alert('Error', 'Incorrect OTP. Please try again.');
+    }
+  };
+  //OTP
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       <View style={{ flex: 1, marginHorizontal: 22 }}>
@@ -190,54 +229,54 @@ const Signup = ({ navigation }) => {
           </View>
         </View>
 
-
         <View style={{ marginBottom: 12 }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: 400,
-              marginVertical: 8,
-            }}
-          >
-            Mobile Number
-          </Text>
+          {/* OTP */}
+          {!isOtpSent ? (
+            // Page to input phone number and send OTP
+            <View>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 400,
+                  marginVertical: 8,
+                }}
+              >
+                Mobile Number
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Phone Number"
+                keyboardType="phone-pad"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+              />
+              <TouchableOpacity style={styles.button} onPress={handleSendOtp}>
+                <Text style={styles.buttonText}>Send OTP</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            // Page with OTP input
+            <View>
+              <Text style={styles.title}>Enter OTP</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter OTP"
+                keyboardType="numeric"
+                value={otp}
+                onChangeText={setOtp}
+              />
+              <>
+                {verified ?
+                  <Text style={{ color: "green", fontSize: 16, textAlign: "center", marginTop: 10 }}>Mobile Number Verified !</Text>
+                  :
+                  <TouchableOpacity style={styles.button} onPress={handleVerifyOtp}>
+                    <Text style={styles.buttonText}>Verify OTP</Text>
+                  </TouchableOpacity>
+                }
+              </>
+            </View>
+          )}
 
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: COLORS.black,
-              borderWidth: 1,
-              borderRadius: 8,
-              alignItems: "center",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingLeft: 22,
-            }}
-          >
-            <TextInput
-              placeholder="+91"
-              placeholderTextColor={COLORS.black}
-              style={{
-                width: "12%",
-                borderRightWidth: 1,
-                borderLeftColor: COLORS.grey,
-                height: "100%",
-              }}
-              defaultValue="+91"
-            />
-
-            <TextInput
-              placeholder="Enter your phone number"
-              placeholderTextColor={COLORS.black}
-              keyboardType="numeric"
-              style={{
-                width: "80%",
-              }}
-              value={phoneNumber}
-              onChangeText={(text) => setPhoneNumber(text)}
-            />
-          </View>
         </View>
 
         <View style={{ marginBottom: 12 }}>
@@ -392,15 +431,19 @@ const Signup = ({ navigation }) => {
           <Text>I agree to the terms and conditions</Text>
         </View>
 
-        <Button
-          onPress={handleSignup}
-          title="Sign Up"
-          filled
-          style={{
-            marginTop: 18,
-            marginBottom: 4,
-          }}
-        />
+        {verified ?
+          <Button
+            onPress={handleSignup}
+            title="Sign Up"
+            filled
+            style={{
+              marginTop: 18,
+              marginBottom: 4,
+            }}
+          />
+          :
+          <Text style={{ color: "red", fontSize: 16, textAlign: "center", marginTop: 10 }}>Verify Your Number First !!!</Text>
+        }
 
         <View
           style={{
@@ -490,5 +533,23 @@ const Signup = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
+const styles = StyleSheet.create({
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+});
 export default Signup;

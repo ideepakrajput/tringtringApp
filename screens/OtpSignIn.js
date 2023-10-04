@@ -1,69 +1,109 @@
-import { OTPVerification } from '@msg91comm/react-native-sendotp'
-import Modal from "react-native-modal";
 import React, { useState } from 'react';
-import { View, Button } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 
-const OtpSignIn = async () => {
+const OtpVerificationPage = () => {
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [isOtpSent, setIsOtpSent] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [sentOtp, setSentOtp] = useState('');
 
-    // Replace with your MSG91 API key
-    const apiKey = '406611Tj5sg0N5D6511529cP1';
+    const handleSendOtp = async () => {
+        // Validate phone number (you can add your validation logic)
+        if (!phoneNumber) {
+            Alert.alert('Error', 'Please enter a valid phone number.');
+            return;
+        }
+        if (phoneNumber.length < 10) {
+            Alert.alert("Error, Please add a valid phone number.");
+        }
+        const randomNumber = Math.floor(100000 + Math.random() * 900000);
+        const sixDigitOTP = ('000000' + randomNumber).slice(-6);
+        setSentOtp(sixDigitOTP);
+        console.log('====================================');
+        console.log(sixDigitOTP);
+        console.log(sentOtp);
+        console.log('====================================');
 
-    // Recipient's phone number
-    const phoneNumber = '917254880990';
-
-    // Generate a random OTP (you can use a library for this)
-    const otp = '1234';
-
-    // MSG91 API endpoint for sending OTP
-    const sendOtpUrl = 'https://api.msg91.com/api/v5/otp';
-
-    // Prepare the payload for sending OTP
-    const sendOtpPayload = {
-        authkey: apiKey,
-        mobile: phoneNumber,
+        await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${sixDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
+        setIsOtpSent(true);
     };
 
-    // Send OTP
-    await axios
-        .post(sendOtpUrl, sendOtpPayload)
-        .then((response) => {
-            console.log('OTP sent successfully:', response.data);
-        })
-        .catch((error) => {
-            console.error('Error sending OTP:', error);
-        });
-
-    const userEnteredOtp = '1234';
-
-    // MSG91 API endpoint for OTP verification
-    const verifyOtpUrl = 'https://api.msg91.com/api/v5/otp/verify';
-
-    // Prepare the payload for OTP verification
-    const verifyOtpPayload = {
-        authkey: apiKey,
-        mobile: phoneNumber,
+    const handleVerifyOtp = () => {
+        // Simulate OTP verification logic
+        const expectedOtp = sentOtp; // Replace with the actual OTP received or generated
+        if (otp === expectedOtp) {
+            Alert.alert('Success', 'OTP verified successfully!');
+        } else {
+            Alert.alert('Error', 'Incorrect OTP. Please try again.');
+        }
     };
 
-    // Verify OTP
-    await axios
-        .get(verifyOtpUrl, verifyOtpPayload)
-        .then((response) => {
-            const verificationStatus = response.data;
-            if (verificationStatus.type === 'success') {
-                console.log('OTP verified successfully.');
-            } else {
-                console.error('OTP verification failed:', verificationStatus.message);
-            }
-        })
-        .catch((error) => {
-            console.error('Error verifying OTP:', error);
-        });
     return (
-        <View style={{ flex: 1 }}>
-
+        <View style={styles.container}>
+            {!isOtpSent ? (
+                // Page to input phone number and send OTP
+                <View>
+                    <Text style={styles.title}>Enter Phone Number</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Phone Number"
+                        keyboardType="phone-pad"
+                        value={phoneNumber}
+                        onChangeText={setPhoneNumber}
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleSendOtp}>
+                        <Text style={styles.buttonText}>Send OTP</Text>
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                // Page with OTP input
+                <View>
+                    <Text style={styles.title}>Enter OTP</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter OTP"
+                        keyboardType="numeric"
+                        value={otp}
+                        onChangeText={setOtp}
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleVerifyOtp}>
+                        <Text style={styles.buttonText}>Verify OTP</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
-}
+};
 
-export default OtpSignIn;
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 16,
+    },
+    title: {
+        fontSize: 20,
+        marginBottom: 16,
+    },
+    input: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        marginBottom: 16,
+        paddingHorizontal: 10,
+    },
+    button: {
+        backgroundColor: 'blue',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+    },
+});
+
+export default OtpVerificationPage;

@@ -8,7 +8,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
 import { formatTimestampToTimeDate, ordinalDateFormat } from '../constants/dataTime';
-import { Table, Row } from 'react-native-table-component';
 import FooterMenu from '../components/Menus/FooterMenu';
 import Modal from 'react-native-modal';
 
