@@ -36,9 +36,8 @@ const Login = ({ navigation }) => {
 	const [userInfo, setUserInfo] = useState(null);
 
 	const [request, response, promptAsync] = Google.useAuthRequest({
-		androidClientId: "641271354850-j48bfubrgpibbv8p18hep9iiqolb9fhh.apps.googleusercontent.com",
-
-		expoClientId: "641271354850-cskndlb8h4ir0g5vptm8b9c9jqfrroaj.apps.googleusercontent.com",
+		androidClientId: "641271354850-s3s89c9101j3pv63i4ult965gv7uncsp.apps.googleusercontent.com",
+		expoClientId: "641271354850-5jd5i3o6kial8kps5mm412bg4ki82lrl.apps.googleusercontent.com",
 	});
 
 	useEffect(() => {
@@ -49,9 +48,8 @@ const Login = ({ navigation }) => {
 		const user = await getLocalUser();
 		if (!user) {
 			if (response?.type === "success") {
-				// setToken(response.authentication.accessToken);
+				setToken(response.authentication.accessToken);
 				getUserInfo(response.authentication.accessToken);
-				navigation.navigate("InputNo");
 			}
 		} else {
 			setUserInfo(user);
