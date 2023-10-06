@@ -42,7 +42,7 @@ const AuthProvider = ({ children }) => {
       }
     };
     loadLocalStorageData();
-  }, [state]);
+  }, [state, authenticatedUser]);
 
   return (
     <AuthContext.Provider value={{ authenticatedUser, setAuthenticatedUser, state, setState, isPredicted, setisPredicted, isEnabled, setIsEnabled, editCount, setEditCount }}>

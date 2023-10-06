@@ -49,11 +49,10 @@ const Signup = ({ navigation }) => {
     { label: 'Female', value: 'female' },
     { label: 'Others', value: 'others' }
   ]);
-  const [selectedValue, setSelectedValue] = useState(null);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: "641271354850-j48bfubrgpibbv8p18hep9iiqolb9fhh.apps.googleusercontent.com",
-    expoClientId: "641271354850-cskndlb8h4ir0g5vptm8b9c9jqfrroaj.apps.googleusercontent.com",
+    androidClientId: "641271354850-s3s89c9101j3pv63i4ult965gv7uncsp.apps.googleusercontent.com",
+    expoClientId: "641271354850-5jd5i3o6kial8kps5mm412bg4ki82lrl.apps.googleusercontent.com",
   });
 
   useEffect(() => {
@@ -62,13 +61,16 @@ const Signup = ({ navigation }) => {
 
   async function handleEffect() {
     const user = await getLocalUser();
+    console.log("user", user);
     if (!user) {
       if (response?.type === "success") {
         setToken(response.authentication.accessToken);
         getUserInfo(response.authentication.accessToken);
+        navigation.navigate("OtpVerificationPage");
       }
     } else {
       setUserInfo(user);
+      console.log("loaded locally");
     }
   }
 
@@ -143,11 +145,6 @@ const Signup = ({ navigation }) => {
 
     const fourDigitOTP = ('000' + randomNumber).slice(-4);
     setSentOtp(fourDigitOTP);
-    console.log('====================================');
-    console.log(fourDigitOTP);
-    console.log(sentOtp);
-    console.log('====================================');
-
     await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
     setIsOtpSent(true);
   };
@@ -300,7 +297,7 @@ const Signup = ({ navigation }) => {
               open={open}
               value={value}
               items={items}
-              defaultValue={selectedValue}
+              defaultValue={gender}
               setOpen={setOpen}
               onSelectItem={(item) => {
                 setGender(item.value)

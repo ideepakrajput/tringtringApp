@@ -38,7 +38,6 @@ const ForgetPassword = ({ navigation }) => {
     };
     //OTP
     const handleSendOtp = async () => {
-        // Validate phone number (you can add your validation logic)
         const result = await axios.get(`${BASE_API_URL}api/user/users`);
         const userData = await result.data;
         function doesPhoneNumberExist(phoneNumberToFind) {
@@ -58,10 +57,6 @@ const ForgetPassword = ({ navigation }) => {
 
             const fourDigitOTP = ('000' + randomNumber).slice(-4);
             setSentOtp(fourDigitOTP);
-            console.log('====================================');
-            console.log(fourDigitOTP);
-            console.log(sentOtp);
-            console.log('====================================');
 
             await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
             setIsOtpSent(true);

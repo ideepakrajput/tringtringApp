@@ -14,23 +14,11 @@ import HeaderMenu from "./HeaderMenu";
 import { Image } from "react-native";
 import ReferAndEarn from "../../screens/ReferAndEarn";
 import ForgetPassword from "../../screens/ForgetPassword";
-
-let authenticatedUserByGoogle;
+import OtpVerificationPage from "../../screens/OtpVerification";
 
 const ScreenMenu = () => {
   //global state
   const { authenticatedUser } = useContext(AuthContext);
-
-  //auth condition true false
-  const getLocalUser = async () => {
-    const data = await AsyncStorage.getItem("@user");
-    authenticatedUserByGoogle = JSON.parse(data)?.verified_email;
-  };
-
-
-  useEffect(() => {
-    getLocalUser();
-  }, [authenticatedUserByGoogle]);
 
   const Stack = createNativeStackNavigator();
 
@@ -101,6 +89,11 @@ const ScreenMenu = () => {
       <Stack.Screen
         name="ForgetPassword"
         component={ForgetPassword}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="OtpVerificationPage"
+        component={OtpVerificationPage}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

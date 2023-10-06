@@ -1,41 +1,93 @@
-import React, { useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
+import { BASE_API_URL } from '../constants/baseApiUrl';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../context/authContext';
 
-const OtpVerificationPage = () => {
+const OtpVerificationPage = ({ navigation }) => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isOtpSent, setIsOtpSent] = useState(false);
     const [otp, setOtp] = useState('');
     const [sentOtp, setSentOtp] = useState('');
+    const [ip, setIp] = useState("");
+
+    const { state, setState } = useContext(AuthContext);
+    const { setAuthenticatedUser } = useContext(AuthContext);
 
     const handleSendOtp = async () => {
-        // Validate phone number (you can add your validation logic)
+        const result = await axios.get(`${BASE_API_URL}api/user/users`);
+        const userData = await result.data;
+        function doesPhoneNumberExist(phoneNumberToFind) {
+            return userData.some((user) => user.phoneNumber == phoneNumberToFind);
+        }
+        const phoneNumberExists = await doesPhoneNumberExist(phoneNumber);
+
         if (!phoneNumber) {
             Alert.alert('Error', 'Please enter a valid phone number.');
             return;
         }
-        if (phoneNumber.length < 10) {
-            Alert.alert("Error, Please add a valid phone number.");
+        else if (phoneNumber.length != 10) {
+            Alert.alert('Error', 'Please add a valid phone number.');
         }
-        const randomNumber = Math.floor(100000 + Math.random() * 900000);
-        const sixDigitOTP = ('000000' + randomNumber).slice(-6);
-        setSentOtp(sixDigitOTP);
-        console.log('====================================');
-        console.log(sixDigitOTP);
-        console.log(sentOtp);
-        console.log('====================================');
+        else if (!phoneNumberExists) {
+            const randomNumber = Math.floor(1000 + Math.random() * 9000);
 
-        await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${sixDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
-        setIsOtpSent(true);
+            const fourDigitOTP = ('000' + randomNumber).slice(-4);
+            setSentOtp(fourDigitOTP);
+            console.log(fourDigitOTP);
+
+            await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
+            setIsOtpSent(true);
+        } else if (phoneNumberExists) {
+            Alert.alert("Eror", "Phone Number already registered, Try With Another Phone Number !");
+        }
     };
+    useEffect(() => {
+        getLocalUser();
+    }, []);
 
+    const getLocalUser = async () => {
+        const data = await AsyncStorage.getItem("@user");
+        if (!data) return null;
+        return JSON.parse(data);
+    };
     const handleVerifyOtp = () => {
         // Simulate OTP verification logic
         const expectedOtp = sentOtp; // Replace with the actual OTP received or generated
         if (otp === expectedOtp) {
             Alert.alert('Success', 'OTP verified successfully!');
+            handleSignup();
         } else {
             Alert.alert('Error', 'Incorrect OTP. Please try again.');
+        }
+    };
+    const handleSignup = async () => {
+        try {
+            await axios.get("https://api.ipify.org/?format=json").then((res) => {
+                setIp(res.data.ip);
+            }).catch((err) => {
+                console.log(err.response.data.message);
+            });
+
+            const user = await getLocalUser();
+
+            const resp = await axios.post(`${BASE_API_URL}api/user/register`, {
+                name: user.name,
+                phoneNumber,
+                email: user.email,
+                password: "true",
+                ip_address: ip
+            });
+            setAuthenticatedUser(true);
+
+            setState(resp.data.data);
+
+            await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
+
+            navigation.navigate("Prediction");
+        } catch (error) {
+            Alert.alert(error.response.data.message);
         }
     };
 
@@ -44,7 +96,7 @@ const OtpVerificationPage = () => {
             {!isOtpSent ? (
                 // Page to input phone number and send OTP
                 <View>
-                    <Text style={styles.title}>Enter Phone Number</Text>
+                    <Text style={styles.title}>Verify Your Phone Number</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Phone Number"
