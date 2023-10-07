@@ -143,9 +143,11 @@ const Prediction = ({ navigation }) => {
                 // Replace this with your actual data fetching logic
                 const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config)
                 const sortedData = await result.data.sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date));
+                const today = new Date().toISOString().split('T')[0];
 
+                const todayDocuments = sortedData.filter(item => item.transaction_date.startsWith(today));
                 // Extract the last three updated prediction_number and created_date_time
-                const lastThreePredictions = sortedData.slice(0, 3).map(item => ({
+                const lastThreePredictions = todayDocuments.map(item => ({
                     prediction_number: item.prediction_number,
                     transaction_date: item.transaction_date,
                     _id: item._id
