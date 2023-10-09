@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image, FlatList, Dimensions, Alert, Share, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Linking, Image, FlatList, Dimensions, Alert, Share, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import React, { useContext, useState, useEffect } from 'react';
 import COLORS from "../constants/colors";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +10,7 @@ import { AuthContext } from '../context/authContext';
 import { formatTimestampToTimeDate, ordinalDateFormat } from '../constants/dataTime';
 import FooterMenu from '../components/Menus/FooterMenu';
 import Modal from 'react-native-modal';
+import { openYouTubeLink } from '../constants/openYouTubeLink';
 
 let entireScreenWidth = Dimensions.get('window').width;
 
@@ -22,6 +23,7 @@ const Prediction = ({ navigation }) => {
     const [predictionData, setPredictionData] = useState([]);
     const [yesterdayPredictionNumber, setYesterdayPredictionNumber] = useState();
     const [yesterdayWinningNumber, setYesterdayWinningNumber] = useState();
+    const [yesterdayWinningURL, setYesterdayWinningURL] = useState("");
     const [todayPredictionNumber, setTodayPredictionNumber] = useState(null);
     const [isBefore830PM, setIsBefore830PM] = useState(false);
     const [addPrediction, setAddPrediction] = useState(false);
@@ -97,6 +99,7 @@ const Prediction = ({ navigation }) => {
                         for (const item of res.data) {
                             if (item.created_date_time.startsWith(yesterdayDateStr)) {
                                 setYesterdayWinningNumber(item.winning_number);
+                                setYesterdayWinningURL(item.youtube_url);
                                 break; // Stop once you find the winning number for yesterday
                             }
                         }
@@ -203,12 +206,14 @@ const Prediction = ({ navigation }) => {
                     setEditCount(updatedEditCount.data.editCount);
                     setIsLoading(false);
                 } else if (wantEdit) {
+                    console.log('====================================');
+                    console.log(id);
+                    console.log('====================================');
                     await axios.put(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, id }, config);
                     setIsLoading(false);
                 }
                 else {
                     await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
-                    await axios.post(`${BASE_API_URL}api/user/update_edit_count`, { incrementValue: 3 }, config);
                     const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
                     setEditCount(updatedEditCount.data.editCount);
                     setIsLoading(false);
@@ -278,7 +283,6 @@ const Prediction = ({ navigation }) => {
             </View>
         );
     };
-
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: "space-evenly" }}>
             <KeyboardAvoidingView
@@ -441,14 +445,16 @@ const Prediction = ({ navigation }) => {
                     <Text style={styles.text1}>Yesterday Winning Number</Text>
                     <View style={{ flexDirection: "row", backgroundColor: "#00BF63", alignItems: "center", justifyContent: "space-around", borderRadius: 50 }}>
                         <Text style={styles.winning_number}>{yesterdayWinningNumber}</Text>
-                        <Image
-                            source={require("../assets/utubelogo.png")}
-                            style={{
-                                height: 60,
-                                width: 60,
-                            }}
-                        >
-                        </Image>
+                        <TouchableOpacity onPress={() => openYouTubeLink(yesterdayWinningURL)}>
+                            <Image
+                                source={require("../assets/utubelogo.png")}
+                                style={{
+                                    height: 60,
+                                    width: 60,
+                                }}
+                            >
+                            </Image>
+                        </TouchableOpacity>
                         <View>
                             <Text style={styles.text2}>Your Prediction</Text>
                             <Text style={styles.winning_number}>{yesterdayPredictionNumber}</Text>

@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, FlatList, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Dimensions, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import React, { useContext, useState } from 'react';
 import COLORS from "../constants/colors";
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -8,6 +8,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/authContext';
 import FooterMenu from '../components/Menus/FooterMenu';
 import { formatTimestampToTimeDate } from '../constants/dataTime';
+import { openYouTubeLink } from '../constants/openYouTubeLink';
 let entireScreenWidth = Dimensions.get('window').width;
 
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
@@ -50,15 +51,27 @@ const UserHistory = ({ navigation }) => {
         }, [])
     )
 
-    const renderItem = ({ item }) => {
+    const MemoizedHistoryItem = React.memo(({ item }) => {
         return (
             <View style={styles.row}>
                 <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
                 <Text style={styles.cell}>{item.prediction_number}</Text>
-                <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "right" }}>{item.winning_number || 'N/A'}</Text>
+                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "center" }}>{item.winning_number || 'N/A'}</Text>
+                <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
+                    <Image
+                        source={require("../assets/utubelogo.png")}
+                        style={{
+                            height: 40,
+                            width: 40,
+                        }}
+                    />
+                </TouchableOpacity>
             </View>
         );
-    };
+    });
+
+    const renderItem = ({ item }) => <MemoizedHistoryItem item={item} />;
+
 
 
     return (
@@ -68,7 +81,8 @@ const UserHistory = ({ navigation }) => {
                 <View style={styles.row}>
                     <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "left" }}>Date & Time</Text>
                     <Text style={styles.headerCell}>Prediction Number</Text>
-                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "right" }}>Winning Number</Text>
+                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "center" }}>Winning Number</Text>
+                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "right" }}>Watch Video</Text>
                 </View>
             </View>
             <View style={styles.container}>
@@ -121,6 +135,7 @@ const styles = EStyleSheet.create({
     cell: {
         flex: 1,
         alignItems: 'center',
+        alignSelf: "center",
         justifyContent: 'center',
         textAlign: "center",
     },
