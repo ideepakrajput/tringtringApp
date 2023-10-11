@@ -51,12 +51,33 @@ const UserHistory = ({ navigation }) => {
         }, [])
     )
 
-    const MemoizedHistoryItem = React.memo(({ item }) => {
+    // const MemoizedHistoryItem = React.memo(({ item, openYouTubeLink }) => {
+    //     return (
+    //         <View style={styles.row}>
+    //             <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
+    //             <Text style={styles.cell}>{item.prediction_number}</Text>
+    //             <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "center" }}>{item.winning_number || 'N/A'}</Text>
+    //             <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
+    //                 <Image
+    //                     source={require("../assets/utubelogo.png")}
+    //                     style={{
+    //                         height: 40,
+    //                         width: 40,
+    //                     }}
+    //                 >
+    //                 </Image>
+    //             </TouchableOpacity>
+    //         </View>
+    //     );
+    // });
+
+    // const renderItem = ({ item }) => <MemoizedHistoryItem item={item} openYouTubeLink={openYouTubeLink} />;
+    const renderItem = ({ item }) => {
         return (
             <View style={styles.row}>
-                <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
+                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
                 <Text style={styles.cell}>{item.prediction_number}</Text>
-                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "center" }}>{item.winning_number || 'N/A'}</Text>
+                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{item.winning_number || 'N/A'}</Text>
                 <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
                     <Image
                         source={require("../assets/utubelogo.png")}
@@ -64,13 +85,13 @@ const UserHistory = ({ navigation }) => {
                             height: 40,
                             width: 40,
                         }}
-                    />
+                    >
+                    </Image>
                 </TouchableOpacity>
             </View>
         );
-    });
+    };
 
-    const renderItem = ({ item }) => <MemoizedHistoryItem item={item} />;
 
 
 
@@ -137,7 +158,7 @@ const styles = EStyleSheet.create({
         alignItems: 'center',
         alignSelf: "center",
         justifyContent: 'center',
-        textAlign: "center",
+        textAlign: "left",
     },
     headerCell: {
         flex: 1,
