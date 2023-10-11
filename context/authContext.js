@@ -12,11 +12,8 @@ const AuthProvider = ({ children }) => {
     user: null,
     token: "",
   });
-  //predicted for today
-  const [isPredicted, setisPredicted] = useState(false);
   //notification
   const [isEnabled, setIsEnabled] = useState(null);
-  const [editCount, setEditCount] = useState(Number);
   const [authenticatedUser, setAuthenticatedUser] = useState(false);
 
   // initial local storage data
@@ -28,24 +25,12 @@ const AuthProvider = ({ children }) => {
       setState({ ...state, user: loginData?.phoneNumber, token: loginData?.token });
 
       setAuthenticatedUser(loginData?.phoneNumber && loginData?.token);
-
-      const token = loginData?.token;
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      if (token) {
-        await axios.get(`${BASE_API_URL}api/user/edit_count`, config).then((res) => {
-          setEditCount(res.data.editCount);
-        })
-      }
     };
     loadLocalStorageData();
   }, [state, authenticatedUser]);
 
   return (
-    <AuthContext.Provider value={{ authenticatedUser, setAuthenticatedUser, state, setState, isPredicted, setisPredicted, isEnabled, setIsEnabled, editCount, setEditCount }}>
+    <AuthContext.Provider value={{ authenticatedUser, setAuthenticatedUser, state, setState, isEnabled, setIsEnabled }}>
       {children}
     </AuthContext.Provider>
   );
