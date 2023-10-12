@@ -9,7 +9,7 @@ const PredictionContext = createContext();
 const PredictionProvider = ({ children }) => {
     //predicted for today
     const [isPredicted, setisPredicted] = useState(false);
-    const [editCount, setEditCount] = useState(Number);
+    const [predictions, setPredictions] = useState(Number);
     const [tempPredictions, setTempPredictions] = useState(Number);
     const [addedPredictions, setAddedPredictions] = useState(Number);
     const [editedPredictions, setEditedPredictions] = useState(Number);
@@ -20,10 +20,13 @@ const PredictionProvider = ({ children }) => {
 
         // Check if it's midnight (00:00:00)
         if (currentDate.getHours() === 0 && currentDate.getMinutes() === 0 && currentDate.getSeconds() === 0) {
-            // Reset your local storage data here
-            await AsyncStorage.setItem('tempPredictions', "0");
-            await AsyncStorage.setItem('addedPredictions', "0");
-            await AsyncStorage.setItem('editedPredictions', "0");
+
+            await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -tempPredictions, addedPredictions: -addedPredictions, editedPredictions: -editedPredictions }, config).then((res) => {
+                setPredictions(res.data.predictions);
+                setTempPredictions(res.data.tempPredictions);
+                setAddedPredictions(res.data.addedPredictions);
+            })
+
         }
     }
 
@@ -35,15 +38,6 @@ const PredictionProvider = ({ children }) => {
         const loadLocalStorageData = async () => {
             let data = await AsyncStorage.getItem("@auth");
             let loginData = JSON.parse(data);
-            let tempPredictionsData = await AsyncStorage.getItem('tempPredictions');
-            let addedPredictionsData = await AsyncStorage.getItem('addedPredictions');
-            let editedPredictionsData = await AsyncStorage.getItem('editedPredictions');
-            tempPredictionsData = parseInt(tempPredictionsData);
-            addedPredictionsData = parseInt(addedPredictionsData);
-            editedPredictionsData = parseInt(editedPredictionsData);
-            setTempPredictions(tempPredictionsData);
-            setAddedPredictions(addedPredictionsData);
-            setEditedPredictions(editedPredictionsData);
 
             const token = loginData?.token;
             const config = {
@@ -52,11 +46,11 @@ const PredictionProvider = ({ children }) => {
                 },
             };
             if (token) {
-                await axios.get(`${BASE_API_URL}api/user/edit_count`, config).then((res) => {
-                    console.log(tempPredictionsData);
-                    console.log(addedPredictions);
-                    console.log(editedPredictions);
-                    setEditCount(res.data.editCount);
+                await axios.get(`${BASE_API_URL}api/user/predictions`, config).then((res) => {
+                    setPredictions(res.data.predictions);
+                    setTempPredictions(res.data.tempPredictions);
+                    setAddedPredictions(res.data.addedPredictions);
+                    setEditedPredictions(res.data.editedPredictions);
                 })
             }
         };
@@ -64,7 +58,7 @@ const PredictionProvider = ({ children }) => {
     }, []);
 
     return (
-        <PredictionContext.Provider value={{ isPredicted, setisPredicted, editCount, setEditCount, tempPredictions, addedPredictions, editedPredictions, setTempPredictions, setAddedPredictions, setEditedPredictions }}>
+        <PredictionContext.Provider value={{ isPredicted, setisPredicted, predictions, setPredictions, tempPredictions, addedPredictions, editedPredictions, setTempPredictions, setAddedPredictions, setEditedPredictions }}>
             {children}
         </PredictionContext.Provider>
     );

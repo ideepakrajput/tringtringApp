@@ -21,6 +21,9 @@ export default function Settings() {
     setState({ token: "", user: null });
     await AsyncStorage.removeItem("@auth");
     await AsyncStorage.removeItem("@user");
+    await AsyncStorage.removeItem("tempPredictions");
+    await AsyncStorage.removeItem("addedPredictions");
+    await AsyncStorage.removeItem("editedPredictions");
     alert("logout Successfully");
   };
 

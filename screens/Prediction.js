@@ -34,7 +34,7 @@ const Prediction = ({ navigation }) => {
     const [addPrediction, setAddPrediction] = useState(false);
     const [wantEdit, setWantEdit] = useState(false);
     const [id, setId] = useState("");
-    const { editCount, setEditCount } = useContext(PredictionContext);
+    const { predictions, setPredictions } = useContext(PredictionContext);
     const [isloading, setIsLoading] = useState(false);
 
     const { state } = useContext(AuthContext);
@@ -223,40 +223,61 @@ const Prediction = ({ navigation }) => {
             if (predictionNumber && predictionNumber.length == 5) {
                 if (addPrediction) {
                     await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
-                    let tempPredictionsData = await AsyncStorage.getItem('tempPredictions');
-                    tempPredictionsData = parseFloat(tempPredictionsData);
-                    if (tempPredictionsData > 0) {
-                        tempPredictionsData = tempPredictionsData - 1;
-                        setTempPredictions(tempPredictionsData);
-                        tempPredictionsData = tempPredictionsData.toString();
-                        await AsyncStorage.setItem('tempPredictions', tempPredictionsData);
+                    // let tempPredictionsData = await AsyncStorage.getItem('tempPredictions');
+                    // tempPredictionsData = parseFloat(tempPredictionsData);
+                    if (tempPredictions > 0) {
+                        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -1, addedPredictions: 1, editedPredictions: 0 }, config).then((res) => {
+                            setPredictions(res.data.predictions);
+                            setTempPredictions(res.data.tempPredictions);
+                            setAddedPredictions(res.data.addedPredictions);
+                        })
+                        // tempPredictionsData = tempPredictionsData - 1;
+                        // setTempPredictions(tempPredictionsData);
+                        // tempPredictionsData = tempPredictionsData.toString();
+                        // await AsyncStorage.setItem('tempPredictions', tempPredictionsData);
                     } else {
-                        const decrementValue = 1;
-                        await axios.post(`${BASE_API_URL}api/user/edit_count`, { decrementValue }, config);
-                        const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
-                        setEditCount(updatedEditCount.data.editCount);
+                        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: -1, tempPredictions: 0, addedPredictions: 1, editedPredictions: 0 }, config).then((res) => {
+                            setPredictions(res.data.predictions);
+                            setTempPredictions(res.data.tempPredictions);
+                            setAddedPredictions(res.data.addedPredictions);
+                            setEditedPredictions(res.data.editedPredictions);
+                        })
+                        // const decrementValue = 1;
+                        // await axios.post(`${BASE_API_URL}api/user/edit_count`, { decrementValue }, config);
+                        // const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
+                        // setEditCount(updatedEditCount.data.editCount);
                     }
-                    let addedPredictionsData = await AsyncStorage.getItem('addedPredictions');
-                    addedPredictionsData = parseFloat(addedPredictionsData);
-                    addedPredictionsData = addedPredictionsData + 1;
-                    setAddedPredictions(addedPredictionsData);
-                    addedPredictionsData = addedPredictionsData.toString();
-                    await AsyncStorage.setItem('addedPredictions', addedPredictionsData);
+                    // let addedPredictionsData = await AsyncStorage.getItem('addedPredictions');
+                    // addedPredictionsData = parseFloat(addedPredictionsData);
+                    // addedPredictionsData = addedPredictionsData + 1;
+                    // setAddedPredictions(addedPredictionsData);
+                    // addedPredictionsData = addedPredictionsData.toString();
+                    // await AsyncStorage.setItem('addedPredictions', addedPredictionsData);
                     setIsLoading(false);
                 } else if (wantEdit) {
                     await axios.put(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, id }, config);
-                    let editedPredictionsData = await AsyncStorage.getItem('editedPredictions');
-                    editedPredictionsData = parseFloat(editedPredictionsData);
-                    editedPredictionsData = editedPredictionsData + 1;
-                    await setEditedPredictions(editedPredictionsData);
-                    editedPredictionsData = editedPredictionsData.toString();
-                    await AsyncStorage.setItem('editedPredictions', editedPredictionsData);
+                    await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 1 }, config).then((res) => {
+                        setPredictions(res.data.predictions);
+                        setTempPredictions(res.data.tempPredictions);
+                        setAddedPredictions(res.data.addedPredictions);
+                        setEditedPredictions(res.data.editedPredictions);
+                    })
+                    // let editedPredictionsData = await AsyncStorage.getItem('editedPredictions');
+                    // editedPredictionsData = parseFloat(editedPredictionsData);
+                    // editedPredictionsData = editedPredictionsData + 1;
+                    // await setEditedPredictions(editedPredictionsData);
+                    // editedPredictionsData = editedPredictionsData.toString();
+                    // await AsyncStorage.setItem('editedPredictions', editedPredictionsData);
                     setIsLoading(false);
                 }
                 else {
                     await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
-                    const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
-                    setEditCount(updatedEditCount.data.editCount);
+                    // const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
+                    // setEditCount(updatedEditCount.data.editCount);
+                    // await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 0 }, config).then((res) => {
+                    //     setPredictions(res.data.predictions);
+                    //     setTempPredictions(res.data.tempPredictions);
+                    // })
                     setIsLoading(false);
                 }
                 // toggleAdsModal();
@@ -383,7 +404,7 @@ const Prediction = ({ navigation }) => {
                                                 Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
                                             </Text>
                                             {
-                                                (editCount + tempPredictions) <= 0 ?
+                                                (predictions + tempPredictions) <= 0 ?
                                                     <>
                                                         <Text style={styles.text1}><Text style={{ color: "red" }}>You have no predictions! Watch video to get predictions.</Text></Text>
                                                     </>
