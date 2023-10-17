@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/authContext";
 import { AntDesign } from '@expo/vector-icons';
@@ -15,6 +15,7 @@ const HeaderMenu = () => {
   const { state } = useContext(AuthContext);
   const { predictions, setPredictions } = useContext(PredictionContext);
   const { tempPredictions, setTempPredictions } = useContext(PredictionContext);
+  const { adsViewed, setAdsViewed } = useContext(PredictionContext);
   const { isLoaded, isEarnedReward, load, show } = useRewardedAd(adUnitId, {
     requestNonPersonalizedAdsOnly: true,
   });
@@ -37,9 +38,10 @@ const HeaderMenu = () => {
         },
       };
       if (isEarnedReward) {
-        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 1, addedPredictions: 0, editedPredictions: 0 }, config).then((res) => {
+        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 1, addedPredictions: 0, editedPredictions: 0, adsViewed: 1 }, config).then((res) => {
           setPredictions(res.data.predictions);
           setTempPredictions(res.data.tempPredictions);
+          setAdsViewed(res.data.adsViewed);
         })
       }
     }
@@ -47,7 +49,11 @@ const HeaderMenu = () => {
   }, [isEarnedReward])
 
   const showAds = async () => {
-    show();
+    if (adsViewed > 2) {
+      Alert.alert("Sorry !", "You can watch only 2 videos per today ! Share with friends to get more predictions.")
+    } else {
+      show();
+    }
   }
 
 

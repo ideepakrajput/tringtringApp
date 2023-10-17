@@ -5,7 +5,6 @@ import { BASE_API_URL } from '../constants/baseApiUrl';
 import { AuthContext } from '../context/authContext';
 
 const ProfileDetailsCard = () => {
-    const [data, setData] = useState();
     const [name, setName] = useState();
     const [phoneNumber, setPhoneNumber] = useState();
     const { state } = useContext(AuthContext);
@@ -20,7 +19,6 @@ const ProfileDetailsCard = () => {
         };
         async function fetchData() {
             await axios.get(`${BASE_API_URL}api/user/user_details`, config).then((res) => {
-                setData(res.data);
                 setName(res.data.name);
                 setPhoneNumber(res.data.phoneNumber);
             }).catch((error) => {

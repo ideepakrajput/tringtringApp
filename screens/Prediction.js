@@ -36,6 +36,7 @@ const Prediction = ({ navigation }) => {
     const [id, setId] = useState("");
     const { predictions, setPredictions } = useContext(PredictionContext);
     const [isloading, setIsLoading] = useState(false);
+    const { announced, setAnnounced } = useContext(PredictionContext);
 
     const { state } = useContext(AuthContext);
     const [isModalVisible, setModalVisible] = useState(false);
@@ -79,12 +80,29 @@ const Prediction = ({ navigation }) => {
             async function fetchData() {
                 await axios.get(`${BASE_API_URL}api/winning/user/prediction_number`, config).then((res) => {
                     const data = res.data;
-                    const currentDate = new Date().toISOString().split('T')[0];
+                    // const currentDate = new Date().toISOString().split('T')[0];
+                    let currentDate = "";
+                    if (announced) {
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        currentDate = tomorrow.toISOString().split('T')[0];
+                    } else {
+                        currentDate = new Date().toISOString().split('T')[0];
+                    }
 
                     // Calculate yesterday's date by subtracting one day from the current date
-                    const yesterdayDate = new Date();
-                    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-                    const formattedYesterdayDate = yesterdayDate.toISOString().split('T')[0];
+                    // const yesterdayDate = new Date();
+                    // yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+                    // const formattedYesterdayDate = yesterdayDate.toISOString().split('T')[0];
+                    let formattedYesterdayDate = "";
+                    if (announced) {
+                        const today = new Date();
+                        formattedYesterdayDate = today.toISOString().split('T')[0];
+                    } else {
+                        const yesterdayDate = new Date();
+                        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+                        formattedYesterdayDate = yesterdayDate.toISOString().split('T')[0];
+                    }
 
                     let lastUpdatedPredictionNumber = null;
 
@@ -169,9 +187,15 @@ const Prediction = ({ navigation }) => {
                 // Replace this with your actual data fetching logic
                 const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config)
                 const sortedData = await result.data.sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date));
-                const today = new Date().toISOString().split('T')[0];
-
-                const todayDocuments = sortedData.filter(item => item.transaction_date.startsWith(today));
+                let day = "";
+                if (announced) {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    day = tomorrow.toISOString().split('T')[0];
+                } else {
+                    day = new Date().toISOString().split('T')[0];
+                }
+                const todayDocuments = sortedData.filter(item => item.transaction_date.startsWith(day));
                 // Extract the last three updated prediction_number and created_date_time
                 const lastThreePredictions = todayDocuments.map(item => ({
                     prediction_number: item.prediction_number,
@@ -199,17 +223,20 @@ const Prediction = ({ navigation }) => {
 
     function handleAddPrediction() {
         setWantEdit(false);
+        setPredictionNumber("");
         setAddPrediction(true);
         setisPredicted(false);
     }
     function handleWantEdit(id) {
         setWantEdit(true);
+        setPredictionNumber("");
         setAddPrediction(false);
         setId(id);
         setisPredicted(false);
     }
 
     const submitPrediction = async () => {
+        load();
         setIsLoading(true);
         const token = state?.token;
 
@@ -222,11 +249,11 @@ const Prediction = ({ navigation }) => {
         try {
             if (predictionNumber && predictionNumber.length == 5) {
                 if (addPrediction) {
-                    await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
+                    await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
                     // let tempPredictionsData = await AsyncStorage.getItem('tempPredictions');
                     // tempPredictionsData = parseFloat(tempPredictionsData);
                     if (tempPredictions > 0) {
-                        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -1, addedPredictions: 1, editedPredictions: 0 }, config).then((res) => {
+                        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -1, addedPredictions: 1, editedPredictions: 0, adsViewed: 0 }, config).then((res) => {
                             setPredictions(res.data.predictions);
                             setTempPredictions(res.data.tempPredictions);
                             setAddedPredictions(res.data.addedPredictions);
@@ -236,7 +263,7 @@ const Prediction = ({ navigation }) => {
                         // tempPredictionsData = tempPredictionsData.toString();
                         // await AsyncStorage.setItem('tempPredictions', tempPredictionsData);
                     } else {
-                        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: -1, tempPredictions: 0, addedPredictions: 1, editedPredictions: 0 }, config).then((res) => {
+                        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: -1, tempPredictions: 0, addedPredictions: 1, editedPredictions: 0, adsViewed: 0 }, config).then((res) => {
                             setPredictions(res.data.predictions);
                             setTempPredictions(res.data.tempPredictions);
                             setAddedPredictions(res.data.addedPredictions);
@@ -256,7 +283,7 @@ const Prediction = ({ navigation }) => {
                     setIsLoading(false);
                 } else if (wantEdit) {
                     await axios.put(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, id }, config);
-                    await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 1 }, config).then((res) => {
+                    await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 1, adsViewed: 0 }, config).then((res) => {
                         setPredictions(res.data.predictions);
                         setTempPredictions(res.data.tempPredictions);
                         setAddedPredictions(res.data.addedPredictions);
@@ -271,7 +298,7 @@ const Prediction = ({ navigation }) => {
                     setIsLoading(false);
                 }
                 else {
-                    await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber }, config);
+                    await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
                     // const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
                     // setEditCount(updatedEditCount.data.editCount);
                     // await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 0 }, config).then((res) => {
@@ -281,9 +308,10 @@ const Prediction = ({ navigation }) => {
                     setIsLoading(false);
                 }
                 // toggleAdsModal();
-                load();
                 show();
                 toggleModal();
+
+                navigation.navigate("UserHistory");
             }
             else if (!predictionNumber) {
                 setIsLoading(false);
@@ -332,6 +360,12 @@ const Prediction = ({ navigation }) => {
 
     const currentDate = new Date();
     currentDate.setDate(currentDate.getDate() - 1);
+
+    if (announced) {
+        setisPredicted(false);
+    }
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
 
     const renderItem = ({ item }) => {
         return (
@@ -390,11 +424,21 @@ const Prediction = ({ navigation }) => {
                                         </>
                                     }
 
-                                    <Text
-                                        style={styles.text2}
-                                    >
-                                        FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST
-                                    </Text>
+                                    <>{
+                                        announced ?
+                                            <Text
+                                                style={styles.text2}
+                                            >
+                                                FOR {ordinalDateFormat(tomorrowDate)}, DRAW @ TOMORROW 9 PM IST
+                                            </Text>
+                                            :
+                                            <Text
+                                                style={styles.text2}
+                                            >
+                                                FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST
+                                            </Text>
+                                    }
+                                    </>
                                 </View>
                                 <View style={{ flex: 2, alignItems: "center" }}>
 
@@ -410,7 +454,7 @@ const Prediction = ({ navigation }) => {
                                                     </>
                                                     :
                                                     <>
-                                                        {addedPredictions > 4 ?
+                                                        {addedPredictions > 5 ?
                                                             <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to predict the number for today.</Text></Text>
                                                             :
                                                             <>
@@ -473,7 +517,7 @@ const Prediction = ({ navigation }) => {
                                                 <View style={styles.modalContent}>
                                                     <Text style={styles.text1}>Your prediction has been submitted successfully.</Text>
                                                     <Text style={styles.text1}>
-                                                        Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
+                                                        Your Prediction Number is <Text style={{ color: "green" }}>{predictionNumber}</Text>
                                                     </Text>
                                                     <Text style={styles.text1}>Watch a video to get another prediction or share it with friends and family and get more predictions</Text>
                                                     <TouchableOpacity

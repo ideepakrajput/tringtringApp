@@ -7,8 +7,9 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
 import FooterMenu from '../components/Menus/FooterMenu';
-import { formatTimestampToTimeDate } from '../constants/dataTime';
+import { formatDateToDDMMYYYY, formatTimestampToTimeDate } from '../constants/dataTime';
 import { openYouTubeLink } from '../constants/openYouTubeLink';
+import { PredictionContext } from '../context/predictionContext';
 let entireScreenWidth = Dimensions.get('window').width;
 
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
@@ -19,6 +20,7 @@ const UserHistory = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
 
     const { state } = useContext(AuthContext);
+    const { announced } = useContext(PredictionContext);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -72,10 +74,22 @@ const UserHistory = ({ navigation }) => {
     // });
 
     // const renderItem = ({ item }) => <MemoizedHistoryItem item={item} openYouTubeLink={openYouTubeLink} />;
+    let tomorrowDate = "";
+    if (announced) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrowDate = tomorrow.toISOString().split('T')[0];
+    }
     const renderItem = ({ item }) => {
         return (
             <View style={styles.row}>
                 <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
+                {announced
+                    ?
+                    <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{tomorrowDate}</Text>
+                    :
+                    <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
+                }
                 <Text style={styles.cell}>{item.prediction_number}</Text>
                 <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{item.winning_number || 'N/A'}</Text>
                 <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
@@ -92,15 +106,13 @@ const UserHistory = ({ navigation }) => {
         );
     };
 
-
-
-
     return (
         <>
             <Text style={styles.text1}>Your Prediction History</Text>
             <View style={styles.table}>
                 <View style={styles.row}>
-                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "left" }}>Date & Time</Text>
+                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "left" }}>Predicted Date & Time</Text>
+                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "left" }}>Predicted For</Text>
                     <Text style={styles.headerCell}>Prediction Number</Text>
                     <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "center" }}>Winning Number</Text>
                     <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "right" }}>Watch Video</Text>
