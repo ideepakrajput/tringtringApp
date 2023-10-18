@@ -20,7 +20,7 @@ let entireScreenWidth = Dimensions.get('window').width;
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
 
-const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-3940256099942544/1033173712';
+const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-6067634275916377/4705877289';
 
 const Prediction = ({ navigation }) => {
     const { isPredicted, setisPredicted } = useContext(PredictionContext);
@@ -30,7 +30,7 @@ const Prediction = ({ navigation }) => {
     const [yesterdayWinningNumber, setYesterdayWinningNumber] = useState();
     const [yesterdayWinningURL, setYesterdayWinningURL] = useState("");
     const [todayPredictionNumber, setTodayPredictionNumber] = useState(null);
-    const [isBefore830PM, setIsBefore830PM] = useState(false);
+    // const [isBefore830PM, setIsBefore830PM] = useState(false);
     const [addPrediction, setAddPrediction] = useState(false);
     const [wantEdit, setWantEdit] = useState(false);
     const [id, setId] = useState("");
@@ -152,25 +152,25 @@ const Prediction = ({ navigation }) => {
             fetchData();
 
 
-            function checkTime() {
-                const currentDate = new Date();
-                const currentHour = currentDate.getHours();
-                const currentMinute = currentDate.getMinutes();
+            // function checkTime() {
+            //     const currentDate = new Date();
+            //     const currentHour = currentDate.getHours();
+            //     const currentMinute = currentDate.getMinutes();
 
-                // Compare with 20 (8 PM) and 30 (8:30 PM)
-                setIsBefore830PM(currentHour < 20 || (currentHour === 20 && currentMinute < 30));
-            }
+            //     // Compare with 20 (8 PM) and 30 (8:30 PM)
+            //     setIsBefore830PM(currentHour < 20 || (currentHour === 20 && currentMinute < 30));
+            // }
 
-            // Call the checkTime function when the component mounts
-            checkTime();
+            // // Call the checkTime function when the component mounts
+            // checkTime();
 
-            // Update the time check every minute
-            const intervalId = setInterval(checkTime, 60000);
+            // // Update the time check every minute
+            // const intervalId = setInterval(checkTime, 60000);
 
             // Cleanup the timer when the component unmounts
-            return () => {
-                clearInterval(intervalId);
-            }
+            // return () => {
+            //     clearInterval(intervalId);
+            // }
         }, [])
     )
 
@@ -340,6 +340,7 @@ const Prediction = ({ navigation }) => {
                     // shared with activity type of result.activityType
                     console.log('====================================');
                     console.log("Activity Type", result.activityType);
+                    console.log("Activity Type", result.activityType);
                     console.log('====================================');
                 } else {
                     // shared
@@ -395,105 +396,105 @@ const Prediction = ({ navigation }) => {
                 enabled="true"
             >
                 <View style={{ flex: 3 }}>
-                    {
-                        isBefore830PM ?
-                            <>
-                                <View style={{ flex: 1, alignItems: "center" }}>
-                                    {isPredicted ?
-                                        <Text
-                                            style={styles.text1}
-                                        >
-                                            YOU HAVE ALREADY PREDICTED
-                                        </Text>
-                                        :
-                                        <>
-                                            {
-                                                addPrediction || wantEdit ?
-                                                    <Text
-                                                        style={styles.text1}
-                                                    >
-                                                        UPDATE YOUR 5 DIGIT PREDICTION NUMBER
-                                                    </Text>
-                                                    :
-                                                    <Text
-                                                        style={styles.text1}
-                                                    >
-                                                        ENTER YOUR 5 DIGIT PREDICTION NUMBER
-                                                    </Text>
-                                            }
-                                        </>
-                                    }
-
-                                    <>{
-                                        announced ?
+                    {/* {
+                        isBefore830PM ? */}
+                    <>
+                        <View style={{ flex: 1, alignItems: "center" }}>
+                            {isPredicted ?
+                                <Text
+                                    style={styles.text1}
+                                >
+                                    YOU HAVE ALREADY PREDICTED
+                                </Text>
+                                :
+                                <>
+                                    {
+                                        addPrediction || wantEdit ?
                                             <Text
-                                                style={styles.text2}
+                                                style={styles.text1}
                                             >
-                                                FOR {ordinalDateFormat(tomorrowDate)}, DRAW @ TOMORROW 9 PM IST
+                                                UPDATE YOUR 5 DIGIT PREDICTION NUMBER
                                             </Text>
                                             :
                                             <Text
-                                                style={styles.text2}
+                                                style={styles.text1}
                                             >
-                                                FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST
+                                                ENTER YOUR 5 DIGIT PREDICTION NUMBER
                                             </Text>
                                     }
-                                    </>
-                                </View>
-                                <View style={{ flex: 2, alignItems: "center" }}>
+                                </>
+                            }
 
-                                    {isPredicted ?
-                                        <>
-                                            <Text style={styles.text1}>
-                                                Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
-                                            </Text>
-                                            {
-                                                (predictions + tempPredictions) <= 0 ?
-                                                    <>
-                                                        <Text style={styles.text1}><Text style={{ color: "red" }}>You have no predictions! Watch video to get predictions.</Text></Text>
-                                                    </>
+                            <>{
+                                announced ?
+                                    <Text
+                                        style={styles.text2}
+                                    >
+                                        FOR {ordinalDateFormat(tomorrowDate)}, DRAW @ TOMORROW 9 PM IST
+                                    </Text>
+                                    :
+                                    <Text
+                                        style={styles.text2}
+                                    >
+                                        FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST
+                                    </Text>
+                            }
+                            </>
+                        </View>
+                        <View style={{ flex: 2, alignItems: "center" }}>
+
+                            {isPredicted ?
+                                <>
+                                    <Text style={styles.text1}>
+                                        Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
+                                    </Text>
+                                    {
+                                        (predictions + tempPredictions) <= 0 ?
+                                            <>
+                                                <Text style={styles.text1}><Text style={{ color: "red" }}>You have no predictions! Watch video to get predictions.</Text></Text>
+                                            </>
+                                            :
+                                            <>
+                                                {addedPredictions > 5 ?
+                                                    <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to predict the number for today.</Text></Text>
                                                     :
                                                     <>
-                                                        {addedPredictions > 5 ?
-                                                            <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to predict the number for today.</Text></Text>
-                                                            :
-                                                            <>
-                                                                <Text style={styles.text2}>Want to add more prediction </Text>
-                                                                {/* <Text style={styles.text2}><Text style={{ color: "#F8DE22" }}>{editCount} more chances </Text> </Text> */}
-                                                                <TouchableOpacity
-                                                                    style={styles.button}
-                                                                    onPress={handleAddPrediction}
-                                                                >
-                                                                    <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Add another</Text>
-                                                                </TouchableOpacity>
-                                                            </>
-                                                        }
+                                                        <Text style={styles.text2}>Want to add more prediction </Text>
+                                                        {/* <Text style={styles.text2}><Text style={{ color: "#F8DE22" }}>{editCount} more chances </Text> </Text> */}
+                                                        <TouchableOpacity
+                                                            style={styles.button}
+                                                            onPress={handleAddPrediction}
+                                                        >
+                                                            <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Add another</Text>
+                                                        </TouchableOpacity>
                                                     </>
-                                            }
-                                        </>
-                                        :
-                                        <>
-                                            <TextInput
-                                                style={styles.textInput}
-                                                maxLength={5}
-                                                autoFocus={true}
-                                                keyboardType='numeric'
-                                                placeholder=' - - - - -'
-                                                value={predictionNumber}
-                                                onChangeText={(text) => setPredictionNumber(text)}
+                                                }
+                                            </>
+                                    }
+                                </>
+                                :
+                                <>
+                                    <TextInput
+                                        style={styles.textInput}
+                                        maxLength={5}
+                                        autoFocus={true}
+                                        keyboardType='numeric'
+                                        placeholder=' - - - - -'
+                                        value={predictionNumber}
+                                        onChangeText={(text) => setPredictionNumber(text)}
+                                    >
+                                    </TextInput>
+                                    <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
+                                    {
+                                        isloading ? <ActivityIndicator></ActivityIndicator> :
+                                            <TouchableOpacity
+                                                style={styles.button}
+                                                onPress={submitPrediction}
                                             >
-                                            </TextInput>
-                                            <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
-                                            {
-                                                isloading ? <ActivityIndicator></ActivityIndicator> :
-                                                    <TouchableOpacity
-                                                        style={styles.button}
-                                                        onPress={submitPrediction}
-                                                    >
-                                                        <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
-                                                    </TouchableOpacity>
-                                            }
-                                            {/* <Modal
+                                                <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
+                                            </TouchableOpacity>
+                                    }
+                                    {/* <Modal
                                                 isVisible={isAdsModalVisible}
                                                 style={styles.modal}
                                                 animationIn="slideInUp"
@@ -508,40 +509,40 @@ const Prediction = ({ navigation }) => {
                                                     </TouchableOpacity>
                                                 </View>
                                             </Modal> */}
-                                            <Modal
-                                                isVisible={isModalVisible}
-                                                style={styles.modal}
-                                                animationIn="slideInUp"
-                                                animationOut="slideOutDown"
+                                    <Modal
+                                        isVisible={isModalVisible}
+                                        style={styles.modal}
+                                        animationIn="slideInUp"
+                                        animationOut="slideOutDown"
+                                    >
+                                        <View style={styles.modalContent}>
+                                            <Text style={styles.text1}>Your prediction has been submitted successfully.</Text>
+                                            <Text style={styles.text1}>
+                                                Your Prediction Number is <Text style={{ color: "green" }}>{predictionNumber}</Text>
+                                            </Text>
+                                            <Text style={styles.text1}>Watch a video to get another prediction or share it with friends and family and get more predictions</Text>
+                                            <TouchableOpacity
+                                                style={styles.shareButton}
+                                            // onPress={() => toggleAdsModal()}
                                             >
-                                                <View style={styles.modalContent}>
-                                                    <Text style={styles.text1}>Your prediction has been submitted successfully.</Text>
-                                                    <Text style={styles.text1}>
-                                                        Your Prediction Number is <Text style={{ color: "green" }}>{predictionNumber}</Text>
-                                                    </Text>
-                                                    <Text style={styles.text1}>Watch a video to get another prediction or share it with friends and family and get more predictions</Text>
-                                                    <TouchableOpacity
-                                                        style={styles.shareButton}
-                                                    // onPress={() => toggleAdsModal()}
-                                                    >
-                                                        <Image style={{ height: 60, width: 60, }} source={require("../assets/utubelogo.png")}></Image>
-                                                    </TouchableOpacity>
-                                                    <TouchableOpacity
-                                                        style={styles.shareButton}
-                                                        onPress={() => handleShare()}
-                                                    >
-                                                        <Text style={styles.shareButtonText}>Share</Text>
-                                                    </TouchableOpacity>
-                                                    <TouchableOpacity onPress={toggleModal}>
-                                                        <Text style={styles.closeButton}>Hide Popup</Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                            </Modal>
-                                        </>
-                                    }
-                                </View>
-                            </>
-                            :
+                                                <Image style={{ height: 60, width: 60, }} source={require("../assets/utubelogo.png")}></Image>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={styles.shareButton}
+                                                onPress={() => handleShare()}
+                                            >
+                                                <Text style={styles.shareButtonText}>Share</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={toggleModal}>
+                                                <Text style={styles.closeButton}>Hide Popup</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </Modal>
+                                </>
+                            }
+                        </View>
+                    </>
+                    {/* :
                             <>
                                 <View style={{ flex: 2, alignItems: "center" }}>
                                     <Text style={{ fontSize: 30, color: "red", textAlign: "center" }}>All entries are closed for today. You can come back and predict for tomorrow after 12 Midnight.</Text>
@@ -550,7 +551,7 @@ const Prediction = ({ navigation }) => {
                                     </Text>
                                 </View>
                             </>
-                    }
+                    } */}
                 </View>
                 <View style={{ flex: 2 }}>
                     <Text style={styles.text1}>My Predictions</Text>

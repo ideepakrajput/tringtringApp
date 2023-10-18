@@ -36,7 +36,7 @@ const UserHistory = ({ navigation }) => {
 
                     const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config);
                     result.data.sort((a, b) => {
-                        return new Date(b.transaction_date) - new Date(a.transaction_date);
+                        return new Date(b.created_date_time) - new Date(a.created_date_time);
                     });
                     setData(result.data);
                     if (result.data.length > 0) {
@@ -74,22 +74,22 @@ const UserHistory = ({ navigation }) => {
     // });
 
     // const renderItem = ({ item }) => <MemoizedHistoryItem item={item} openYouTubeLink={openYouTubeLink} />;
-    let tomorrowDate = "";
-    if (announced) {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrowDate = tomorrow.toISOString().split('T')[0];
-    }
+    // let tomorrowDate = "";
+    // if (announced) {
+    //     const tomorrow = new Date();
+    //     tomorrow.setDate(tomorrow.getDate() + 1);
+    //     tomorrowDate = tomorrow.toISOString().split('T')[0];
+    // }
     const renderItem = ({ item }) => {
         return (
             <View style={styles.row}>
-                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
-                {announced
+                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
+                {/* {announced
                     ?
                     <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{tomorrowDate}</Text>
-                    :
-                    <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
-                }
+                    : */}
+                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
+                {/* } */}
                 <Text style={styles.cell}>{item.prediction_number}</Text>
                 <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{item.winning_number || 'N/A'}</Text>
                 <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
