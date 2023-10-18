@@ -44,6 +44,7 @@ const Prediction = ({ navigation }) => {
     const { tempPredictions, setTempPredictions } = useContext(PredictionContext);
     const { addedPredictions, setAddedPredictions } = useContext(PredictionContext);
     const { editedPredictions, setEditedPredictions } = useContext(PredictionContext);
+    const { adsViewed, setAdsViewed } = useContext(PredictionContext);
     // const [isAdsModalVisible, setIsAdsModalVisible] = useState(false);
 
     // const toggleAdsModal = () => {
@@ -67,6 +68,27 @@ const Prediction = ({ navigation }) => {
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
+
+    useEffect(() => {
+        const reset = async () => {
+            if (announced) {
+                const token = state?.token;
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+                await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
+                    setPredictions(res.data.predictions);
+                    setTempPredictions(res.data.tempPredictions);
+                    setAddedPredictions(res.data.addedPredictions);
+                    setEditedPredictions(res.data.editedPredictions);
+                    setAdsViewed(res.data.adsViewed);
+                })
+            }
+        }
+        reset();
+    }, []);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -127,15 +149,28 @@ const Prediction = ({ navigation }) => {
 
                 await axios.get(`${BASE_API_URL}api/winning/winning_numbers`)
                     .then(res => {
-                        const currentDate = new Date();
+                        let yesterdayDateStr = "";
+                        if (announced) {
+                            const currentDate = new Date();
 
-                        // Subtract one day to get yesterday's date
-                        const yesterdayDate = new Date(currentDate);
-                        yesterdayDate.setDate(currentDate.getDate() - 1);
+                            // Subtract one day to get yesterday's date
+                            const yesterdayDate = new Date(currentDate);
 
-                        // Convert both dates to strings and extract only the date part
-                        // const currentDateStr = currentDate.toISOString().slice(0, 10);
-                        const yesterdayDateStr = yesterdayDate.toISOString().slice(0, 10);
+                            // Convert both dates to strings and extract only the date part
+                            // const currentDateStr = currentDate.toISOString().slice(0, 10);
+                            yesterdayDateStr = yesterdayDate.toISOString().slice(0, 10);
+                        } else {
+                            const currentDate = new Date();
+
+                            // Subtract one day to get yesterday's date
+                            const yesterdayDate = new Date(currentDate);
+                            yesterdayDate.setDate(currentDate.getDate() - 1);
+
+                            // Convert both dates to strings and extract only the date part
+                            // const currentDateStr = currentDate.toISOString().slice(0, 10);
+                            yesterdayDateStr = yesterdayDate.toISOString().slice(0, 10);
+                        }
+
 
                         for (const item of res.data) {
                             if (item.created_date_time.startsWith(yesterdayDateStr)) {
@@ -186,7 +221,7 @@ const Prediction = ({ navigation }) => {
             try {
                 // Replace this with your actual data fetching logic
                 const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config)
-                const sortedData = await result.data.sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date));
+                const sortedData = await result.data.sort((a, b) => new Date(b.created_date_time) - new Date(a.created_date_time));
                 let day = "";
                 if (announced) {
                     const tomorrow = new Date();
@@ -199,14 +234,14 @@ const Prediction = ({ navigation }) => {
                 // Extract the last three updated prediction_number and created_date_time
                 const lastThreePredictions = todayDocuments.map(item => ({
                     prediction_number: item.prediction_number,
-                    transaction_date: item.transaction_date,
+                    created_date_time: item.created_date_time,
                     _id: item._id
                 }));
 
                 // Table data
                 const tableData = lastThreePredictions.map(prediction => [
                     prediction.prediction_number,
-                    formatTimestampToTimeDate(prediction.transaction_date),
+                    formatTimestampToTimeDate(prediction.created_date_time),
                     prediction._id
                 ]);
 
@@ -299,12 +334,12 @@ const Prediction = ({ navigation }) => {
                 }
                 else {
                     await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
-                    // const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
-                    // setEditCount(updatedEditCount.data.editCount);
-                    // await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 0 }, config).then((res) => {
-                    //     setPredictions(res.data.predictions);
-                    //     setTempPredictions(res.data.tempPredictions);
-                    // })
+                    const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
+                    setEditCount(updatedEditCount.data.editCount);
+                    await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -1, addedPredictions: 0, editedPredictions: 0, adsViewed: 0 }, config).then((res) => {
+                        setPredictions(res.data.predictions);
+                        setTempPredictions(res.data.tempPredictions);
+                    })
                     setIsLoading(false);
                 }
                 // toggleAdsModal();
@@ -371,7 +406,7 @@ const Prediction = ({ navigation }) => {
     const renderItem = ({ item }) => {
         return (
             <View style={styles.row}>
-                <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
+                <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
                 <Text style={styles.cell}>{item.prediction_number}</Text>
                 <>{
                     editedPredictions === 5 ?
