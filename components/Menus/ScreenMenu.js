@@ -72,15 +72,6 @@ const ScreenMenu = () => {
               headerRight: () => <HeaderMenu />,
             }}
           />
-          <Stack.Screen
-            name="ShowAds"
-            component={ShowAds}
-            options={{
-              headerTitle: "",
-              headerLeft: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
-              headerRight: () => <HeaderMenu />,
-            }}
-          />
         </>
       ) : (
         <>
