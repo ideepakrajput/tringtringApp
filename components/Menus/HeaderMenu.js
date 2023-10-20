@@ -49,7 +49,7 @@ const HeaderMenu = () => {
   }, [isEarnedReward])
 
   const showAds = async () => {
-    if (adsViewed >= 2) {
+    if (adsViewed >= 1) {
       Alert.alert("Sorry !", "You can watch only 2 videos per today ! Share with friends to get more predictions.")
     } else {
       show();

@@ -16,6 +16,7 @@ const FooterMenu = () => {
           style={styles.iconStyle}
           color={route.name === "PrizesData" && "orange"}
         />
+        <Text style={{ fontWeight: "bold" }}>Prizes</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("UserHistory")}>
         <FontAwesome5
@@ -23,6 +24,7 @@ const FooterMenu = () => {
           style={styles.iconStyle}
           color={route.name === "UserHistory" && "orange"}
         />
+        <Text style={{ fontWeight: "bold" }}>History</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("Prediction")}>
         <FontAwesome5
@@ -30,6 +32,7 @@ const FooterMenu = () => {
           style={styles.iconStyle}
           color={route.name === "Prediction" && "orange"}
         />
+        <Text style={{ fontWeight: "bold" }}>Home</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ReferAndEarn")}>
         <FontAwesome5
@@ -37,6 +40,7 @@ const FooterMenu = () => {
           style={styles.iconStyle}
           color={route.name === "ReferAndEarn" && "orange"}
         />
+        <Text style={{ fontWeight: "bold" }}>Share</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
         <FontAwesome5
@@ -44,6 +48,7 @@ const FooterMenu = () => {
           style={styles.iconStyle}
           color={route.name === "Settings" && "orange"}
         />
+        <Text style={{ fontWeight: "bold" }}>My Account</Text>
       </TouchableOpacity>
     </View>
   );

@@ -349,7 +349,7 @@ const Login = ({ navigation }) => {
 					}}
 				>
 					<Text style={{ fontSize: 16, color: COLORS.black }}>
-						Have You forget your password ?{" "}
+						Forgot Password ?{" "}
 					</Text>
 					<Pressable onPress={() => navigation.navigate("ForgetPassword")}>
 						<Text
@@ -360,7 +360,7 @@ const Login = ({ navigation }) => {
 								marginLeft: 6,
 							}}
 						>
-							Forget Password
+							Forgot Password
 						</Text>
 					</Pressable>
 				</View>

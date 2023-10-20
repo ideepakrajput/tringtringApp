@@ -16,47 +16,47 @@ const PredictionProvider = ({ children }) => {
     const [adsViewed, setAdsViewed] = useState(Number);
     const [announced, setAnnounced] = useState(false);
     const [winner, setWinner] = useState(false);
-    async function resetLocalStorageData() {
-        // Get the current date
-        const currentDate = new Date();
+    // async function resetLocalStorageData() {
+    //     // Get the current date
+    //     const currentDate = new Date();
 
-        // Check if it's midnight (00:00:00)
-        if (currentDate.getHours() === 0 && currentDate.getMinutes() === 0 && currentDate.getSeconds() === 0) {
-            await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
-                setPredictions(res.data.predictions);
-                setTempPredictions(res.data.tempPredictions);
-                setAddedPredictions(res.data.addedPredictions);
-                setEditedPredictions(res.data.editedPredictions);
-                setAdsViewed(res.data.adsViewed);
-            })
-            await AsyncStorage.setItem("@announced", "false");
-            setAnnounced(false);
-        }
-        // const announced = await AsyncStorage.getItem("@announced");
-        // const reset = await AsyncStorage.getItem("@reset");
-        // if (announced && !reset) {
-        //     let data = await AsyncStorage.getItem("@auth");
-        //     let loginData = JSON.parse(data);
+    //     // Check if it's midnight (00:00:00)
+    //     if (currentDate.getHours() === 0 && currentDate.getMinutes() === 0 && currentDate.getSeconds() === 0) {
+    //         await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
+    //             setPredictions(res.data.predictions);
+    //             setTempPredictions(res.data.tempPredictions);
+    //             setAddedPredictions(res.data.addedPredictions);
+    //             setEditedPredictions(res.data.editedPredictions);
+    //             setAdsViewed(res.data.adsViewed);
+    //         })
+    //         await AsyncStorage.setItem("@announced", "false");
+    //         setAnnounced(false);
+    //     }
+    // const announced = await AsyncStorage.getItem("@announced");
+    // const reset = await AsyncStorage.getItem("@reset");
+    // if (announced && !reset) {
+    //     let data = await AsyncStorage.getItem("@auth");
+    //     let loginData = JSON.parse(data);
 
-        //     const token = loginData?.token;
-        //     const config = {
-        //         headers: {
-        //             Authorization: `Bearer ${token}`,
-        //         },
-        //     };
-        //     await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
-        //         setPredictions(res.data.predictions);
-        //         setTempPredictions(res.data.tempPredictions);
-        //         setAddedPredictions(res.data.addedPredictions);
-        //         setEditedPredictions(res.data.editedPredictions);
-        //         setAdsViewed(res.data.adsViewed);
-        //     })
-        //     await AsyncStorage.setItem("@reset", "true");
-        // }
-    }
+    //     const token = loginData?.token;
+    //     const config = {
+    //         headers: {
+    //             Authorization: `Bearer ${token}`,
+    //         },
+    //     };
+    //     await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
+    //         setPredictions(res.data.predictions);
+    //         setTempPredictions(res.data.tempPredictions);
+    //         setAddedPredictions(res.data.addedPredictions);
+    //         setEditedPredictions(res.data.editedPredictions);
+    //         setAdsViewed(res.data.adsViewed);
+    //     })
+    //     await AsyncStorage.setItem("@reset", "true");
+    // }
+    // }
 
-    // Check and reset local storage data every minute
-    setInterval(resetLocalStorageData, 60000);
+    // // Check and reset local storage data every minute
+    // setInterval(resetLocalStorageData, 60000);
 
     // initial local storage data
     useEffect(() => {
@@ -77,30 +77,33 @@ const PredictionProvider = ({ children }) => {
                     setAddedPredictions(res.data.addedPredictions);
                     setEditedPredictions(res.data.editedPredictions);
                     setAdsViewed(res.data.adsViewed);
-                    console.log(res.data.adsViewed);
                 })
             }
         };
         loadLocalStorageData();
         async function checkWinningNumber() {
-            // const currentDate = new Date().toISOString().split('T')[0];let currentDate = "";
-            let currentDate = "";
-            // if (announced) {
-            //     const tomorrow = new Date();
-            //     tomorrow.setDate(tomorrow.getDate() + 1);
-            //     currentDate = tomorrow.toISOString().split('T')[0];
-            // } else {
-            currentDate = new Date().toISOString().split('T')[0];
-            // }
+            const currentDate = new Date().toISOString().split('T')[0];
             const result = await axios.get(`${BASE_API_URL}api/winning/winning_numbers`);
             const todayWinningEntry = result.data.find(entry => entry.draw_date.includes(currentDate));
             if (todayWinningEntry) {
+                let data = await AsyncStorage.getItem("@auth");
+                let loginData = JSON.parse(data);
+
+                const token = loginData?.token;
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+                const reset = await axios.get(`${BASE_API_URL}api/user/reset`, config);
+
+                if (!reset.data.reset) {
+                    await axios.post(`${BASE_API_URL}api/user/reset`, { reset: false }, config);
+                }
                 await AsyncStorage.setItem("@announced", "true");
-                await AsyncStorage.setItem("@reset", "false");
                 setAnnounced(true);
             } else {
                 await AsyncStorage.setItem("@announced", "false");
-                await AsyncStorage.setItem("@reset", "true");
                 setAnnounced(false);
             }
         }

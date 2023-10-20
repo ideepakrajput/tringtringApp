@@ -15,6 +15,7 @@ import { Image } from "react-native";
 import ReferAndEarn from "../../screens/ReferAndEarn";
 import ForgetPassword from "../../screens/ForgetPassword";
 import OtpVerificationPage from "../../screens/OtpVerification";
+import ShowAds from "../../screens/ShowAds";
 
 const ScreenMenu = () => {
   //global state
@@ -30,8 +31,8 @@ const ScreenMenu = () => {
             name="Prediction"
             component={Prediction}
             options={{
-              headerTitleAlign: "center",
-              headerTitle: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
+              headerTitle: "",
+              headerLeft: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
               headerRight: () => <HeaderMenu />,
             }}
           />
@@ -39,8 +40,8 @@ const ScreenMenu = () => {
             name="PrizesData"
             component={PrizesData}
             options={{
-              headerTitleAlign: "center",
-              headerTitle: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
+              headerTitle: "",
+              headerLeft: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
               headerRight: () => <HeaderMenu />,
             }}
           />
@@ -48,8 +49,8 @@ const ScreenMenu = () => {
             name="Settings"
             component={Settings}
             options={{
-              headerTitleAlign: "center",
-              headerTitle: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
+              headerTitle: "",
+              headerLeft: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
               headerRight: () => <HeaderMenu />,
             }}
           />
@@ -57,8 +58,8 @@ const ScreenMenu = () => {
             name="ReferAndEarn"
             component={ReferAndEarn}
             options={{
-              headerTitleAlign: "center",
-              headerTitle: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
+              headerTitle: "",
+              headerLeft: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
               headerRight: () => <HeaderMenu />,
             }}
           />
@@ -66,8 +67,17 @@ const ScreenMenu = () => {
             name="UserHistory"
             component={UserHistory}
             options={{
-              headerTitleAlign: "center",
-              headerTitle: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
+              headerTitle: "",
+              headerLeft: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
+              headerRight: () => <HeaderMenu />,
+            }}
+          />
+          <Stack.Screen
+            name="ShowAds"
+            component={ShowAds}
+            options={{
+              headerTitle: "",
+              headerLeft: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
               headerRight: () => <HeaderMenu />,
             }}
           />

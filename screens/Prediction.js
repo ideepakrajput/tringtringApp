@@ -12,7 +12,7 @@ import FooterMenu from '../components/Menus/FooterMenu';
 import Modal from 'react-native-modal';
 import { openYouTubeLink } from '../constants/openYouTubeLink';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { InterstitialAd, useInterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
+import { useRewardedAd, useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 import { PredictionContext } from '../context/predictionContext';
 
 let entireScreenWidth = Dimensions.get('window').width;
@@ -20,7 +20,8 @@ let entireScreenWidth = Dimensions.get('window').width;
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
 
-const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-6067634275916377/4705877289';
+const interstitialAdUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-6067634275916377/4705877289';
+const rewardedAdUnitId = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-6067634275916377/1879585158';
 
 const Prediction = ({ navigation }) => {
     const { isPredicted, setisPredicted } = useContext(PredictionContext);
@@ -51,33 +52,78 @@ const Prediction = ({ navigation }) => {
     //     setIsAdsModalVisible(!isAdsModalVisible);
     // }
 
-    const { isLoaded, isClosed, load, show } = useInterstitialAd(adUnitId, {
-        requestNonPersonalizedAdsOnly: true,
-        keywords: ['fashion', 'clothing'],
-    });
-
-    useFocusEffect(
-        React.useCallback(() => {
-            if (!isLoaded) {
-                load();
-            }
-        }, [load, isLoaded])
+    const { isLoaded: isInterstitialLoaded, load: loadInterstitial, show: showInterstitial } = useInterstitialAd(
+        interstitialAdUnitId,
+        {
+            requestNonPersonalizedAdsOnly: true,
+        }
     );
 
+    // Rewarded Ad
+    const { isLoaded: isRewardedLoaded, load: loadRewarded, show: showRewarded, isEarnedReward } = useRewardedAd(
+        rewardedAdUnitId,
+        {
+            requestNonPersonalizedAdsOnly: true,
+        }
+    );
+
+    useEffect(() => {
+        // Load interstitial and rewarded ads when the component mounts
+        if (!isInterstitialLoaded) {
+            loadInterstitial();
+        }
+        if (!isRewardedLoaded) {
+            loadRewarded();
+        }
+    }, [isInterstitialLoaded, loadInterstitial, isRewardedLoaded, loadRewarded]);
+
+    useEffect(() => {
+        const incrementPredictions = async () => {
+            const token = state?.token;
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+            if (isEarnedReward) {
+                await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 1, addedPredictions: 0, editedPredictions: 0, adsViewed: 1 }, config).then((res) => {
+                    setPredictions(res.data.predictions);
+                    setTempPredictions(res.data.tempPredictions);
+                    setAdsViewed(res.data.adsViewed);
+                })
+            }
+        }
+        incrementPredictions();
+    }, [isEarnedReward])
+
+    const showAds = async () => {
+        if (adsViewed >= 1) {
+            Alert.alert("Sorry !", "You can watch only 2 videos per today ! Share with friends to get more predictions.")
+        } else {
+            showRewarded();
+        }
+    }
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
     };
 
     useEffect(() => {
-        const reset = async () => {
-            if (announced) {
-                const token = state?.token;
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                };
+        const resetFunction = async () => {
+
+            const token = state?.token;
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+            const reset = await axios.get(`${BASE_API_URL}api/user/reset`, config);
+            console.log('====================================');
+            console.log(reset.data.reset);
+            console.log('====================================');
+
+            if (!reset.data.reset || reset.data.reset === undefined) {
                 await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
                     setPredictions(res.data.predictions);
                     setTempPredictions(res.data.tempPredictions);
@@ -85,9 +131,22 @@ const Prediction = ({ navigation }) => {
                     setEditedPredictions(res.data.editedPredictions);
                     setAdsViewed(res.data.adsViewed);
                 })
+                await axios.post(`${BASE_API_URL}api/user/reset`, { reset: true }, config);
+            }
+            if (announced) {
+                if (!reset.data.reset) {
+                    await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
+                        setPredictions(res.data.predictions);
+                        setTempPredictions(res.data.tempPredictions);
+                        setAddedPredictions(res.data.addedPredictions);
+                        setEditedPredictions(res.data.editedPredictions);
+                        setAdsViewed(res.data.adsViewed);
+                    })
+                    await axios.post(`${BASE_API_URL}api/user/reset`, { reset: true }, config);
+                }
             }
         }
-        reset();
+        resetFunction();
     }, []);
 
     useFocusEffect(
@@ -187,25 +246,38 @@ const Prediction = ({ navigation }) => {
             fetchData();
 
 
-            // function checkTime() {
-            //     const currentDate = new Date();
-            //     const currentHour = currentDate.getHours();
-            //     const currentMinute = currentDate.getMinutes();
+            async function checkTime() {
+                const currentDate = new Date();
+                const token = state?.token;
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+                const reset = await axios.get(`${BASE_API_URL}api/user/reset`, config);
+                // Check if it's midnight (00:00:00)
+                if (currentDate.getHours() === 0 && currentDate.getMinutes() === 0 && currentDate.getSeconds() === 0 && reset.data.reset == false) {
+                    await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
+                        setPredictions(res.data.predictions);
+                        setTempPredictions(res.data.tempPredictions);
+                        setAddedPredictions(res.data.addedPredictions);
+                        setEditedPredictions(res.data.editedPredictions);
+                        setAdsViewed(res.data.adsViewed);
+                    })
+                    await axios.post(`${BASE_API_URL}api/user/reset`, { reset: true }, config);
+                }
+            }
 
-            //     // Compare with 20 (8 PM) and 30 (8:30 PM)
-            //     setIsBefore830PM(currentHour < 20 || (currentHour === 20 && currentMinute < 30));
-            // }
+            // Call the checkTime function when the component mounts
+            checkTime();
 
-            // // Call the checkTime function when the component mounts
-            // checkTime();
-
-            // // Update the time check every minute
-            // const intervalId = setInterval(checkTime, 60000);
+            // Update the time check every minute
+            const intervalId = setInterval(checkTime, 60000);
 
             // Cleanup the timer when the component unmounts
-            // return () => {
-            //     clearInterval(intervalId);
-            // }
+            return () => {
+                clearInterval(intervalId);
+            }
         }, [])
     )
 
@@ -234,14 +306,12 @@ const Prediction = ({ navigation }) => {
                 // Extract the last three updated prediction_number and created_date_time
                 const lastThreePredictions = todayDocuments.map(item => ({
                     prediction_number: item.prediction_number,
-                    created_date_time: item.created_date_time,
                     _id: item._id
                 }));
 
                 // Table data
                 const tableData = lastThreePredictions.map(prediction => [
                     prediction.prediction_number,
-                    formatTimestampToTimeDate(prediction.created_date_time),
                     prediction._id
                 ]);
 
@@ -271,7 +341,7 @@ const Prediction = ({ navigation }) => {
     }
 
     const submitPrediction = async () => {
-        load();
+        loadInterstitial();
         setIsLoading(true);
         const token = state?.token;
 
@@ -292,7 +362,13 @@ const Prediction = ({ navigation }) => {
                             setPredictions(res.data.predictions);
                             setTempPredictions(res.data.tempPredictions);
                             setAddedPredictions(res.data.addedPredictions);
-                        })
+                            setEditedPredictions(res.data.editedPredictions);
+                            setAdsViewed(res.data.adsViewed);
+                        }).catch((err) => {
+                            console.log('====================================');
+                            console.log(err.response.data.message);
+                            console.log('====================================');
+                        });
                         // tempPredictionsData = tempPredictionsData - 1;
                         // setTempPredictions(tempPredictionsData);
                         // tempPredictionsData = tempPredictionsData.toString();
@@ -303,7 +379,12 @@ const Prediction = ({ navigation }) => {
                             setTempPredictions(res.data.tempPredictions);
                             setAddedPredictions(res.data.addedPredictions);
                             setEditedPredictions(res.data.editedPredictions);
-                        })
+                            setAdsViewed(res.data.adsViewed);
+                        }).catch((err) => {
+                            console.log('====================================');
+                            console.log(err.response.data.message);
+                            console.log('====================================');
+                        });
                         // const decrementValue = 1;
                         // await axios.post(`${BASE_API_URL}api/user/edit_count`, { decrementValue }, config);
                         // const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
@@ -323,7 +404,12 @@ const Prediction = ({ navigation }) => {
                         setTempPredictions(res.data.tempPredictions);
                         setAddedPredictions(res.data.addedPredictions);
                         setEditedPredictions(res.data.editedPredictions);
-                    })
+                        setAdsViewed(res.data.adsViewed);
+                    }).catch((err) => {
+                        console.log('====================================');
+                        console.log(err.response.data.message);
+                        console.log('====================================');
+                    });
                     // let editedPredictionsData = await AsyncStorage.getItem('editedPredictions');
                     // editedPredictionsData = parseFloat(editedPredictionsData);
                     // editedPredictionsData = editedPredictionsData + 1;
@@ -334,16 +420,23 @@ const Prediction = ({ navigation }) => {
                 }
                 else {
                     await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
-                    const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
-                    setEditCount(updatedEditCount.data.editCount);
+                    // const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
+                    // setEditCount(updatedEditCount.data.editCount);
                     await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -1, addedPredictions: 0, editedPredictions: 0, adsViewed: 0 }, config).then((res) => {
                         setPredictions(res.data.predictions);
                         setTempPredictions(res.data.tempPredictions);
-                    })
+                        setAddedPredictions(res.data.addedPredictions);
+                        setEditedPredictions(res.data.editedPredictions);
+                        setAdsViewed(res.data.adsViewed);
+                    }).catch((err) => {
+                        console.log('====================================');
+                        console.log(err.response.data.message);
+                        console.log('====================================');
+                    });
                     setIsLoading(false);
                 }
                 // toggleAdsModal();
-                show();
+                showInterstitial();
                 toggleModal();
 
                 navigation.navigate("UserHistory");
@@ -406,10 +499,9 @@ const Prediction = ({ navigation }) => {
     const renderItem = ({ item }) => {
         return (
             <View style={styles.row}>
-                <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
                 <Text style={styles.cell}>{item.prediction_number}</Text>
                 <>{
-                    editedPredictions === 5 ?
+                    editedPredictions >= 2 ?
                         <></>
                         :
                         <TouchableOpacity
@@ -434,10 +526,18 @@ const Prediction = ({ navigation }) => {
                     {/* {
                         isBefore830PM ? */}
                     <>
-                        <View style={{ flex: 1, alignItems: "center" }}>
+                        <View style={{ flex: 2, alignItems: "center", marginVertical: 20 }}>
+                            <Text
+                                style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}
+                            >
+                                GUESS AND WIN 1 LAC RUPEES BEFORE 9 PM TODAY
+                            </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
+                                <Text style={{ color: "#00BF63", textAlign: "center", fontSize: 16, marginBottom: 20 }}>view more prizes</Text>
+                            </TouchableOpacity>
                             {isPredicted ?
                                 <Text
-                                    style={styles.text1}
+                                    style={styles.text2}
                                 >
                                     YOU HAVE ALREADY PREDICTED
                                 </Text>
@@ -446,13 +546,13 @@ const Prediction = ({ navigation }) => {
                                     {
                                         addPrediction || wantEdit ?
                                             <Text
-                                                style={styles.text1}
+                                                style={styles.text2}
                                             >
                                                 UPDATE YOUR 5 DIGIT PREDICTION NUMBER
                                             </Text>
                                             :
                                             <Text
-                                                style={styles.text1}
+                                                style={styles.text2}
                                             >
                                                 ENTER YOUR 5 DIGIT PREDICTION NUMBER
                                             </Text>
@@ -480,17 +580,43 @@ const Prediction = ({ navigation }) => {
 
                             {isPredicted ?
                                 <>
-                                    <Text style={styles.text1}>
-                                        Your Prediction Number is <Text style={{ color: "green" }}>{todayPredictionNumber}</Text>
-                                    </Text>
                                     {
                                         (predictions + tempPredictions) <= 0 ?
                                             <>
-                                                <Text style={styles.text1}><Text style={{ color: "red" }}>You have no predictions! Watch video to get predictions.</Text></Text>
+                                                <Text style={styles.text1}><Text style={{ color: "red" }}>You have no more predictions left</Text></Text>
+                                                <Text style={styles.text2}>Earn more predictions</Text>
+                                                {adsViewed >= 1 ?
+                                                    <TouchableOpacity
+                                                        disabled={true}
+                                                        style={{
+                                                            margin: 10,
+                                                            backgroundColor: "lightgrey",
+                                                            borderRadius: 15,
+                                                            paddingHorizontal: 10
+                                                        }}
+                                                        onPress={() => showAds()}
+                                                    >
+                                                        <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
+                                                    </TouchableOpacity>
+                                                    :
+                                                    <TouchableOpacity
+                                                        style={styles.button}
+                                                        onPress={() => showAds()}
+                                                    >
+                                                        <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
+                                                    </TouchableOpacity>
+                                                }
+                                                <Text>OR</Text>
+                                                <TouchableOpacity
+                                                    style={styles.button}
+                                                    onPress={() => navigation.navigate("ReferAndEarn")}
+                                                >
+                                                    <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Share with friends</Text>
+                                                </TouchableOpacity>
                                             </>
                                             :
                                             <>
-                                                {addedPredictions > 5 ?
+                                                {addedPredictions >= 2 ?
                                                     <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to predict the number for today.</Text></Text>
                                                     :
                                                     <>
@@ -558,7 +684,7 @@ const Prediction = ({ navigation }) => {
                                             <Text style={styles.text1}>Watch a video to get another prediction or share it with friends and family and get more predictions</Text>
                                             <TouchableOpacity
                                                 style={styles.shareButton}
-                                            // onPress={() => toggleAdsModal()}
+                                                onPress={() => showAds()}
                                             >
                                                 <Image style={{ height: 60, width: 60, }} source={require("../assets/utubelogo.png")}></Image>
                                             </TouchableOpacity>
@@ -588,25 +714,56 @@ const Prediction = ({ navigation }) => {
                             </>
                     } */}
                 </View>
-                <View style={{ flex: 2 }}>
-                    <Text style={styles.text1}>My Predictions</Text>
-                    <View style={{ borderBottomWidth: 2 }}></View>
-                    {
-                        editedPredictions === 5 ?
-                            <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached limit to edit predictions!</Text></Text>
-                            :
-                            <></>
-                    }
-                    <FlatList
-                        data={predictionData}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item._id}
-                    />
+                <View style={{ flex: 1 }}>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        {predictionData.map((item, index) => (
+                            <View key={item._id} style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 5 }}>
+                                {index === 0 ?
+                                    <Text style={styles.text1}>Your Numbers : </Text> : <></>
+                                }
+                                <Text style={styles.text2}>{item.prediction_number}</Text>
+                                {
+                                    editedPredictions >= 2 ?
+                                        <>
+                                            <TouchableOpacity
+                                                disabled={true}
+                                                style={{
+                                                    backgroundColor: "lightgrey",
+                                                    borderRadius: 15,
+                                                    marginVertical: 5,
+                                                    marginLeft: 5,
+                                                    paddingHorizontal: 10,
+                                                }}
+                                                onPress={() => handleWantEdit(item._id)}
+                                            >
+                                                <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Edit</Text>
+                                            </TouchableOpacity></>
+                                        :
+                                        <TouchableOpacity
+                                            style={{
+                                                backgroundColor: "#00BF63",
+                                                borderRadius: 15,
+                                                marginVertical: 5,
+                                                marginLeft: 5,
+                                                paddingHorizontal: 10,
+                                            }}
+                                            onPress={() => handleWantEdit(item._id)}
+                                        >
+                                            <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Edit</Text>
+                                        </TouchableOpacity>
+                                }
+                                <Text> {" | "} </Text>
+                            </View>
+                        ))}
+                    </View>
                 </View>
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.text1}>Yesterday Winning Number</Text>
-                    <View style={{ flexDirection: "row", backgroundColor: "#00BF63", alignItems: "center", justifyContent: "space-around", borderRadius: 50 }}>
-                        <Text style={styles.winning_number}>{yesterdayWinningNumber || "N/A"}</Text>
+                    <Text style={styles.text1}>Yesterday</Text>
+                    <View style={{ flexDirection: "row", backgroundColor: "#00BF63", alignItems: "center", justifyContent: "space-around", borderRadius: 25 }}>
+                        <View>
+                            <Text style={styles.text2}>Your Prediction(s)</Text>
+                            <Text style={styles.winning_number}>{yesterdayPredictionNumber || "N/A"}</Text>
+                        </View>
                         <TouchableOpacity onPress={() => openYouTubeLink(yesterdayWinningURL)}>
                             <Image
                                 source={require("../assets/utubelogo.png")}
@@ -618,8 +775,8 @@ const Prediction = ({ navigation }) => {
                             </Image>
                         </TouchableOpacity>
                         <View>
-                            <Text style={styles.text2}>Your Prediction</Text>
-                            <Text style={styles.winning_number}>{yesterdayPredictionNumber || "N/A"}</Text>
+                            <Text style={styles.text2}>Winning Number</Text>
+                            <Text style={styles.winning_number}>{yesterdayWinningNumber || "N/A"}</Text>
                         </View>
                     </View>
                 </View>
@@ -660,15 +817,16 @@ const styles = EStyleSheet.create({
     },
     button: {
         margin: 10,
-        backgroundColor: "green",
+        backgroundColor: "#00BF63",
         borderRadius: 15,
-        padding: 10,
+        paddingHorizontal: 10
     },
     editbutton: {
-        backgroundColor: "green",
+        backgroundColor: "#00BF63",
         borderRadius: 15,
-        margin: 10,
-        paddingHorizontal: 10
+        marginVertical: 5,
+        marginLeft: 5,
+        paddingHorizontal: 10,
     },
     container: {
         flex: 1, flexDirection: "column", justifyContent: "space-around", backgroundColor: COLORS.white
@@ -688,14 +846,13 @@ const styles = EStyleSheet.create({
         flexDirection: 'row',
         borderBottomWidth: 1,
         borderColor: 'black',
-        padding: 8,
+        justifyContent: "center"
     },
     cell: {
         flex: 1,
         alignItems: 'center',
         alignSelf: "center",
-        justifyContent: 'center',
-        textAlign: "center",
+        marginHorizontal: 20
     },
     headerCell: {
         flex: 1,
