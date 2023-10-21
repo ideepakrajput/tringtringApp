@@ -90,6 +90,8 @@ const Prediction = ({ navigation }) => {
                 await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 1, addedPredictions: 0, editedPredictions: 0, adsViewed: 1 }, config).then((res) => {
                     setPredictions(res.data.predictions);
                     setTempPredictions(res.data.tempPredictions);
+                    setAddedPredictions(res.data.addedPredictions);
+                    setEditedPredictions(res.data.editedPredictions);
                     setAdsViewed(res.data.adsViewed);
                 })
             }
@@ -123,7 +125,7 @@ const Prediction = ({ navigation }) => {
             console.log(reset.data.reset);
             console.log('====================================');
 
-            if (!reset.data.reset || reset.data.reset === undefined) {
+            if (!reset.data.reset || reset.data.reset == undefined) {
                 await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
                     setPredictions(res.data.predictions);
                     setTempPredictions(res.data.tempPredictions);
@@ -170,11 +172,6 @@ const Prediction = ({ navigation }) => {
                     } else {
                         currentDate = new Date().toISOString().split('T')[0];
                     }
-
-                    // Calculate yesterday's date by subtracting one day from the current date
-                    // const yesterdayDate = new Date();
-                    // yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-                    // const formattedYesterdayDate = yesterdayDate.toISOString().split('T')[0];
                     let formattedYesterdayDate = "";
                     if (announced) {
                         const today = new Date();

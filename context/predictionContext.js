@@ -16,49 +16,6 @@ const PredictionProvider = ({ children }) => {
     const [adsViewed, setAdsViewed] = useState(Number);
     const [announced, setAnnounced] = useState(false);
     const [winner, setWinner] = useState(false);
-    // async function resetLocalStorageData() {
-    //     // Get the current date
-    //     const currentDate = new Date();
-
-    //     // Check if it's midnight (00:00:00)
-    //     if (currentDate.getHours() === 0 && currentDate.getMinutes() === 0 && currentDate.getSeconds() === 0) {
-    //         await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
-    //             setPredictions(res.data.predictions);
-    //             setTempPredictions(res.data.tempPredictions);
-    //             setAddedPredictions(res.data.addedPredictions);
-    //             setEditedPredictions(res.data.editedPredictions);
-    //             setAdsViewed(res.data.adsViewed);
-    //         })
-    //         await AsyncStorage.setItem("@announced", "false");
-    //         setAnnounced(false);
-    //     }
-    // const announced = await AsyncStorage.getItem("@announced");
-    // const reset = await AsyncStorage.getItem("@reset");
-    // if (announced && !reset) {
-    //     let data = await AsyncStorage.getItem("@auth");
-    //     let loginData = JSON.parse(data);
-
-    //     const token = loginData?.token;
-    //     const config = {
-    //         headers: {
-    //             Authorization: `Bearer ${token}`,
-    //         },
-    //     };
-    //     await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
-    //         setPredictions(res.data.predictions);
-    //         setTempPredictions(res.data.tempPredictions);
-    //         setAddedPredictions(res.data.addedPredictions);
-    //         setEditedPredictions(res.data.editedPredictions);
-    //         setAdsViewed(res.data.adsViewed);
-    //     })
-    //     await AsyncStorage.setItem("@reset", "true");
-    // }
-    // }
-
-    // // Check and reset local storage data every minute
-    // setInterval(resetLocalStorageData, 60000);
-
-    // initial local storage data
     useEffect(() => {
         const loadLocalStorageData = async () => {
             let data = await AsyncStorage.getItem("@auth");
@@ -81,6 +38,9 @@ const PredictionProvider = ({ children }) => {
             }
         };
         loadLocalStorageData();
+    }, [predictions, tempPredictions, editedPredictions, adsViewed, addedPredictions]);
+
+    useEffect(() => {
         async function checkWinningNumber() {
             const currentDate = new Date().toISOString().split('T')[0];
             const result = await axios.get(`${BASE_API_URL}api/winning/winning_numbers`);

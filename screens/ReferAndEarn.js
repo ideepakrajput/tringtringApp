@@ -65,21 +65,27 @@ const InviteFriends = () => {
 
     const MemoizedContactItem = React.memo(({ item, handleShare }) => (
         <View style={styles.contactItem}>
-            {item.image ? (
-                <Image source={{ uri: item.image.uri }} style={styles.contactImage} />
-            ) : (
-                <Image source={require("../assets/user-avatar.png")} style={styles.contactImage} />
-            )}
-            <View>
-                <Text style={styles.contactName}>{item.name}</Text>
-                <Text style={styles.contactNumber}>{item.phoneNumbers != null ? item.phoneNumbers[0].number : ""}</Text>
+            <View style={{ flex: 1, flexDirection: "row" }}>
+                <View>
+                    {item.image ? (
+                        <Image source={{ uri: item.image.uri }} style={styles.contactImage} />
+                    ) : (
+                        <Image source={require("../assets/user-avatar.png")} style={styles.contactImage} />
+                    )}
+                </View>
+                <View>
+                    <Text style={styles.contactName}>{item.name}</Text>
+                    <Text style={styles.contactNumber}>{item.phoneNumbers != null ? item.phoneNumbers[0].number : ""}</Text>
+                </View>
             </View>
-            <TouchableOpacity
-                style={styles.shareButton}
-                onPress={() => handleShare(item.name)}
-            >
-                <Text style={styles.shareButtonText}>Share</Text>
-            </TouchableOpacity>
+            <View>
+                <TouchableOpacity
+                    style={styles.shareButton}
+                    onPress={() => handleShare(item.name)}
+                >
+                    <Text style={styles.shareButtonText}>Share</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     ));
 
@@ -144,17 +150,14 @@ const styles = StyleSheet.create({
     },
     contactName: {
         fontSize: 16,
-        flex: 1,
     },
     contactNumber: {
-        flex: 1,
         fontSize: 16
     },
     shareButton: {
         backgroundColor: '#4caf50',
         padding: 8,
         borderRadius: 50,
-        marginLeft: 10,
     },
     shareButtonText: {
         color: '#fff',

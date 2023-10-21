@@ -15,7 +15,6 @@ import { Image } from "react-native";
 import ReferAndEarn from "../../screens/ReferAndEarn";
 import ForgetPassword from "../../screens/ForgetPassword";
 import OtpVerificationPage from "../../screens/OtpVerification";
-import ShowAds from "../../screens/ShowAds";
 
 const ScreenMenu = () => {
   //global state
@@ -24,7 +23,7 @@ const ScreenMenu = () => {
   const Stack = createNativeStackNavigator();
 
   return (
-    <Stack.Navigator initialRouteName="Login">
+    <Stack.Navigator>
       {authenticatedUser ? (
         <>
           <Stack.Screen
