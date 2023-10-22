@@ -135,11 +135,14 @@ const Signup = ({ navigation }) => {
   const handleSendOtp = async () => {
     // Validate phone number (you can add your validation logic)
     if (!phoneNumber) {
-      Alert.alert('Error', 'Please enter a valid phone number.');
+      Alert.alert('Error', 'Please enter phone number.');
+      setIsOtpSent(false);
       return;
     }
     if (phoneNumber.length < 10) {
-      Alert.alert("Error, Please add a valid phone number.");
+      Alert.alert("Error", "Please enter a valid phone number.");
+      setIsOtpSent(false);
+      return;
     }
     const randomNumber = Math.floor(1000 + Math.random() * 9000);
 

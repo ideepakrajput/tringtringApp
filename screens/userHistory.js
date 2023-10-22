@@ -20,7 +20,6 @@ const UserHistory = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
 
     const { state } = useContext(AuthContext);
-    const { announced } = useContext(PredictionContext);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -73,13 +72,6 @@ const UserHistory = ({ navigation }) => {
     //     );
     // });
 
-    // const renderItem = ({ item }) => <MemoizedHistoryItem item={item} openYouTubeLink={openYouTubeLink} />;
-    // let tomorrowDate = "";
-    // if (announced) {
-    //     const tomorrow = new Date();
-    //     tomorrow.setDate(tomorrow.getDate() + 1);
-    //     tomorrowDate = tomorrow.toISOString().split('T')[0];
-    // }
     const renderItem = ({ item }) => {
         return (
             <View style={styles.row}>

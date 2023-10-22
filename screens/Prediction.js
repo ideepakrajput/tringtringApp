@@ -100,16 +100,16 @@ const Prediction = ({ navigation }) => {
     }, [isEarnedReward])
 
     const showAds = async () => {
-        if (adsViewed >= 1) {
+        if (adsViewed >= 2) {
             Alert.alert("Sorry !", "You can watch only 2 videos per today ! Share with friends to get more predictions.")
         } else {
             showRewarded();
         }
     }
 
-    const toggleModal = () => {
-        setModalVisible(!isModalVisible);
-    };
+    // const toggleModal = () => {
+    //     setModalVisible(!isModalVisible);
+    // };
 
     useEffect(() => {
         const resetFunction = async () => {
@@ -124,7 +124,23 @@ const Prediction = ({ navigation }) => {
             console.log('====================================');
             console.log(reset.data.reset);
             console.log('====================================');
-
+            await axios.get(`${BASE_API_URL}api/user/predictions`, config).then((res) => {
+                setPredictions(res.data.predictions);
+                setTempPredictions(res.data.tempPredictions);
+                setAddedPredictions(res.data.addedPredictions);
+                setEditedPredictions(res.data.editedPredictions);
+                setAdsViewed(res.data.adsViewed);
+                console.log("Predictions:", res.data.predictions);
+                console.log("Predictions:", predictions);
+                console.log("Temp Predictions:", res.data.tempPredictions);
+                console.log("Temp Predictions:", tempPredictions);
+                console.log("Added Predictions:", res.data.addedPredictions);
+                console.log("Added Predictions:", addedPredictions);
+                console.log("Edited Predictions:", res.data.editedPredictions);
+                console.log("Edited Predictions:", editedPredictions);
+                console.log("Ads Viewed:", res.data.adsViewed);
+                console.log("Ads Viewed:", adsViewed);
+            })
             if (!reset.data.reset || reset.data.reset == undefined) {
                 await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
                     setPredictions(res.data.predictions);
@@ -132,10 +148,22 @@ const Prediction = ({ navigation }) => {
                     setAddedPredictions(res.data.addedPredictions);
                     setEditedPredictions(res.data.editedPredictions);
                     setAdsViewed(res.data.adsViewed);
+                    console.log("Predictions:", res.data.predictions);
+                    console.log("Predictions:", predictions);
+                    console.log("Temp Predictions:", res.data.tempPredictions);
+                    console.log("Temp Predictions:", tempPredictions);
+                    console.log("Added Predictions:", res.data.addedPredictions);
+                    console.log("Added Predictions:", addedPredictions);
+                    console.log("Edited Predictions:", res.data.editedPredictions);
+                    console.log("Edited Predictions:", editedPredictions);
+                    console.log("Ads Viewed:", res.data.adsViewed);
+                    console.log("Ads Viewed:", adsViewed);
+                    console.log("here 1");
                 })
                 await axios.post(`${BASE_API_URL}api/user/reset`, { reset: true }, config);
             }
             if (announced) {
+                const reset = await axios.get(`${BASE_API_URL}api/user/reset`, config);
                 if (!reset.data.reset) {
                     await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
                         setPredictions(res.data.predictions);
@@ -143,12 +171,49 @@ const Prediction = ({ navigation }) => {
                         setAddedPredictions(res.data.addedPredictions);
                         setEditedPredictions(res.data.editedPredictions);
                         setAdsViewed(res.data.adsViewed);
+                        console.log("Predictions:", res.data.predictions);
+                        console.log("Predictions:", predictions);
+                        console.log("Temp Predictions:", res.data.tempPredictions);
+                        console.log("Temp Predictions:", tempPredictions);
+                        console.log("Added Predictions:", res.data.addedPredictions);
+                        console.log("Added Predictions:", addedPredictions);
+                        console.log("Edited Predictions:", res.data.editedPredictions);
+                        console.log("Edited Predictions:", editedPredictions);
+                        console.log("Ads Viewed:", res.data.adsViewed);
+                        console.log("Ads Viewed:", adsViewed);
+                        console.log("here 2");
                     })
                     await axios.post(`${BASE_API_URL}api/user/reset`, { reset: true }, config);
                 }
             }
         }
         resetFunction();
+        async function checkTime() {
+            const currentDate = new Date();
+            const token = state?.token;
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+            console.log("check");
+            const reset = await axios.get(`${BASE_API_URL}api/user/reset`, config);
+            // Check if it's midnight (00:00:00)
+            if (currentDate.getHours() === 0 && currentDate.getMinutes() === 0 && currentDate.getSeconds() === 0 && reset.data.reset == false) {
+                await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
+                    setPredictions(res.data.predictions);
+                    setTempPredictions(res.data.tempPredictions);
+                    setAddedPredictions(res.data.addedPredictions);
+                    setEditedPredictions(res.data.editedPredictions);
+                    setAdsViewed(res.data.adsViewed);
+                    console.log("here 3");
+                })
+                await axios.post(`${BASE_API_URL}api/user/reset`, { reset: true }, config);
+            }
+        }
+
+        // Check every minute (60,000 milliseconds)
+        setInterval(checkTime, 60000);
     }, []);
 
     useFocusEffect(
@@ -241,40 +306,6 @@ const Prediction = ({ navigation }) => {
                     });
             }
             fetchData();
-
-
-            async function checkTime() {
-                const currentDate = new Date();
-                const token = state?.token;
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                };
-                const reset = await axios.get(`${BASE_API_URL}api/user/reset`, config);
-                // Check if it's midnight (00:00:00)
-                if (currentDate.getHours() === 0 && currentDate.getMinutes() === 0 && currentDate.getSeconds() === 0 && reset.data.reset == false) {
-                    await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -(tempPredictions - 1), addedPredictions: -addedPredictions, editedPredictions: -editedPredictions, adsViewed: -adsViewed }, config).then((res) => {
-                        setPredictions(res.data.predictions);
-                        setTempPredictions(res.data.tempPredictions);
-                        setAddedPredictions(res.data.addedPredictions);
-                        setEditedPredictions(res.data.editedPredictions);
-                        setAdsViewed(res.data.adsViewed);
-                    })
-                    await axios.post(`${BASE_API_URL}api/user/reset`, { reset: true }, config);
-                }
-            }
-
-            // Call the checkTime function when the component mounts
-            checkTime();
-
-            // Update the time check every minute
-            const intervalId = setInterval(checkTime, 60000);
-
-            // Cleanup the timer when the component unmounts
-            return () => {
-                clearInterval(intervalId);
-            }
         }, [])
     )
 
@@ -434,7 +465,20 @@ const Prediction = ({ navigation }) => {
                 }
                 // toggleAdsModal();
                 showInterstitial();
-                toggleModal();
+                Alert.alert('Success', `Your prediction number is ${predictionNumber}`, [
+                    {
+                        text: 'Show Ads',
+                        onPress: () => showAds(),
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'Share',
+                        onPress: () => navigation.navigate("ReferAndEarn"),
+                        style: 'cancel',
+                    },
+                    { text: 'OK', onPress: () => navigation.navigate("Prediction") },
+                ]);
+                // toggleModal();
 
                 navigation.navigate("UserHistory");
             }
@@ -493,25 +537,25 @@ const Prediction = ({ navigation }) => {
     const tomorrowDate = new Date();
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
 
-    const renderItem = ({ item }) => {
-        return (
-            <View style={styles.row}>
-                <Text style={styles.cell}>{item.prediction_number}</Text>
-                <>{
-                    editedPredictions >= 2 ?
-                        <></>
-                        :
-                        <TouchableOpacity
-                            style={styles.editbutton}
-                            onPress={() => handleWantEdit(item._id)}
-                        >
-                            <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Edit</Text>
-                        </TouchableOpacity>
-                }
-                </>
-            </View>
-        );
-    };
+    // const renderItem = ({ item }) => {
+    //     return (
+    //         <View style={styles.row}>
+    //             <Text style={styles.cell}>{item.prediction_number}</Text>
+    //             <>{
+    //                 editedPredictions >= 3 ?
+    //                     <></>
+    //                     :
+    //                     <TouchableOpacity
+    //                         style={styles.editbutton}
+    //                         onPress={() => handleWantEdit(item._id)}
+    //                     >
+    //                         <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Edit</Text>
+    //                     </TouchableOpacity>
+    //             }
+    //             </>
+    //         </View>
+    //     );
+    // };
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: "space-evenly" }}>
             <KeyboardAvoidingView
@@ -582,7 +626,7 @@ const Prediction = ({ navigation }) => {
                                             <>
                                                 <Text style={styles.text1}><Text style={{ color: "red" }}>You have no more predictions left</Text></Text>
                                                 <Text style={styles.text2}>Earn more predictions</Text>
-                                                {adsViewed >= 1 ?
+                                                {adsViewed >= 2 ?
                                                     <TouchableOpacity
                                                         disabled={true}
                                                         style={{
@@ -613,7 +657,7 @@ const Prediction = ({ navigation }) => {
                                             </>
                                             :
                                             <>
-                                                {addedPredictions >= 2 ?
+                                                {addedPredictions >= 3 ?
                                                     <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to predict the number for today.</Text></Text>
                                                     :
                                                     <>
@@ -667,7 +711,7 @@ const Prediction = ({ navigation }) => {
                                                     </TouchableOpacity>
                                                 </View>
                                             </Modal> */}
-                                    <Modal
+                                    {/* <Modal
                                         isVisible={isModalVisible}
                                         style={styles.modal}
                                         animationIn="slideInUp"
@@ -695,7 +739,7 @@ const Prediction = ({ navigation }) => {
                                                 <Text style={styles.closeButton}>Hide Popup</Text>
                                             </TouchableOpacity>
                                         </View>
-                                    </Modal>
+                                    </Modal> */}
                                 </>
                             }
                         </View>
@@ -720,7 +764,7 @@ const Prediction = ({ navigation }) => {
                                 }
                                 <Text style={styles.text2}>{item.prediction_number}</Text>
                                 {
-                                    editedPredictions >= 2 ?
+                                    editedPredictions >= 3 ?
                                         <>
                                             <TouchableOpacity
                                                 disabled={true}

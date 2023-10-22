@@ -15,6 +15,8 @@ const HeaderMenu = () => {
   const { state } = useContext(AuthContext);
   const { predictions, setPredictions } = useContext(PredictionContext);
   const { tempPredictions, setTempPredictions } = useContext(PredictionContext);
+  const { addedPredictions, setAddedPredictions } = useContext(PredictionContext);
+  const { editedPredictions, setEditedPredictions } = useContext(PredictionContext);
   const { adsViewed, setAdsViewed } = useContext(PredictionContext);
   const { isLoaded, isEarnedReward, load, show } = useRewardedAd(adUnitId, {
     requestNonPersonalizedAdsOnly: true,
@@ -41,6 +43,8 @@ const HeaderMenu = () => {
         await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 1, addedPredictions: 0, editedPredictions: 0, adsViewed: 1 }, config).then((res) => {
           setPredictions(res.data.predictions);
           setTempPredictions(res.data.tempPredictions);
+          setAddedPredictions(res.data.addedPredictions);
+          setEditedPredictions(res.data.editedPredictions);
           setAdsViewed(res.data.adsViewed);
         })
       }
@@ -49,7 +53,7 @@ const HeaderMenu = () => {
   }, [isEarnedReward])
 
   const showAds = async () => {
-    if (adsViewed >= 1) {
+    if (adsViewed >= 2) {
       Alert.alert("Sorry !", "You can watch only 2 videos per today ! Share with friends to get more predictions.")
     } else {
       show();
