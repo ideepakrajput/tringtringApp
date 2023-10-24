@@ -34,6 +34,10 @@ const Prediction = ({ navigation }) => {
     const [wantEdit, setWantEdit] = useState(false);
     const [id, setId] = useState("");
     const [isloading, setIsLoading] = useState(false);
+
+
+    const [editPN, setPN] = useState(null);
+
     const { announced, setAnnounced } = useContext(PredictionContext);
     const editNumber = useRef();
     const { state } = useContext(AuthContext);
@@ -99,12 +103,17 @@ const Prediction = ({ navigation }) => {
         }
     }
 
-    const showDialog = () => {
+    const showDialog = (p, i) => {
+        console.log("Id is ----->", id)
+        setPN(p)
+        setId(i)
+        // setPredictionNumber(p)
         setVisible(true);
     };
 
     const handleCancel = () => {
         setVisible(false);
+        setPN(null)
     };
     const handleDelete = () => {
         // The user has pressed the "Delete" button, so here you can do your own logic.
@@ -215,6 +224,7 @@ const Prediction = ({ navigation }) => {
             try {
                 // Replace this with your actual data fetching logic
                 const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config)
+                console.log(result.data)
                 const sortedData = await result.data.sort((a, b) => new Date(b.created_date_time) - new Date(a.created_date_time));
                 let day = "";
                 let yesterday = "";
@@ -243,6 +253,7 @@ const Prediction = ({ navigation }) => {
 
                 setYesterdayPredictionsData(yesterdayPredictions);
                 setPredictionData(lastThreePredictions);
+                console.log(predictionData)
 
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -250,21 +261,28 @@ const Prediction = ({ navigation }) => {
         };
 
         fetchData();
-    }, [predictionData, yesterdayPredictionsData]);
+    }, []);
 
 
     function handleAddPrediction() {
         setWantEdit(false);
         setPredictionNumber("");
         setAddPrediction(true);
-        setisPredicted(false);
+        // setisPredicted(false);
     }
-    function handleWantEdit(id) {
+    function handleWantEdit() {
         setWantEdit(true);
         setPredictionNumber("");
         setAddPrediction(false);
-        setId(id);
-        setisPredicted(false);
+        // setId(id);
+        // setisPredicted(false);
+    }
+
+    function handleEditPrediction() {
+        handleWantEdit()
+        submitPrediction()
+        setPN(null)
+
     }
 
     const submitPrediction = async () => {
@@ -322,6 +340,7 @@ const Prediction = ({ navigation }) => {
                         console.log('====================================');
                     });
                     setIsLoading(false);
+                    setVisible(false);
                 }
                 else {
                     await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
@@ -356,8 +375,8 @@ const Prediction = ({ navigation }) => {
                     { text: 'OK', onPress: () => navigation.navigate("Prediction") },
                 ]);
                 // toggleModal();
-
-                navigation.navigate("UserHistory");
+                setVisible(false);
+                // navigation.navigate("UserHistory");
             }
             else if (!predictionNumber) {
                 setIsLoading(false);
@@ -553,10 +572,11 @@ const Prediction = ({ navigation }) => {
                                 {index === 0 ?
                                     <Text style={styles.text1}>Your Number(s) : </Text> : <></>
                                 }
-                                <Text style={styles.text2}>{item.prediction_number}</Text>
+
                                 {
                                     editedPredictions >= 3 ?
                                         <>
+                                            <Text style={styles.text2}>{item.prediction_number}</Text>
                                             <TouchableOpacity
                                                 disabled={true}
                                                 style={{
@@ -572,6 +592,7 @@ const Prediction = ({ navigation }) => {
                                             </TouchableOpacity></>
                                         :
                                         <>
+                                            <Text style={styles.text2}>{item.prediction_number}</Text>
                                             <TouchableOpacity
                                                 style={{
                                                     backgroundColor: "lightgrey",
@@ -580,7 +601,7 @@ const Prediction = ({ navigation }) => {
                                                     marginLeft: 5,
                                                     paddingHorizontal: 10,
                                                 }}
-                                                onPress={() => showDialog()}
+                                                onPress={() => showDialog(item.prediction_number, item._id)}
                                             >
                                                 <MaterialIcons name="mode-edit" size={24} color="#00BF63" />
                                             </TouchableOpacity>
@@ -588,11 +609,21 @@ const Prediction = ({ navigation }) => {
                                                 <Dialog.Container visible={visible}>
                                                     <Dialog.Title>Edit</Dialog.Title>
                                                     <Dialog.Description>
-                                                        You are edit your number {item.prediction_number}
+                                                        You are edit your number {editPN}
                                                     </Dialog.Description>
-                                                    <Dialog.Input textInputRef={editNumber} label="Enter your number" />
+                                                    <TextInput
+                                                        style={styles.textInput}
+                                                        maxLength={5}
+                                                        autoFocus={true}
+                                                        keyboardType='numeric'
+                                                        placeholder='-----'
+                                                        value={predictionNumber}
+                                                        onChangeText={(text) => setPredictionNumber(text)}
+                                                    >
+                                                    </TextInput>
+                                                    {/* <Dialog.Input textInputRef={editNumber} label="Enter your number" /> */}
                                                     <Dialog.Button label="Cancel" onPress={handleCancel} />
-                                                    <Dialog.Button label="Submit" onPress={() => { handleWantEdit(item._id); submitPrediction(); }} />
+                                                    <Dialog.Button label="Submit" onPress={() => handleEditPrediction()} />
                                                 </Dialog.Container>
                                             </View>
                                         </>

@@ -101,7 +101,7 @@ const Login = ({ navigation }) => {
 
 			await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
 
-			navigation.navigate("Prediction");
+			navigation.navigate("PrizesData");
 
 		} catch (error) {
 			setLoading(true);
