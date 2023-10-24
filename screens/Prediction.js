@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, Image, Dimensions, Alert, Share, KeyboardAvoidingView, ActivityIndicator, Button } from 'react-native';
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import COLORS from "../constants/colors";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -7,7 +7,7 @@ import { BASE_API_URL } from '../constants/baseApiUrl';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
-import { formatTimestampToTimeDate, ordinalDateFormat } from '../constants/dataTime';
+import { ordinalDateFormat } from '../constants/dataTime';
 import FooterMenu from '../components/Menus/FooterMenu';
 import { openYouTubeLink } from '../constants/openYouTubeLink';
 import { useRewardedAd, useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
@@ -30,24 +30,26 @@ const Prediction = ({ navigation }) => {
     const [yesterdayWinningNumber, setYesterdayWinningNumber] = useState();
     const [yesterdayWinningURL, setYesterdayWinningURL] = useState("");
     const [visible, setVisible] = useState(false);
-    const [addPrediction, setAddPrediction] = useState(false);
-    const [wantEdit, setWantEdit] = useState(false);
     const [id, setId] = useState("");
     const [isloading, setIsLoading] = useState(false);
-
-
     const [editPN, setPN] = useState(null);
 
     const { announced, setAnnounced } = useContext(PredictionContext);
-    const editNumber = useRef();
-    const { state } = useContext(AuthContext);
-
     const { predictions, setPredictions } = useContext(PredictionContext);
     const { tempPredictions, setTempPredictions } = useContext(PredictionContext);
     const { addedPredictions, setAddedPredictions } = useContext(PredictionContext);
     const { editedPredictions, setEditedPredictions } = useContext(PredictionContext);
     const { adsViewed, setAdsViewed } = useContext(PredictionContext);
 
+    const { state } = useContext(AuthContext);
+    const token = state?.token;
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+    // Interstitial Ad
     const { isLoaded: isInterstitialLoaded, load: loadInterstitial, show: showInterstitial } = useInterstitialAd(
         interstitialAdUnitId,
         {
@@ -64,7 +66,6 @@ const Prediction = ({ navigation }) => {
     );
 
     useEffect(() => {
-        // Load interstitial and rewarded ads when the component mounts
         if (!isInterstitialLoaded) {
             loadInterstitial();
         }
@@ -75,13 +76,7 @@ const Prediction = ({ navigation }) => {
 
     useEffect(() => {
         const incrementPredictions = async () => {
-            const token = state?.token;
 
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            };
             if (isEarnedReward) {
                 await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 1, addedPredictions: 0, editedPredictions: 0, adsViewed: 1 }, config).then((res) => {
                     setPredictions(res.data.predictions);
@@ -107,7 +102,7 @@ const Prediction = ({ navigation }) => {
         console.log("Id is ----->", i)
         setPN(p)
         setId(i)
-        // setPredictionNumber(p)
+        setPredictionNumber("");
         setVisible(true);
     };
 
@@ -115,84 +110,21 @@ const Prediction = ({ navigation }) => {
         setVisible(false);
         setPN(null)
     };
-    const handleDelete = () => {
-        // The user has pressed the "Delete" button, so here you can do your own logic.
-        // ...Your logic
-        setVisible(false);
-    };
 
     useFocusEffect(
         React.useCallback(() => {
-            const token = state?.token;
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            };
-
             async function fetchData() {
-                // await axios.get(`${BASE_API_URL}api/winning/user/prediction_number`, config).then((res) => {
-                //     const data = res.data;
-                //     // const currentDate = new Date().toISOString().split('T')[0];
-                //     let currentDate = "";
-                //     if (announced) {
-                //         const tomorrow = new Date();
-                //         tomorrow.setDate(tomorrow.getDate() + 1);
-                //         currentDate = tomorrow.toISOString().split('T')[0];
-                //     } else {
-                //         currentDate = new Date().toISOString().split('T')[0];
-                //     }
-                //     let formattedYesterdayDate = "";
-                //     if (announced) {
-                //         const today = new Date();
-                //         formattedYesterdayDate = today.toISOString().split('T')[0];
-                //     } else {
-                //         const yesterdayDate = new Date();
-                //         yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-                //         formattedYesterdayDate = yesterdayDate.toISOString().split('T')[0];
-                //     }
-
-                //     let lastUpdatedPredictionNumber = null;
-
-                //     // Iterate through the data to find the prediction_numbers
-                //     data.forEach((item) => {
-                //         if (item.transaction_date.startsWith(currentDate)) {
-                //             if (lastUpdatedPredictionNumber === null || item.updatedAt > lastUpdatedPredictionNumber.updatedAt) {
-                //                 lastUpdatedPredictionNumber = item;
-                //                 setTodayPredictionNumber(item.prediction_number);
-                //             }
-                //         } else if (item.transaction_date.startsWith(formattedYesterdayDate)) {
-                //             setYesterdayPredictionNumber(item.prediction_number);
-                //         }
-                //     });
-
-                // }).catch((err) => {
-                //     console.log('====================================');
-                //     console.log(err.response.data.message);
-                //     console.log('====================================');
-                // });
-
                 await axios.get(`${BASE_API_URL}api/winning/winning_numbers`)
                     .then(res => {
                         let yesterdayDateStr = "";
                         if (announced) {
                             const currentDate = new Date();
-
-                            // Subtract one day to get yesterday's date
                             const yesterdayDate = new Date(currentDate);
-
-                            // Convert both dates to strings and extract only the date part
-                            // const currentDateStr = currentDate.toISOString().slice(0, 10);
                             yesterdayDateStr = yesterdayDate.toISOString().slice(0, 10);
                         } else {
                             const currentDate = new Date();
-
-                            // Subtract one day to get yesterday's date
                             const yesterdayDate = new Date(currentDate);
                             yesterdayDate.setDate(currentDate.getDate() - 1);
-
-                            // Convert both dates to strings and extract only the date part
-                            // const currentDateStr = currentDate.toISOString().slice(0, 10);
                             yesterdayDateStr = yesterdayDate.toISOString().slice(0, 10);
                         }
 
@@ -200,7 +132,7 @@ const Prediction = ({ navigation }) => {
                             if (item.created_date_time.startsWith(yesterdayDateStr)) {
                                 setYesterdayWinningNumber(item.winning_number);
                                 setYesterdayWinningURL(item.youtube_url);
-                                break; // Stop once you find the winning number for yesterday
+                                break;
                             }
                         }
                     })
@@ -213,18 +145,15 @@ const Prediction = ({ navigation }) => {
     )
 
     useEffect(() => {
-        // Fetch your data asynchronously and update the state
-        const token = state?.token;
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        };
+        // const token = state?.token;
+        // const config = {
+        //     headers: {
+        //         Authorization: `Bearer ${token}`,
+        //     },
+        // };
         const fetchData = async () => {
             try {
-                // Replace this with your actual data fetching logic
                 const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config)
-                console.log(result.data)
                 const sortedData = await result.data.sort((a, b) => new Date(b.created_date_time) - new Date(a.created_date_time));
                 let day = "";
                 let yesterday = "";
@@ -241,7 +170,6 @@ const Prediction = ({ navigation }) => {
                 }
                 const todayDocuments = sortedData.filter(item => item.transaction_date.startsWith(day));
                 const yesterdayDocuments = sortedData.filter(item => item.transaction_date.startsWith(yesterday));
-                // Extract the last three updated prediction_number and created_date_time
                 const lastThreePredictions = todayDocuments.map(item => ({
                     prediction_number: item.prediction_number,
                     _id: item._id
@@ -253,43 +181,24 @@ const Prediction = ({ navigation }) => {
 
                 setYesterdayPredictionsData(yesterdayPredictions);
                 setPredictionData(lastThreePredictions);
-                console.log(predictionData)
 
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
-
         fetchData();
-    }, []);
-
-
-    function handleAddPrediction() {
-        setWantEdit(false);
-        setPredictionNumber("");
-        setAddPrediction(true);
-        // setisPredicted(false);
-    }
-    function handleWantEdit() {
-        setWantEdit(true);
-        setPredictionNumber("");
-        setAddPrediction(false);
-        // setId(id);
-        // setisPredicted(false);
-    }
+    }, [predictionData]);
 
     async function handleEditPrediction() {
         loadInterstitial();
         setIsLoading(true);
-        const token = state?.token;
-        console.log(editPN);
-        console.log(id);
+        // const token = state?.token;
 
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        };
+        // const config = {
+        //     headers: {
+        //         Authorization: `Bearer ${token}`,
+        //     },
+        // };
         await axios.put(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, id }, config);
         await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 1, adsViewed: 0 }, config).then((res) => {
             setPredictions(res.data.predictions);
@@ -302,59 +211,40 @@ const Prediction = ({ navigation }) => {
             console.log(err.response.data.message);
             console.log('====================================');
         });
+        showInterstitial();
+        Alert.alert('Success', `Your prediction number is ${editPN} to ${predictionNumber}`, [
+            {
+                text: 'Show Ads',
+                onPress: () => showAds(),
+                style: 'cancel',
+            },
+            {
+                text: 'Share',
+                onPress: () => navigation.navigate("ReferAndEarn"),
+                style: 'cancel',
+            },
+            { text: 'OK', onPress: () => navigation.navigate("Prediction") },
+        ]);
         setIsLoading(false);
+        setPredictionNumber("");
         setVisible(false);
-
     }
 
     const submitPrediction = async () => {
         loadInterstitial();
         setIsLoading(true);
-        const token = state?.token;
+        // const token = state?.token;
 
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        };
+        // const config = {
+        //     headers: {
+        //         Authorization: `Bearer ${token}`,
+        //     },
+        // };
 
         try {
             if (predictionNumber && predictionNumber.length == 5) {
-                if (addPrediction) {
-                    await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
-                    if (tempPredictions > 0) {
-                        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -1, addedPredictions: 1, editedPredictions: 0, adsViewed: 0 }, config).then((res) => {
-                            setPredictions(res.data.predictions);
-                            setTempPredictions(res.data.tempPredictions);
-                            setAddedPredictions(res.data.addedPredictions);
-                            setEditedPredictions(res.data.editedPredictions);
-                            setAdsViewed(res.data.adsViewed);
-                        }).catch((err) => {
-                            console.log('====================================');
-                            console.log(err.response.data.message);
-                            console.log('====================================');
-                        });
-                    } else {
-                        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: -1, tempPredictions: 0, addedPredictions: 1, editedPredictions: 0, adsViewed: 0 }, config).then((res) => {
-                            setPredictions(res.data.predictions);
-                            setTempPredictions(res.data.tempPredictions);
-                            setAddedPredictions(res.data.addedPredictions);
-                            setEditedPredictions(res.data.editedPredictions);
-                            setAdsViewed(res.data.adsViewed);
-                        }).catch((err) => {
-                            console.log('====================================');
-                            console.log(err.response.data.message);
-                            console.log('====================================');
-                        });
-                    }
-                    setIsLoading(false);
-                } else if (wantEdit) {
-
-                }
-                else {
-                    await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
-                    // const updatedEditCount = await axios.get(`${BASE_API_URL}api/user/edit_count`, config);
-                    // setEditCount(updatedEditCount.data.editCount);
+                await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
+                if (tempPredictions > 0) {
                     await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: -1, addedPredictions: 1, editedPredictions: 0, adsViewed: 0 }, config).then((res) => {
                         setPredictions(res.data.predictions);
                         setTempPredictions(res.data.tempPredictions);
@@ -366,9 +256,20 @@ const Prediction = ({ navigation }) => {
                         console.log(err.response.data.message);
                         console.log('====================================');
                     });
-                    setIsLoading(false);
+                } else {
+                    await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: -1, tempPredictions: 0, addedPredictions: 1, editedPredictions: 0, adsViewed: 0 }, config).then((res) => {
+                        setPredictions(res.data.predictions);
+                        setTempPredictions(res.data.tempPredictions);
+                        setAddedPredictions(res.data.addedPredictions);
+                        setEditedPredictions(res.data.editedPredictions);
+                        setAdsViewed(res.data.adsViewed);
+                    }).catch((err) => {
+                        console.log('====================================');
+                        console.log(err.response.data.message);
+                        console.log('====================================');
+                    });
                 }
-                // toggleAdsModal();
+
                 showInterstitial();
                 Alert.alert('Success', `Your prediction number is ${predictionNumber}`, [
                     {
@@ -383,9 +284,9 @@ const Prediction = ({ navigation }) => {
                     },
                     { text: 'OK', onPress: () => navigation.navigate("Prediction") },
                 ]);
-                // toggleModal();
                 setVisible(false);
-                // navigation.navigate("UserHistory");
+                setIsLoading(false);
+                setPredictionNumber("");
             }
             else if (!predictionNumber) {
                 setIsLoading(false);
@@ -402,37 +303,6 @@ const Prediction = ({ navigation }) => {
         }
     }
 
-    // const handleShare = async (name) => {
-    //     try {
-    //         const result = await Share.share({
-    //             title: `Tring Tring`,
-    //             message:
-    //                 `https://tring-tring.netlify.app/ \nHey ${name}! , I am using Tring Tring to PREDICT and WIN daily !!!\nJoin by my referral get bonus money and more predictions.`,
-    //         });
-    //         if (result.action === Share.sharedAction) {
-    //             if (result.activityType) {
-    //                 // shared with activity type of result.activityType
-    //                 console.log('====================================');
-    //                 console.log("Activity Type", result.activityType);
-    //                 console.log("Activity Type", result.activityType);
-    //                 console.log('====================================');
-    //             } else {
-    //                 // shared
-    //                 console.log('====================================');
-    //                 console.log("Shared");
-    //                 console.log('====================================');
-    //             }
-    //         } else if (result.action === Share.dismissedAction) {
-    //             // dismissed
-    //             console.log('====================================');
-    //             console.log("Dismiseds");
-    //             console.log('====================================');
-    //         }
-    //     } catch (error) {
-    //         Alert.alert(error.message);
-    //     }
-    // };
-
     const tomorrowDate = new Date();
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
 
@@ -445,7 +315,7 @@ const Prediction = ({ navigation }) => {
             case 3:
                 return "Third";
             default:
-                return "Invalid Input"; // Handle other cases as needed
+                return "";
         }
     }
 
@@ -548,29 +418,6 @@ const Prediction = ({ navigation }) => {
                                         }
                                     </>
                             }
-                            {/* <>
-                                <TextInput
-                                    style={styles.textInput}
-                                    maxLength={5}
-                                    autoFocus={true}
-                                    keyboardType='numeric'
-                                    placeholder='-----'
-                                    value={predictionNumber}
-                                    onChangeText={(text) => setPredictionNumber(text)}
-                                >
-                                </TextInput>
-                                <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
-                                {
-                                    isloading ? <ActivityIndicator></ActivityIndicator> :
-                                        <TouchableOpacity
-                                            style={styles.button}
-                                            onPress={submitPrediction}
-                                        >
-                                            <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
-                                        </TouchableOpacity>
-                                }
-                            </> */}
-                            {/* } */}
                         </View>
                     </>
                 </View>
@@ -587,7 +434,6 @@ const Prediction = ({ navigation }) => {
                                         <>
                                             <Text style={styles.text2}>{item.prediction_number}</Text>
                                             <TouchableOpacity
-                                                disabled={true}
                                                 style={{
                                                     backgroundColor: "lightgrey",
                                                     borderRadius: 15,
@@ -595,7 +441,7 @@ const Prediction = ({ navigation }) => {
                                                     marginLeft: 5,
                                                     paddingHorizontal: 10,
                                                 }}
-                                                onPress={() => handleWantEdit(item._id)}
+                                                onPress={() => Alert.alert("No edit left.")}
                                             >
                                                 <MaterialIcons name="edit-off" size={24} color="grey" />
                                             </TouchableOpacity></>
@@ -630,7 +476,6 @@ const Prediction = ({ navigation }) => {
                                                         onChangeText={(text) => setPredictionNumber(text)}
                                                     >
                                                     </TextInput>
-                                                    {/* <Dialog.Input textInputRef={editNumber} label="Enter your number" /> */}
                                                     <Dialog.Button label="Cancel" onPress={handleCancel} />
                                                     <Dialog.Button label="Submit" onPress={() => handleEditPrediction()} />
                                                 </Dialog.Container>
