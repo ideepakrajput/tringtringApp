@@ -58,19 +58,6 @@ const PredictionProvider = ({ children }) => {
             if (todayWinningEntry) {
                 let data = await AsyncStorage.getItem("@auth");
                 let loginData = JSON.parse(data);
-
-                const token = loginData?.token;
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                };
-                if (token) {
-                    const reset = await axios.get(`${BASE_API_URL}api/user/reset`, config);
-                    if (!reset.data.reset) {
-                        await axios.post(`${BASE_API_URL}api/user/reset`, { reset: false }, config);
-                    }
-                }
                 await AsyncStorage.setItem("@announced", "true");
                 setAnnounced(true);
             } else {
@@ -78,10 +65,8 @@ const PredictionProvider = ({ children }) => {
                 setAnnounced(false);
             }
         }
-
-        // Check every minute (60,000 milliseconds)
-        setInterval(checkWinningNumber, 60000);
-    }, []);
+        checkWinningNumber();
+    }, [announced]);
 
 
     return (

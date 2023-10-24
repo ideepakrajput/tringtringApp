@@ -100,14 +100,14 @@ const UserHistory = ({ navigation }) => {
 
     return (
         <>
-            <Text style={styles.text1}>Your Prediction History</Text>
+            <Text style={styles.text1}>History</Text>
             <View style={styles.table}>
                 <View style={styles.row}>
-                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "left" }}>Predicted Date & Time</Text>
-                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "left" }}>Predicted For</Text>
-                    <Text style={styles.headerCell}>Prediction Number</Text>
-                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "center" }}>Winning Number</Text>
-                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "right" }}>Watch Video</Text>
+                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "left" }}>Created On</Text>
+
+                    <Text style={styles.headerCell}>Your Number</Text>
+                    <Text style={styles.headerCell}>Winning Number Info</Text>
+
                 </View>
             </View>
             <View style={styles.container}>

@@ -32,6 +32,7 @@
     "react-hook-form": "^7.47.0",
     "react-native": "0.71.8",
     "react-native-clarity": "^1.0.1",
+    "react-native-dialog": "^9.3.0",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-extended-stylesheet": "^0.12.0",
     "react-native-gesture-handler": "~2.9.0",

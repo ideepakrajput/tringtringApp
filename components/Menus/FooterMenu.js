@@ -14,41 +14,41 @@ const FooterMenu = () => {
         <MaterialCommunityIcons
           name="cash-multiple"
           style={styles.iconStyle}
-          color={route.name === "PrizesData" && "orange"}
+          color={route.name === "PrizesData" ? "green" : "white"}
         />
-        <Text style={{ fontWeight: "bold" }}>Prizes</Text>
+        <Text style={[styles.textStyle, route.name === "PrizesData" ? styles.active : styles.inactive]}>Prizes</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("UserHistory")}>
         <FontAwesome5
           name="history"
           style={styles.iconStyle}
-          color={route.name === "UserHistory" && "orange"}
+          color={route.name === "UserHistory" ? "green" : "white"}
         />
-        <Text style={{ fontWeight: "bold" }}>History</Text>
+        <Text style={[styles.textStyle, route.name === "UserHistory" ? styles.active : styles.inactive]}>History</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("Prediction")}>
         <FontAwesome5
           name="home"
           style={styles.iconStyle}
-          color={route.name === "Prediction" && "orange"}
+          color={route.name === "Prediction" ? "green" : "white"}
         />
-        <Text style={{ fontWeight: "bold" }}>Home</Text>
+        <Text style={[styles.textStyle, route.name === "Prediction" ? styles.active : styles.inactive]}>Home</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ReferAndEarn")}>
         <FontAwesome5
           name="share-square"
           style={styles.iconStyle}
-          color={route.name === "ReferAndEarn" && "orange"}
+          color={route.name === "ReferAndEarn" ? "green" : "white"}
         />
-        <Text style={{ fontWeight: "bold" }}>Share</Text>
+        <Text style={[styles.textStyle, route.name === "ReferAndEarn" ? styles.active : styles.inactive]}>Share</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
         <FontAwesome5
           name="user"
           style={styles.iconStyle}
-          color={route.name === "Settings" && "orange"}
+          color={route.name === "Settings" ? "green" : "white"}
         />
-        <Text style={{ fontWeight: "bold" }}>My Account</Text>
+        <Text style={[styles.textStyle, route.name === "Settings" ? styles.active : styles.inactive]}>My Account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -57,7 +57,8 @@ const FooterMenu = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    margin: 15,
+    padding: 15,
+    backgroundColor: "grey",
     justifyContent: "space-between",
   },
   iconStyle: {
@@ -65,6 +66,15 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontSize: 25,
   },
+  textStyle: {
+    fontWeight: "bold"
+  },
+  active: {
+    color: "green"
+  },
+  inactive: {
+    color: "white"
+  }
 });
 
 export default FooterMenu;

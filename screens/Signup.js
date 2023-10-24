@@ -8,7 +8,7 @@ import {
   Alert,
   StyleSheet,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,6 +21,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 
 import DropDownPicker from 'react-native-dropdown-picker';
+import { AuthContext } from "../context/authContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -49,6 +50,8 @@ const Signup = ({ navigation }) => {
     { label: 'Female', value: 'female' },
     { label: 'Others', value: 'others' }
   ]);
+  const { state, setState } = useContext(AuthContext);
+  const { setAuthenticatedUser } = useContext(AuthContext);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: "641271354850-s3s89c9101j3pv63i4ult965gv7uncsp.apps.googleusercontent.com",
@@ -111,13 +114,16 @@ const Signup = ({ navigation }) => {
         Alert.alert("Please fill the age !");
       } else if (!password) {
         Alert.alert("Please create your password !");
+      } else if (password.length < 5) {
+        Alert.alert("Password should be minimum 5 characters !");
+        return;
       }
 
       await axios.get("https://api.ipify.org/?format=json").then((res) => {
         setIp(res.data.ip);
       });
 
-      await axios.post(`${BASE_API_URL}api/user/register`, {
+      const resp = await axios.post(`${BASE_API_URL}api/user/register`, {
         name,
         phoneNumber,
         gender,
@@ -126,7 +132,13 @@ const Signup = ({ navigation }) => {
         ip_address: ip
       });
 
-      navigation.navigate("Login");
+      setAuthenticatedUser(true);
+
+      setState(resp.data.data);
+
+      await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
+
+      navigation.navigate("Prediction");
     } catch (error) {
       Alert.alert(error.response.data.message);
     }
@@ -302,6 +314,7 @@ const Signup = ({ navigation }) => {
               items={items}
               defaultValue={gender}
               setOpen={setOpen}
+              placeholder="Select your gender"
               onSelectItem={(item) => {
                 setGender(item.value)
               }}
