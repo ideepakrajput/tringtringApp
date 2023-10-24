@@ -104,7 +104,7 @@ const Prediction = ({ navigation }) => {
     }
 
     const showDialog = (p, i) => {
-        console.log("Id is ----->", id)
+        console.log("Id is ----->", i)
         setPN(p)
         setId(i)
         // setPredictionNumber(p)
@@ -278,10 +278,32 @@ const Prediction = ({ navigation }) => {
         // setisPredicted(false);
     }
 
-    function handleEditPrediction() {
-        handleWantEdit()
-        submitPrediction()
-        setPN(null)
+    async function handleEditPrediction() {
+        loadInterstitial();
+        setIsLoading(true);
+        const token = state?.token;
+        console.log(editPN);
+        console.log(id);
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        await axios.put(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, id }, config);
+        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 1, adsViewed: 0 }, config).then((res) => {
+            setPredictions(res.data.predictions);
+            setTempPredictions(res.data.tempPredictions);
+            setAddedPredictions(res.data.addedPredictions);
+            setEditedPredictions(res.data.editedPredictions);
+            setAdsViewed(res.data.adsViewed);
+        }).catch((err) => {
+            console.log('====================================');
+            console.log(err.response.data.message);
+            console.log('====================================');
+        });
+        setIsLoading(false);
+        setVisible(false);
 
     }
 
@@ -327,20 +349,7 @@ const Prediction = ({ navigation }) => {
                     }
                     setIsLoading(false);
                 } else if (wantEdit) {
-                    await axios.put(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, id }, config);
-                    await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 1, adsViewed: 0 }, config).then((res) => {
-                        setPredictions(res.data.predictions);
-                        setTempPredictions(res.data.tempPredictions);
-                        setAddedPredictions(res.data.addedPredictions);
-                        setEditedPredictions(res.data.editedPredictions);
-                        setAdsViewed(res.data.adsViewed);
-                    }).catch((err) => {
-                        console.log('====================================');
-                        console.log(err.response.data.message);
-                        console.log('====================================');
-                    });
-                    setIsLoading(false);
-                    setVisible(false);
+
                 }
                 else {
                     await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
