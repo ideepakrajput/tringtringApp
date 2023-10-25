@@ -212,7 +212,7 @@ const Prediction = ({ navigation }) => {
             console.log('====================================');
         });
         showInterstitial();
-        Alert.alert('Success', `Your prediction number is ${editPN} to ${predictionNumber}`, [
+        Alert.alert('Success', `Your entry successfully changed from ${editPN} to ${predictionNumber}`, [
             {
                 text: 'Show Ads',
                 onPress: () => showAds(),
@@ -271,7 +271,7 @@ const Prediction = ({ navigation }) => {
                 }
 
                 showInterstitial();
-                Alert.alert('Success', `Your prediction number is ${predictionNumber}`, [
+                Alert.alert('Success', `Your Entry ${predictionNumber} added successfully`, [
                     {
                         text: 'Show Ads',
                         onPress: () => showAds(),
@@ -468,10 +468,14 @@ const Prediction = ({ navigation }) => {
                                             <Text>{"| "}</Text>
                                             <View style={styles.containerD}>
                                                 <Dialog.Container visible={visible}>
-                                                    <Dialog.Title>Edit</Dialog.Title>
-                                                    <Dialog.Description>
+                                                    {/* <Dialog.Button style={{}} label="Cancel" onPress={handleCancel} /> */}
+                                                    <TouchableOpacity><Text>x</Text></TouchableOpacity>
+                                                    {/* <Button title='x' /> */}
+                                                    {/* <Dialog.Title>Edit</Dialog.Title> */}
+                                                    {/* <Dialog.Description>
                                                         You are edit your number {editPN}
-                                                    </Dialog.Description>
+                                                    </Dialog.Description> */}
+                                                    <Text>Old Prediction Number: {editPN}</Text>
                                                     <TextInput
                                                         style={styles.textInput}
                                                         maxLength={5}
@@ -482,7 +486,6 @@ const Prediction = ({ navigation }) => {
                                                         onChangeText={(text) => setPredictionNumber(text)}
                                                     >
                                                     </TextInput>
-                                                    <Dialog.Button label="Cancel" onPress={handleCancel} />
                                                     <Dialog.Button label="Submit" onPress={() => handleEditPrediction()} />
                                                 </Dialog.Container>
                                             </View>
