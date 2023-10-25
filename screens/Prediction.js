@@ -303,6 +303,18 @@ const Prediction = ({ navigation }) => {
         }
     }
 
+    const handleShare = async (predictionNumber) => {
+        try {
+            await Share.share({
+                title: `Tring Tring`,
+                message:
+                    `https://tring-tring.netlify.app/ \n!,I am using Tring Tring to GUESS and WIN daily !!!\nMy entry for today is ${predictionNumber}.\nJoin by my referral get bonus money and gain more entries.`,
+            })
+        } catch (error) {
+            Alert.alert(error.message);
+        }
+    };
+
     const tomorrowDate = new Date();
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
 
@@ -332,32 +344,32 @@ const Prediction = ({ navigation }) => {
                             <Text
                                 style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}
                             >
-                                GUESS AND WIN 1 LAC RUPEES BEFORE 9 PM TODAY
+                                GUESS AND WIN 1 LAC RUPEES BEFORE 9 PM EVERYDAY
                             </Text>
                             <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
                                 <Text style={{ color: "#00BF63", textAlign: "center", fontSize: 16, marginBottom: 20 }}>view more prizes</Text>
                             </TouchableOpacity>
                             <Text style={styles.text2}>
-                                ENTER YOUR 5 DIGIT PREDICTION NUMBER
+                                ENTER 5 DIGIT NUMBER AND WIN 1 LAC RUPEES EVERY DAY BEFORE 9 PM:{"("}
+                                {
+                                    announced ?
+                                        <Text style={styles.text2}>
+                                            {"("}FOR {ordinalDateFormat(tomorrowDate)}, DRAW @ TOMORROW 9 PM IST{")"}
+                                        </Text>
+                                        :
+                                        <Text style={styles.text2}>
+                                            FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST{")"}
+                                        </Text>
+                                }
                             </Text>
-                            {
-                                announced ?
-                                    <Text style={styles.text2}>
-                                        FOR {ordinalDateFormat(tomorrowDate)}, DRAW @ TOMORROW 9 PM IST
-                                    </Text>
-                                    :
-                                    <Text style={styles.text2}>
-                                        FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST
-                                    </Text>
-                            }
                         </View>
                         <View style={{ flex: 2, alignItems: "center" }}>
 
                             {
                                 (predictions + tempPredictions) <= 0 ?
                                     <>
-                                        <Text style={styles.text1}><Text style={{ color: "red" }}>You have no more predictions left</Text></Text>
-                                        <Text style={styles.text2}>Earn more predictions</Text>
+                                        <Text style={styles.text1}><Text style={{ color: "red" }}>You have no more entries left</Text></Text>
+                                        <Text style={styles.text2}>Earn more entries</Text>
                                         {adsViewed >= 2 ?
                                             <TouchableOpacity
                                                 disabled={true}
@@ -390,7 +402,7 @@ const Prediction = ({ navigation }) => {
                                     :
                                     <>
                                         {addedPredictions >= 3 ?
-                                            <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to predict the number for today.</Text></Text>
+                                            <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to entry the number for today.</Text></Text>
                                             :
                                             <>
                                                 <Text style={styles.text2}>Your {numberToOrdinal(addedPredictions + 1)} Prediction</Text>
@@ -422,44 +434,38 @@ const Prediction = ({ navigation }) => {
                     </>
                 </View>
                 <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    <Text style={[styles.text1, styles.green]}>Your Number(s)</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginLeft: 10, justifyContent: "center" }}>
                         {predictionData.map((item, index) => (
-                            <View key={item._id} style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 5 }}>
-                                {index === 0 ?
-                                    <Text style={styles.text1}>Your Number(s) : </Text> : <></>
-                                }
-
+                            <View key={item._id} style={{ flexDirection: 'row', alignContent: 'center', justifyContent: "center", alignItems: "center" }}>
                                 {
                                     editedPredictions >= 3 ?
                                         <>
                                             <Text style={styles.text2}>{item.prediction_number}</Text>
                                             <TouchableOpacity
                                                 style={{
-                                                    backgroundColor: "lightgrey",
                                                     borderRadius: 15,
                                                     marginVertical: 5,
-                                                    marginLeft: 5,
                                                     paddingHorizontal: 10,
                                                 }}
                                                 onPress={() => Alert.alert("No edit left.")}
                                             >
-                                                <MaterialIcons name="edit-off" size={24} color="grey" />
+                                                <MaterialIcons name="edit-off" size={20} color="grey" />
                                             </TouchableOpacity></>
                                         :
                                         <>
                                             <Text style={styles.text2}>{item.prediction_number}</Text>
                                             <TouchableOpacity
                                                 style={{
-                                                    backgroundColor: "lightgrey",
                                                     borderRadius: 15,
                                                     marginVertical: 5,
-                                                    marginLeft: 5,
                                                     paddingHorizontal: 10,
                                                 }}
                                                 onPress={() => showDialog(item.prediction_number, item._id)}
                                             >
-                                                <MaterialIcons name="mode-edit" size={24} color="#00BF63" />
+                                                <MaterialIcons name="mode-edit" size={20} color="#00BF63" />
                                             </TouchableOpacity>
+                                            <Text>{"| "}</Text>
                                             <View style={styles.containerD}>
                                                 <Dialog.Container visible={visible}>
                                                     <Dialog.Title>Edit</Dialog.Title>
@@ -482,14 +488,13 @@ const Prediction = ({ navigation }) => {
                                             </View>
                                         </>
                                 }
-                                <Text> {" | "} </Text>
                             </View>
                         ))}
                     </View>
                 </View>
             </KeyboardAvoidingView>
             <View style={{ flex: 1 }}>
-                <Text style={styles.text1}>Yesterday</Text>
+                <Text style={[styles.text1, styles.green]}>Yesterday</Text>
                 <View style={{ flexDirection: "row", backgroundColor: "#00BF63", alignItems: "center", justifyContent: "space-around", borderRadius: 25 }}>
                     <View>
                         <Text style={styles.text2}>Your Number(s)</Text>
@@ -556,6 +561,9 @@ const styles = EStyleSheet.create({
         fontWeight: "bold",
         color: COLORS.black,
         textAlign: "center"
+    },
+    green: {
+        color: "#00BF63",
     },
     button: {
         margin: 10,
