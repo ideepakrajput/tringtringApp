@@ -20,7 +20,11 @@ import { BASE_API_URL } from "../constants/baseApiUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-
+import {
+	GoogleSignin,
+	GoogleSigninButton,
+	statusCodes,
+} from '@react-native-google-signin/google-signin';
 WebBrowser.maybeCompleteAuthSession();
 
 const Login = ({ navigation }) => {
@@ -34,28 +38,53 @@ const Login = ({ navigation }) => {
 
 	const [token, setToken] = useState("");
 	const [userInfo, setUserInfo] = useState(null);
-
-	const [request, response, promptAsync] = Google.useAuthRequest({
-		androidClientId: "641271354850-s3s89c9101j3pv63i4ult965gv7uncsp.apps.googleusercontent.com",
-		expoClientId: "641271354850-5jd5i3o6kial8kps5mm412bg4ki82lrl.apps.googleusercontent.com",
+	GoogleSignin.configure({
+		scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
+		webClientId: '463746785862-a1r667n088f5p85tvl31qltsgsfrsr70.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access). Required to get the `idToken` on the user object!
 	});
+	// const [request, response, promptAsync] = Google.useAuthRequest({
+	// 	androidClientId: "641271354850-s3s89c9101j3pv63i4ult965gv7uncsp.apps.googleusercontent.com",
+	// 	expoClientId: "641271354850-5jd5i3o6kial8kps5mm412bg4ki82lrl.apps.googleusercontent.com",
+	// });
 
-	useEffect(() => {
-		handleEffect();
-	}, [response, token]);
+	// useEffect(() => {
+	// 	handleEffect();
+	// }, [response, token]);
 
-	async function handleEffect() {
-		const user = await getLocalUser();
-		if (!user) {
-			if (response?.type === "success") {
-				setToken(response.authentication.accessToken);
-				getUserInfo(response.authentication.accessToken);
+	// async function handleEffect() {
+	// 	const user = await getLocalUser();
+	// 	if (!user) {
+	// 		if (response?.type === "success") {
+	// 			setToken(response.authentication.accessToken);
+	// 			getUserInfo(response.authentication.accessToken);
+	// 		}
+	// 	} else {
+	// 		setUserInfo(user);
+	// 	}
+	// }
+	async function googleLogin() {
+		try {
+			await GoogleSignin.hasPlayServices();
+			const userInfo = await GoogleSignin.signIn();
+			// console.log(userInfo)
+			if (userInfo.idToken) {
+				setToken(userInfo.idToken)
 			}
-		} else {
-			setUserInfo(user);
+			else {
+				throw new Error("no token ID")
+			}
+		} catch (error) {
+			if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+				console.log("cancelled")
+			} else if (error.code === statusCodes.IN_PROGRESS) {
+				console.log("In progress")
+			} else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+				console.log("Gplay services not enabled")
+			} else {
+				console.log("something went wrong")
+			}
 		}
 	}
-
 	const getLocalUser = async () => {
 		const data = await AsyncStorage.getItem("@user");
 		if (!data) return null;
@@ -288,10 +317,7 @@ const Login = ({ navigation }) => {
 				>
 
 					<TouchableOpacity
-						disabled={!request}
-						onPress={() => {
-							promptAsync();
-						}}
+						onPress={() => googleLogin()}
 						style={{
 							flex: 1,
 							alignItems: "center",

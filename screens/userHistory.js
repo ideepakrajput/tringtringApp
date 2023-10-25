@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, Dimensions, FlatList, TouchableOpacity, ActivityIndicator, Image, ScrollView } from 'react-native';
 import React, { useContext, useState } from 'react';
 import COLORS from "../constants/colors";
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -9,13 +9,12 @@ import { AuthContext } from '../context/authContext';
 import FooterMenu from '../components/Menus/FooterMenu';
 import { formatDateToDDMMYYYY, formatTimestampToTimeDate } from '../constants/dataTime';
 import { openYouTubeLink } from '../constants/openYouTubeLink';
-import { PredictionContext } from '../context/predictionContext';
 let entireScreenWidth = Dimensions.get('window').width;
 
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
 const UserHistory = ({ navigation }) => {
-    const [data, setData] = useState();
+    const [data, setData] = useState({});
     const [isData, setIsData] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -35,9 +34,18 @@ const UserHistory = ({ navigation }) => {
 
                     const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config);
                     result.data.sort((a, b) => {
-                        return new Date(b.created_date_time) - new Date(a.created_date_time);
+                        return new Date(b.transaction_date) - new Date(a.transaction_date);
                     });
-                    setData(result.data);
+                    const groupedData = {}
+                    result.data.forEach(item => {
+                        const date = item.transaction_date.split('T')[0];
+                        if (!groupedData[date]) {
+                            groupedData[date] = [];
+                        }
+                        groupedData[date].push(item);
+                    });
+                    setData(groupedData)
+                    console.log(groupedData);
                     if (result.data.length > 0) {
                         setIsData(true);
                     }
@@ -52,88 +60,84 @@ const UserHistory = ({ navigation }) => {
         }, [])
     )
 
-    // const MemoizedHistoryItem = React.memo(({ item, openYouTubeLink }) => {
-    //     return (
-    //         <View style={styles.row}>
-    //             <Text style={{ flex: 1, alignItems: 'center', justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.transaction_date)}</Text>
-    //             <Text style={styles.cell}>{item.prediction_number}</Text>
-    //             <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "center" }}>{item.winning_number || 'N/A'}</Text>
-    //             <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
-    //                 <Image
-    //                     source={require("../assets/utubelogo.png")}
-    //                     style={{
-    //                         height: 40,
-    //                         width: 40,
-    //                     }}
-    //                 >
-    //                 </Image>
-    //             </TouchableOpacity>
-    //         </View>
-    //     );
-    // });
-
     const renderItem = ({ item }) => {
         return (
             <View style={styles.row}>
                 <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
-                {/* {announced
-                    ?
-                    <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{tomorrowDate}</Text>
-                    : */}
-                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
-                {/* } */}
                 <Text style={styles.cell}>{item.prediction_number}</Text>
-                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{item.winning_number || 'N/A'}</Text>
-                <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
-                    <Image
-                        source={require("../assets/utubelogo.png")}
-                        style={{
-                            height: 40,
-                            width: 40,
-                        }}
-                    >
-                    </Image>
-                </TouchableOpacity>
+                <View>
+                    <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
+                    <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{item.winning_number || 'N/A'}</Text>
+                    <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
+                        <Image
+                            source={require("../assets/utubelogo.png")}
+                            style={{
+                                height: 40,
+                                width: 40,
+                                alignSelf: "center"
+                            }}
+                        >
+                        </Image>
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     };
 
     return (
         <>
-            <Text style={styles.text1}>History</Text>
-            <View style={styles.table}>
-                <View style={styles.row}>
-                    <Text style={{ flex: 1, alignItems: 'center', fontWeight: 'bold', justifyContent: 'center', textAlign: "left" }}>Created On</Text>
-
-                    <Text style={styles.headerCell}>Your Number</Text>
-                    <Text style={styles.headerCell}>Winning Number Info</Text>
-
-                </View>
-            </View>
             <View style={styles.container}>
-                {
-                    loading ?
-                        <>
-                            <ActivityIndicator size="large"></ActivityIndicator>
-                        </>
-                        :
-                        <>
-                            {
-                                isData ?
-                                    <FlatList
-                                        data={data}
-                                        renderItem={renderItem}
-                                        keyExtractor={(item) => item._id}
-                                    />
-                                    :
-                                    <>
-                                        <Text style={styles.text1}>You have not made any prediction yet.</Text>
-                                    </>
-
-                            }
-                        </>
+                <Text style={styles.text1}>History</Text>
+                <View style={styles.headerRow}>
+                    <Text style={styles.headerCell}>Created On</Text>
+                    <Text style={styles.headerCell}>Prediction Number</Text>
+                    <Text style={styles.headerCell}>Winning Number Info</Text>
+                </View>
+                {loading ?
+                    <ActivityIndicator size="large"></ActivityIndicator>
+                    :
+                    <View>
+                        {isData ?
+                            <>
+                                {Object.entries(data).map(([date, items]) => (
+                                    <View style={{ flexDirection: "column", backgroundColor: 'skyblue', marginTop: 10 }} key={date}>
+                                        {items.map((item, index) => (
+                                            <View style={{ flexDirection: "row", marginTop: 10, paddingRight: 10, paddingVertical: 5, height: 30 }} key={item._id}>
+                                                <Text style={[styles.cell, { fontSize: 15 }]}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
+                                                <Text style={[styles.cell, { marginLeft: 50 }]}>{item.prediction_number}</Text>
+                                                <View style={{ marginLeft: 'auto' }}>
+                                                    {index === 0 ?
+                                                        <View>
+                                                            <Text style={styles.cell}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
+                                                            <Text style={styles.cell}>{item.winning_number || " - "}</Text>
+                                                            <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
+                                                                <Image
+                                                                    source={require("../assets/utubelogo.png")}
+                                                                    style={{
+                                                                        height: 40,
+                                                                        width: 40,
+                                                                        alignSelf: "center"
+                                                                    }}
+                                                                >
+                                                                </Image>
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                        :
+                                                        <>
+                                                        </>
+                                                    }
+                                                </View>
+                                            </View>
+                                        ))}
+                                    </View>
+                                ))}
+                            </>
+                            :
+                            <Text style={styles.text1}>You have not made any prediction yet.</Text>
+                        }
+                    </View>
                 }
-            </View>
+            </View >
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
                 <FooterMenu />
             </View>
@@ -142,34 +146,6 @@ const UserHistory = ({ navigation }) => {
 };
 
 const styles = EStyleSheet.create({
-    container: {
-        flex: 6,
-        justifyContent: "center",
-    },
-    table: {
-        borderWidth: 1,
-        borderColor: 'black',
-        width: '100%',
-    },
-    row: {
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: 'black',
-        padding: 8,
-    },
-    cell: {
-        flex: 1,
-        alignItems: 'center',
-        alignSelf: "center",
-        justifyContent: 'center',
-        textAlign: "left",
-    },
-    headerCell: {
-        flex: 1,
-        justifyContent: 'center',
-        fontWeight: 'bold',
-        textAlign: "center"
-    },
     text1: {
         fontSize: "30rem",
         fontWeight: "bold",
@@ -177,6 +153,32 @@ const styles = EStyleSheet.create({
         marginTop: 10,
         marginBottom: 10,
         textAlign: "center"
+    },
+    container: {
+        flex: 1,
+        padding: 10,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        backgroundColor: '#303030',
+        padding: 5,
+
+    },
+    headerCell: {
+        flex: 1,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: 'white'
+    },
+    row: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderColor: '#ccc',
+        padding: 5,
+    },
+    cell: {
+        textAlign: 'center',
+        marginLeft: 10
     },
 });
 

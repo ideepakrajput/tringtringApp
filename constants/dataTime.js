@@ -25,7 +25,7 @@ export function formatTimestampToTimeDate(timestamp) {
     const dateString = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year}`;
 
     // Combine time and date
-    return `${dateString} \n${timeString}`;
+    return `${dateString} ${timeString}`;
 }
 
 export function ordinalDateFormat(timestamp) {

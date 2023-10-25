@@ -19,6 +19,9 @@
         {
           "contactsPermission": "Allow $(PRODUCT_NAME) to access your contacts."
         }
+      ],
+      [
+        "@react-native-google-signin/google-signin"
       ]
     ],
     "ios": {
@@ -41,7 +44,7 @@
       }
     }
   },
-  "react-native-google-mobile-ads":{
-    "android_app_id":"ca-app-pub-6067634275916377~7802227182"
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-6067634275916377~7802227182"
   }
 }
