@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image, Dimensions, Alert, Share, KeyboardAvoidingView, ActivityIndicator, Button } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Modal, Animated, Dimensions, Alert, Share, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import React, { useContext, useState, useEffect } from 'react';
 import COLORS from "../constants/colors";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,7 +13,6 @@ import { openYouTubeLink } from '../constants/openYouTubeLink';
 import { useRewardedAd, useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 import { PredictionContext } from '../context/predictionContext';
 import { MaterialIcons } from '@expo/vector-icons';
-import Dialog from "react-native-dialog";
 
 let entireScreenWidth = Dimensions.get('window').width;
 
@@ -22,6 +21,41 @@ EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
 const interstitialAdUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-6067634275916377/4705877289';
 const rewardedAdUnitId = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-6067634275916377/1879585158';
+
+const ModalPoup = ({ visible, children }) => {
+    const [showModal, setShowModal] = React.useState(visible);
+    const scaleValue = React.useRef(new Animated.Value(0)).current;
+    React.useEffect(() => {
+        toggleModal();
+    }, [visible]);
+    const toggleModal = () => {
+        if (visible) {
+            setShowModal(true);
+            Animated.spring(scaleValue, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            setTimeout(() => setShowModal(false), 200);
+            Animated.timing(scaleValue, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        }
+    };
+    return (
+        <Modal transparent visible={showModal}>
+            <View style={styles.modalBackGround}>
+                <Animated.View
+                    style={[styles.modalContainer, { transform: [{ scale: scaleValue }] }]}>
+                    {children}
+                </Animated.View>
+            </View>
+        </Modal>
+    );
+};
 
 const Prediction = ({ navigation }) => {
     const [predictionNumber, setPredictionNumber] = useState("");
@@ -214,11 +248,6 @@ const Prediction = ({ navigation }) => {
         showInterstitial();
         Alert.alert('Success', `Your entry successfully changed from ${editPN} to ${predictionNumber}`, [
             {
-                text: 'Show Ads',
-                onPress: () => showAds(),
-                style: 'cancel',
-            },
-            {
                 text: 'Share',
                 onPress: () => navigation.navigate("ReferAndEarn"),
                 style: 'cancel',
@@ -271,7 +300,7 @@ const Prediction = ({ navigation }) => {
                 }
 
                 showInterstitial();
-                Alert.alert('Success', `Your Entry ${predictionNumber} added successfully`, [
+                Alert.alert('Success', `Your entry ${predictionNumber} added successfully`, [
                     {
                         text: 'Show Ads',
                         onPress: () => showAds(),
@@ -314,6 +343,7 @@ const Prediction = ({ navigation }) => {
             Alert.alert(error.message);
         }
     };
+    // handleShare(55555);
 
     const tomorrowDate = new Date();
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
@@ -340,28 +370,23 @@ const Prediction = ({ navigation }) => {
             >
                 <View style={{ flex: 5 }}>
                     <>
-                        <View style={{ flex: 2, alignItems: "center", marginVertical: 20 }}>
-                            <Text
-                                style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}
-                            >
-                                GUESS AND WIN 1 LAC RUPEES BEFORE 9 PM EVERYDAY
-                            </Text>
-                            <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
-                                <Text style={{ color: "#00BF63", textAlign: "center", fontSize: 16, marginBottom: 20 }}>view more prizes</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.text2}>
+                        <View style={{ flex: 2, alignItems: "center", marginTop: 50, marginHorizontal: 10 }}>
+                            <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}>
                                 ENTER 5 DIGIT NUMBER AND WIN 1 LAC RUPEES EVERY DAY BEFORE 9 PM:{"("}
                                 {
                                     announced ?
-                                        <Text style={styles.text2}>
+                                        <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}>
                                             {"("}FOR {ordinalDateFormat(tomorrowDate)}, DRAW @ TOMORROW 9 PM IST{")"}
                                         </Text>
                                         :
-                                        <Text style={styles.text2}>
+                                        <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}>
                                             FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST{")"}
                                         </Text>
                                 }
                             </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
+                                <Text style={{ color: "#00BF63", textAlign: "center", fontSize: 16, marginBottom: 20 }}>view all prizes</Text>
+                            </TouchableOpacity>
                         </View>
                         <View style={{ flex: 2, alignItems: "center" }}>
 
@@ -402,7 +427,10 @@ const Prediction = ({ navigation }) => {
                                     :
                                     <>
                                         {addedPredictions >= 3 ?
-                                            <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to entry the number for today.</Text></Text>
+                                            <>
+                                                <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to make entries for today</Text></Text>
+                                                <Text style={styles.text2}><Text style={{ color: "grey" }}>(maximum 3 entries per day)</Text></Text>
+                                            </>
                                             :
                                             <>
                                                 <Text style={styles.text2}>Your {numberToOrdinal(addedPredictions + 1)} Prediction</Text>
@@ -416,7 +444,7 @@ const Prediction = ({ navigation }) => {
                                                     onChangeText={(text) => setPredictionNumber(text)}
                                                 >
                                                 </TextInput>
-                                                <Text style={{ marginTop: -5, fontWeight: "bold", color: "green" }}>terms & conditions apply*</Text>
+                                                <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen" }}>terms & conditions apply*</Text>
                                                 {
                                                     isloading ? <ActivityIndicator></ActivityIndicator> :
                                                         <TouchableOpacity
@@ -467,17 +495,21 @@ const Prediction = ({ navigation }) => {
                                             </TouchableOpacity>
                                             <Text>{"| "}</Text>
                                             <View style={styles.containerD}>
-                                                <Dialog.Container visible={visible}>
-                                                    {/* <Dialog.Button style={{}} label="Cancel" onPress={handleCancel} /> */}
-                                                    <TouchableOpacity><Text>x</Text></TouchableOpacity>
-                                                    {/* <Button title='x' /> */}
-                                                    {/* <Dialog.Title>Edit</Dialog.Title> */}
-                                                    {/* <Dialog.Description>
-                                                        You are edit your number {editPN}
-                                                    </Dialog.Description> */}
-                                                    <Text>Old Prediction Number: {editPN}</Text>
+                                                <ModalPoup visible={visible}>
+                                                    <View style={{ alignItems: 'center' }}>
+                                                        <View style={styles.header}>
+                                                            <TouchableOpacity onPress={() => setVisible(false)}>
+                                                                <Image
+                                                                    source={require('../assets/x.png')}
+                                                                    style={{ height: 30, width: 30 }}
+                                                                />
+                                                            </TouchableOpacity>
+                                                        </View>
+                                                    </View>
+                                                    <Text style={styles.text2}>Your existing number : {editPN}</Text>
+                                                    <Text style={[styles.text2, { fontWeight: "bold" }]}>Enter New Number </Text>
                                                     <TextInput
-                                                        style={styles.textInput}
+                                                        style={[styles.textInput, { alignSelf: "center" }]}
                                                         maxLength={5}
                                                         autoFocus={true}
                                                         keyboardType='numeric'
@@ -486,8 +518,15 @@ const Prediction = ({ navigation }) => {
                                                         onChangeText={(text) => setPredictionNumber(text)}
                                                     >
                                                     </TextInput>
-                                                    <Dialog.Button label="Submit" onPress={() => handleEditPrediction()} />
-                                                </Dialog.Container>
+                                                    <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen", textAlign: "center" }}>terms & conditions apply*</Text>
+
+                                                    <TouchableOpacity
+                                                        style={styles.button}
+                                                        onPress={handleEditPrediction}
+                                                    >
+                                                        <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
+                                                    </TouchableOpacity>
+                                                </ModalPoup>
                                             </View>
                                         </>
                                 }
@@ -505,13 +544,17 @@ const Prediction = ({ navigation }) => {
                             <Text style={styles.winning_number}>{" - "}</Text>
                             :
                             <>
-                                {
-                                    yesterdayPredictionsData.map((item) => (
-                                        <View key={item._id}>
-                                            <Text style={{ textAlign: "center", color: "white", fontWeight: "bold" }}>{item.prediction_number}</Text>
-                                        </View>
-                                    ))
-                                }
+                                <View style={{ flexDirection: "row" }}>
+                                    {
+                                        yesterdayPredictionsData.map((item, index) => (
+                                            <View key={item._id}>
+                                                <Text style={{ textAlign: "center", color: "white", fontWeight: "bold", fontSize: 16, paddingVertical: 10 }}>{item.prediction_number}
+                                                    {index != yesterdayPredictionsData.length - 1 ? <Text style={{ textAlign: "center", color: "white", fontWeight: "bold" }}>{","}</Text> : <></>}
+                                                </Text>
+                                            </View>
+                                        ))
+                                    }
+                                </View>
                             </>
                         }
                     </View>
@@ -527,7 +570,7 @@ const Prediction = ({ navigation }) => {
                     </TouchableOpacity>
                     <View>
                         <Text style={styles.text2}>Winning Number</Text>
-                        <Text style={styles.winning_number}>{yesterdayWinningNumber || " - "}</Text>
+                        <Text style={styles.winning_number}>{yesterdayWinningNumber || "55555"}</Text>
                     </View>
                 </View>
             </View>
@@ -594,60 +637,24 @@ const styles = EStyleSheet.create({
         color: "green", fontSize: "36rem", borderWidth: 2, marginVertical: 10, paddingHorizontal: 10, width: "150rem", borderRadius: 15, borderColor: "green",
         textAlign: "center",
     },
-    head: { height: 40, backgroundColor: '#808B97' },
-    text: { margin: 6 },
-    table: {
-        borderWidth: 1,
-        borderColor: 'black',
-        width: '100%',
-    },
-    row: {
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: 'black',
-        justifyContent: "center"
-    },
-    cell: {
+    modalBackGround: {
         flex: 1,
-        alignItems: 'center',
-        alignSelf: "center",
-        marginHorizontal: 20
-    },
-    headerCell: {
-        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
-        fontWeight: 'bold',
-        textAlign: "center"
-    },
-    modal: {
-        justifyContent: 'flex-end',
-        margin: 0,
-    },
-    modalContent: {
-        backgroundColor: 'green', // Background color of the modal
-        padding: 16,
         alignItems: 'center',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
     },
-    modalText: {
-        color: 'white', // Text color
-        fontSize: 18,
-        marginBottom: 10,
+    modalContainer: {
+        width: '80%',
+        backgroundColor: 'white',
+        borderRadius: 20,
+        elevation: 20,
     },
-    closeButton: {
-        color: 'red', // Close button text color
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    shareButton: {
-        backgroundColor: '#4caf50',
-        padding: 8,
-        borderRadius: 50,
-        marginLeft: 10,
-    },
-    shareButtonText: {
-        color: '#fff',
+    header: {
+        width: '100%',
+        marginTop: -5,
+        height: 40,
+        alignItems: 'flex-end',
+        justifyContent: 'center',
     },
 });
 

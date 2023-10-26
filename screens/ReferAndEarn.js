@@ -9,7 +9,7 @@ const image = require('../assets/icon.png');
 const InviteFriends = () => {
     const [contacts, setContacts] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-
+    const myreferralcode = "takestimetocompletethistask"
     useEffect(() => {
         getContacts();
     }, []);
@@ -32,12 +32,12 @@ const InviteFriends = () => {
             contact.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const handleShare = async (name) => {
+    const handleShare = async (myreferralcode) => {
         try {
             const result = await Share.share({
                 title: `Tring Tring`,
                 message:
-                    `https://tring-tring.netlify.app/ \nHey ${name}! , I am using Tring Tring to PREDICT and WIN daily !!!\nJoin by my referral get bonus money and more predictions.`,
+                    `https://tring-tring.netlify.app/ \nI am using Tring Tring to GUESS and WIN daily !!!\nJoin by my referral get bonus money and more entries.\nMy referral code is ${myreferralcode}`,
             });
             if (result.action === Share.sharedAction) {
                 if (result.activityType) {
@@ -81,7 +81,7 @@ const InviteFriends = () => {
             <View>
                 <TouchableOpacity
                     style={styles.shareButton}
-                    onPress={() => handleShare(item.name)}
+                    onPress={() => handleShare(myreferralcode)}
                 >
                     <Text style={styles.shareButtonText}>Share</Text>
                 </TouchableOpacity>
@@ -96,6 +96,26 @@ const InviteFriends = () => {
     return (
         <>
             <View style={styles.container}>
+                <View style={{ backgroundColor: "skyblue", padding: 10, marginBottom: 10 }}>
+                    <Text style={styles.text1}>Refer and Gain entries</Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                        <TextInput style={styles.text2} value={myreferralcode}></TextInput>
+                        <TouchableOpacity
+                            style={[styles.shareButton, { alignItems: "flex-end" }]}
+                            onPress={() => handleShare(myreferralcode)}
+                        >
+                            <Text style={styles.shareButtonText}>Copy</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ alignItems: "center" }}>
+                        <TouchableOpacity
+                            style={[styles.shareButton, { width: 100 }]}
+                            onPress={() => handleShare(myreferralcode)}
+                        >
+                            <Text style={styles.shareButtonText}>Share</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <TextInput
                     style={styles.searchInput}
                     placeholder="Search by Name"
@@ -108,7 +128,7 @@ const InviteFriends = () => {
                     renderItem={renderItem}
                     contentContainerStyle={styles.contactList}
                 />
-            </View>
+            </View >
             <View style={{ flex: 0.1, justifyContent: "flex-end" }}>
                 <FooterMenu />
             </View>
@@ -117,6 +137,16 @@ const InviteFriends = () => {
 };
 
 const styles = StyleSheet.create({
+    text1: {
+        fontSize: 24,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    text2: {
+        fontSize: 20,
+        fontWeight: "bold",
+        textAlign: "center"
+    },
     container: {
         flex: 1,
         paddingTop: 16,
@@ -161,6 +191,7 @@ const styles = StyleSheet.create({
     },
     shareButtonText: {
         color: '#fff',
+        textAlign: "center"
     },
 });
 

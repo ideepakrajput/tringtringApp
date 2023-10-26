@@ -62,10 +62,10 @@ const HeaderMenu = () => {
 
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, columnGap: 10, borderRadius: 50, backgroundColor: "#00BF63" }}>
+    <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, columnGap: 20, borderRadius: 50, backgroundColor: "#00BF63" }}>
       <View>
         <Text style={styles.text2}>{predictions + tempPredictions}</Text>
-        <Text style={styles.text2}>Predictions</Text>
+        {(predictions + tempPredictions) > 1 ? <Text style={styles.text2}>Entries</Text> : <Text style={styles.text2}>Entry</Text>}
       </View>
       <TouchableOpacity onPress={() => { showAds(); }}>
         <AntDesign name="pluscircleo" size={30} color="white" />
@@ -78,6 +78,7 @@ const styles = EStyleSheet.create({
     fontSize: "15rem",
     fontWeight: "bold",
     color: "white",
+    marginLeft: 20,
     textAlign: "center"
   },
 });

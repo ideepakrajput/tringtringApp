@@ -44,8 +44,7 @@ const UserHistory = ({ navigation }) => {
                         }
                         groupedData[date].push(item);
                     });
-                    setData(groupedData)
-                    console.log(groupedData);
+                    setData(groupedData);
                     if (result.data.length > 0) {
                         setIsData(true);
                     }
@@ -60,47 +59,23 @@ const UserHistory = ({ navigation }) => {
         }, [])
     )
 
-    const renderItem = ({ item }) => {
-        return (
-            <View style={styles.row}>
-                <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
-                <Text style={styles.cell}>{item.prediction_number}</Text>
-                <View>
-                    <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
-                    <Text style={{ flex: 1, alignItems: 'center', alignSelf: "center", justifyContent: 'center', textAlign: "left" }}>{item.winning_number || 'N/A'}</Text>
-                    <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
-                        <Image
-                            source={require("../assets/utubelogo.png")}
-                            style={{
-                                height: 40,
-                                width: 40,
-                                alignSelf: "center"
-                            }}
-                        >
-                        </Image>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        );
-    };
-
     return (
         <>
             <View style={styles.container}>
                 <Text style={styles.text1}>History</Text>
                 <View style={styles.headerRow}>
                     <Text style={styles.headerCell}>Created On</Text>
-                    <Text style={styles.headerCell}>Prediction Number</Text>
-                    <Text style={styles.headerCell}>Winning Number Info</Text>
+                    <Text style={[styles.headerCell, { textAlign: "center" }]}>Prediction Number</Text>
+                    <Text style={[styles.headerCell, { textAlign: "center" }]}>Winning Number Info</Text>
                 </View>
                 {loading ?
                     <ActivityIndicator size="large"></ActivityIndicator>
                     :
-                    <View>
+                    <ScrollView style={{ marginBottom: 10 }}>
                         {isData ?
                             <>
                                 {Object.entries(data).map(([date, items]) => (
-                                    <View style={{ flexDirection: "column", backgroundColor: 'skyblue', marginTop: 10 }} key={date}>
+                                    <View style={{ flexDirection: "column", backgroundColor: 'skyblue', marginTop: 10, height: 120 }} key={date}>
                                         {items.map((item, index) => (
                                             <View style={{ flexDirection: "row", marginTop: 10, paddingRight: 10, paddingVertical: 5, height: 30 }} key={item._id}>
                                                 <Text style={[styles.cell, { fontSize: 15 }]}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
@@ -110,7 +85,7 @@ const UserHistory = ({ navigation }) => {
                                                         <View>
                                                             <Text style={styles.cell}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
                                                             <Text style={styles.cell}>{item.winning_number || " - "}</Text>
-                                                            <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)}>
+                                                            <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)} style={styles.cell}>
                                                                 <Image
                                                                     source={require("../assets/utubelogo.png")}
                                                                     style={{
@@ -135,10 +110,10 @@ const UserHistory = ({ navigation }) => {
                             :
                             <Text style={styles.text1}>You have not made any prediction yet.</Text>
                         }
-                    </View>
+                    </ScrollView>
                 }
             </View >
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+            <View style={{ flex: 0.1, justifyContent: "flex-end" }}>
                 <FooterMenu />
             </View>
         </>
@@ -167,7 +142,6 @@ const styles = EStyleSheet.create({
     headerCell: {
         flex: 1,
         fontWeight: 'bold',
-        textAlign: 'center',
         color: 'white'
     },
     row: {

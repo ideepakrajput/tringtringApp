@@ -78,7 +78,7 @@ export default ScheduledNotificaction = () => {
                 await Notifications.scheduleNotificationAsync({
                     content: {
                         title: "Predict and Win",
-                        body: `Aaj tring tring nhi kiya kya ???? \nPredict your number to win exiting prizes !!`,
+                        body: `Aaj tring tring kiye kya? \nCreate your ENTRY to Win Exciting Cash Prizes upto 1 Lakh Rupees Daily!`,
                     },
                     trigger: {
                         hour: 10,
