@@ -30,7 +30,7 @@
     "expo-web-browser": "~12.1.1",
     "react": "18.2.0",
     "react-hook-form": "^7.47.0",
-    "react-native": "0.71.14",
+    "react-native": "0.72.5",
     "react-native-clarity": "^1.0.1",
     "react-native-dialog": "^9.3.0",
     "react-native-dropdown-picker": "^5.4.6",
