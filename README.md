@@ -2,4 +2,4 @@
 
 ## Internship Project
 
-### Done By [Deepak Rajput](github.com/ideepakrajput) and Akash Kamat(https://github.com/akash-kamat)
+### Done By [Deepak Rajput](github.com/ideepakrajput) and [Akash kamat](https://github.com/akash-kamat)
