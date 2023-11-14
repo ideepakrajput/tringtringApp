@@ -7,7 +7,7 @@ import { BASE_API_URL } from '../constants/baseApiUrl';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import { AuthContext } from '../context/authContext';
-import { ordinalDateFormat } from '../constants/dataTime';
+import { ordinalDate, ordinalDateFormat } from '../constants/dataTime';
 import FooterMenu from '../components/Menus/FooterMenu';
 import { openYouTubeLink } from '../constants/openYouTubeLink';
 import { useRewardedAd, useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
@@ -179,12 +179,6 @@ const Prediction = ({ navigation }) => {
     )
 
     useEffect(() => {
-        // const token = state?.token;
-        // const config = {
-        //     headers: {
-        //         Authorization: `Bearer ${token}`,
-        //     },
-        // };
         const fetchData = async () => {
             try {
                 const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config)
@@ -226,13 +220,6 @@ const Prediction = ({ navigation }) => {
     async function handleEditPrediction() {
         loadInterstitial();
         setIsLoading(true);
-        // const token = state?.token;
-
-        // const config = {
-        //     headers: {
-        //         Authorization: `Bearer ${token}`,
-        //     },
-        // };
         await axios.put(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, id }, config);
         await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 1, adsViewed: 0 }, config).then((res) => {
             setPredictions(res.data.predictions);
@@ -262,14 +249,6 @@ const Prediction = ({ navigation }) => {
     const submitPrediction = async () => {
         loadInterstitial();
         setIsLoading(true);
-        // const token = state?.token;
-
-        // const config = {
-        //     headers: {
-        //         Authorization: `Bearer ${token}`,
-        //     },
-        // };
-
         try {
             if (predictionNumber && predictionNumber.length == 5) {
                 await axios.post(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, announced }, config);
@@ -347,6 +326,8 @@ const Prediction = ({ navigation }) => {
 
     const tomorrowDate = new Date();
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
 
     function numberToOrdinal(number) {
         switch (number) {
@@ -362,107 +343,98 @@ const Prediction = ({ navigation }) => {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1, justifyContent: "space-evenly" }}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 6, justifyContent: "space-between" }}
-                enabled="true"
-            >
-                <View style={{ flex: 5 }}>
-                    <>
-                        <View style={{ flex: 2, alignItems: "center", marginTop: 50, marginHorizontal: 10 }}>
-                            <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}>
-                                ENTER 5 DIGIT NUMBER AND WIN 1 LAC RUPEES EVERY DAY BEFORE 9 PM:{"("}
-                                {
-                                    announced ?
-                                        <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}>
-                                            {"("}FOR {ordinalDateFormat(tomorrowDate)}, DRAW @ TOMORROW 9 PM IST{")"}
-                                        </Text>
-                                        :
-                                        <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}>
-                                            FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST{")"}
-                                        </Text>
-                                }
+        <SafeAreaView style={{ flex: 1 }}>
+            <View style={{ flex: 1, justifyContent: "space-between" }}>
+                <View style={{ marginTop: 28 }}>
+                    <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}>
+                        ENTER 5 DIGIT NUMBER AND WIN 1 LAC RUPEES EVERY DAY BEFORE 9 PM
+                    </Text>
+                    {
+                        announced ?
+                            <Text style={styles.text2}>
+                                {"("}FOR {ordinalDateFormat(tomorrowDate)}, DRAW @ TOMORROW 9 PM IST{")"}
                             </Text>
-                            <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
-                                <Text style={{ color: "#00BF63", textAlign: "center", fontSize: 16, marginBottom: 20 }}>view all prizes</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={{ flex: 2, alignItems: "center" }}>
-
-                            {
-                                (predictions + tempPredictions) <= 0 ?
+                            :
+                            <Text style={styles.text2}>
+                                {"("}FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST{")"}
+                            </Text>
+                    }
+                    <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
+                        <Text style={{ color: "#00BF63", textAlign: "center", fontSize: 16, marginBottom: 20 }}>view all prizes</Text>
+                    </TouchableOpacity>
+                </View>
+                <View>
+                    {
+                        (predictions + tempPredictions) <= 0 ?
+                            <>
+                                <Text style={styles.text1}><Text style={{ color: "red" }}>You have no more entries left</Text></Text>
+                                <Text style={styles.text2}>Earn more entries</Text>
+                                {adsViewed >= 2 ?
+                                    <TouchableOpacity
+                                        disabled={true}
+                                        style={{
+                                            margin: 10,
+                                            backgroundColor: "lightgrey",
+                                            borderRadius: 15,
+                                            paddingHorizontal: 10
+                                        }}
+                                        onPress={() => showAds()}
+                                    >
+                                        <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
+                                    </TouchableOpacity>
+                                    :
+                                    <TouchableOpacity
+                                        style={styles.button}
+                                        onPress={() => showAds()}
+                                    >
+                                        <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
+                                    </TouchableOpacity>
+                                }
+                                <Text>OR</Text>
+                                <TouchableOpacity
+                                    style={styles.button}
+                                    onPress={() => navigation.navigate("ReferAndEarn")}
+                                >
+                                    <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Share with friends</Text>
+                                </TouchableOpacity>
+                            </>
+                            :
+                            <>
+                                {addedPredictions >= 3 ?
                                     <>
-                                        <Text style={styles.text1}><Text style={{ color: "red" }}>You have no more entries left</Text></Text>
-                                        <Text style={styles.text2}>Earn more entries</Text>
-                                        {adsViewed >= 2 ?
-                                            <TouchableOpacity
-                                                disabled={true}
-                                                style={{
-                                                    margin: 10,
-                                                    backgroundColor: "lightgrey",
-                                                    borderRadius: 15,
-                                                    paddingHorizontal: 10
-                                                }}
-                                                onPress={() => showAds()}
-                                            >
-                                                <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
-                                            </TouchableOpacity>
-                                            :
-                                            <TouchableOpacity
-                                                style={styles.button}
-                                                onPress={() => showAds()}
-                                            >
-                                                <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
-                                            </TouchableOpacity>
-                                        }
-                                        <Text>OR</Text>
-                                        <TouchableOpacity
-                                            style={styles.button}
-                                            onPress={() => navigation.navigate("ReferAndEarn")}
-                                        >
-                                            <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Share with friends</Text>
-                                        </TouchableOpacity>
+                                        <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to make entries for today</Text></Text>
+                                        <Text style={styles.text2}><Text style={{ color: "grey" }}>(maximum 3 entries per day)</Text></Text>
                                     </>
                                     :
                                     <>
-                                        {addedPredictions >= 3 ?
-                                            <>
-                                                <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to make entries for today</Text></Text>
-                                                <Text style={styles.text2}><Text style={{ color: "grey" }}>(maximum 3 entries per day)</Text></Text>
-                                            </>
-                                            :
-                                            <>
-                                                <Text style={styles.text2}>Your {numberToOrdinal(addedPredictions + 1)} Prediction</Text>
-                                                <TextInput
-                                                    style={styles.textInput}
-                                                    maxLength={5}
-                                                    autoFocus={true}
-                                                    keyboardType='numeric'
-                                                    placeholder='-----'
-                                                    value={predictionNumber}
-                                                    onChangeText={(text) => setPredictionNumber(text)}
+                                        <Text style={styles.text2}>Your {numberToOrdinal(addedPredictions + 1)} Prediction</Text>
+                                        <TextInput
+                                            style={[styles.textInput, { alignSelf: "center" }]}
+                                            maxLength={5}
+                                            autoFocus={true}
+                                            keyboardType='numeric'
+                                            placeholder='-----'
+                                            value={predictionNumber}
+                                            onChangeText={(text) => setPredictionNumber(text)}
+                                        >
+                                        </TextInput>
+                                        <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen", textAlign: "center" }}>terms & conditions apply*</Text>
+                                        {
+                                            isloading ? <ActivityIndicator></ActivityIndicator> :
+                                                <TouchableOpacity
+                                                    style={styles.button}
+                                                    onPress={submitPrediction}
                                                 >
-                                                </TextInput>
-                                                <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen" }}>terms & conditions apply*</Text>
-                                                {
-                                                    isloading ? <ActivityIndicator></ActivityIndicator> :
-                                                        <TouchableOpacity
-                                                            style={styles.button}
-                                                            onPress={submitPrediction}
-                                                        >
-                                                            <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
-                                                        </TouchableOpacity>
-                                                }
-                                            </>
+                                                    <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
+                                                </TouchableOpacity>
                                         }
                                     </>
-                            }
-                        </View>
-                    </>
+                                }
+                            </>
+                    }
                 </View>
-                <View style={{ flex: 1 }}>
-                    <Text style={[styles.text1, styles.green]}>Your Number(s)</Text>
+                <View>
+                    <Text style={[styles.text1, styles.green]}>Today's Entries</Text>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginLeft: 10, justifyContent: "center" }}>
                         {predictionData.map((item, index) => (
                             <View key={item._id} style={{ flexDirection: 'row', alignContent: 'center', justifyContent: "center", alignItems: "center" }}>
@@ -534,50 +506,59 @@ const Prediction = ({ navigation }) => {
                         ))}
                     </View>
                 </View>
-            </KeyboardAvoidingView>
-            <View style={{ flex: 1 }}>
-                <Text style={[styles.text1, styles.green]}>Yesterday</Text>
-                <View style={{ flexDirection: "row", backgroundColor: "#00BF63", alignItems: "center", justifyContent: "space-around", borderRadius: 25 }}>
-                    <View>
-                        <Text style={styles.text2}>Your Number(s)</Text>
-                        {yesterdayPredictionsData.length === 0 ?
-                            <Text style={styles.winning_number}>{" - "}</Text>
+                <View style={{ marginBottom: 8 }}>
+                    {
+                        announced ?
+                            <Text style={[styles.text1, styles.green]}>
+                                {ordinalDate(new Date())} Draw Result
+                            </Text>
                             :
-                            <>
-                                <View style={{ flexDirection: "row" }}>
-                                    {
-                                        yesterdayPredictionsData.map((item, index) => (
-                                            <View key={item._id}>
-                                                <Text style={{ textAlign: "center", color: "white", fontWeight: "bold", fontSize: 16, paddingVertical: 10 }}>{item.prediction_number}
-                                                    {index != yesterdayPredictionsData.length - 1 ? <Text style={{ textAlign: "center", color: "white", fontWeight: "bold" }}>{","}</Text> : <></>}
-                                                </Text>
-                                            </View>
-                                        ))
-                                    }
-                                </View>
-                            </>
-                        }
-                    </View>
-                    <TouchableOpacity onPress={() => openYouTubeLink(yesterdayWinningURL)}>
-                        <Image
-                            source={require("../assets/utubelogo.png")}
-                            style={{
-                                height: 60,
-                                width: 60,
-                            }}
-                        >
-                        </Image>
-                    </TouchableOpacity>
-                    <View>
-                        <Text style={styles.text2}>Winning Number</Text>
-                        <Text style={styles.winning_number}>{yesterdayWinningNumber || "55555"}</Text>
+                            <Text style={[styles.text1, styles.green]}>
+                                {ordinalDate(yesterdayDate)} Draw Result
+                            </Text>
+                    }
+                    <View style={{ flexDirection: "row", backgroundColor: "#00BF63", alignItems: "center", justifyContent: "space-around", borderRadius: 25 }}>
+                        <View>
+                            <Text style={styles.text2}>Your Entries</Text>
+                            {yesterdayPredictionsData.length === 0 ?
+                                <Text style={styles.winning_number}>{" - "}</Text>
+                                :
+                                <>
+                                    <View style={{ flexDirection: "row" }}>
+                                        {
+                                            yesterdayPredictionsData.map((item, index) => (
+                                                <View key={item._id}>
+                                                    <Text style={{ textAlign: "center", color: "white", fontWeight: "bold", fontSize: 16, paddingVertical: 10 }}>{item.prediction_number}
+                                                        {index != yesterdayPredictionsData.length - 1 ? <Text style={{ textAlign: "center", color: "white", fontWeight: "bold" }}>{","}</Text> : <></>}
+                                                    </Text>
+                                                </View>
+                                            ))
+                                        }
+                                    </View>
+                                </>
+                            }
+                        </View>
+                        <TouchableOpacity onPress={() => openYouTubeLink(yesterdayWinningURL)}>
+                            <Image
+                                source={require("../assets/utubelogo.png")}
+                                style={{
+                                    height: 60,
+                                    width: 60,
+                                }}
+                            >
+                            </Image>
+                        </TouchableOpacity>
+                        <View>
+                            <Text style={styles.text2}>Winning Number</Text>
+                            <Text style={styles.winning_number}>{yesterdayWinningNumber || " - "}</Text>
+                        </View>
                     </View>
                 </View>
             </View>
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+            <View style={{ justifyContent: "flex-end" }}>
                 <FooterMenu />
             </View>
-        </SafeAreaView >
+        </SafeAreaView>
     )
 }
 

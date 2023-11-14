@@ -53,7 +53,7 @@ const FooterMenu = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "grey",
+    backgroundColor: "#111111",
     justifyContent: "space-between",
   },
   iconStyle: {

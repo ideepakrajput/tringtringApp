@@ -75,7 +75,7 @@ const UserHistory = ({ navigation }) => {
                         {isData ?
                             <>
                                 {Object.entries(data).map(([date, items]) => (
-                                    <View style={{ flexDirection: "column", backgroundColor: 'skyblue', marginTop: 10, height: 120 }} key={date}>
+                                    <View style={{ flexDirection: "column", backgroundColor: 'skyblue', marginTop: 10, minHeight: 120 }} key={date}>
                                         {items.map((item, index) => (
                                             <View style={{ flexDirection: "row", marginTop: 10, paddingRight: 10, paddingVertical: 5, height: 30 }} key={item._id}>
                                                 <Text style={[styles.cell, { fontSize: 15 }]}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
@@ -84,7 +84,7 @@ const UserHistory = ({ navigation }) => {
                                                     {index === 0 ?
                                                         <View>
                                                             <Text style={styles.cell}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
-                                                            <Text style={styles.cell}>{item.winning_number || " - "}</Text>
+                                                            <Text style={[styles.cell, { fontSize: 28 }]}>{item.winning_number || " - "}</Text>
                                                             <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)} style={styles.cell}>
                                                                 <Image
                                                                     source={require("../assets/utubelogo.png")}
