@@ -34,7 +34,7 @@ const UserHistory = ({ navigation }) => {
 
                     const result = await axios.get(`${BASE_API_URL}api/winning/user/user_history`, config);
                     result.data.sort((a, b) => {
-                        return new Date(b.transaction_date) - new Date(a.transaction_date);
+                        return new Date(b.created_date_time) - new Date(a.created_date_time);
                     });
                     const groupedData = {}
                     result.data.forEach(item => {

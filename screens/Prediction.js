@@ -324,6 +324,14 @@ const Prediction = ({ navigation }) => {
     };
     // handleShare(55555);
 
+    const handleInputChange = (input) => {
+        // Remove non-numeric characters
+        const cleanedInput = input.replace(/[^0-9]/g, '');
+
+        // Update the state with the cleaned numeric value
+        setPredictionNumber(cleanedInput);
+    };
+
     const tomorrowDate = new Date();
     tomorrowDate.setDate(tomorrowDate.getDate() + 1);
     const yesterdayDate = new Date();
@@ -337,6 +345,12 @@ const Prediction = ({ navigation }) => {
                 return "Second";
             case 3:
                 return "Third";
+            case 4:
+                return "Fourth";
+            case 5:
+                return "Fifth";
+            case 6:
+                return "Sixth";
             default:
                 return "";
         }
@@ -372,15 +386,10 @@ const Prediction = ({ navigation }) => {
                                 {adsViewed >= 2 ?
                                     <TouchableOpacity
                                         disabled={true}
-                                        style={{
-                                            margin: 10,
-                                            backgroundColor: "lightgrey",
-                                            borderRadius: 15,
-                                            paddingHorizontal: 10
-                                        }}
+                                        style={styles.buttonDisable}
                                         onPress={() => showAds()}
                                     >
-                                        <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
+                                        <Text style={{ color: "black", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
                                     </TouchableOpacity>
                                     :
                                     <TouchableOpacity
@@ -390,7 +399,7 @@ const Prediction = ({ navigation }) => {
                                         <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
                                     </TouchableOpacity>
                                 }
-                                <Text>OR</Text>
+                                <Text style={{ textAlign: "center" }}>OR</Text>
                                 <TouchableOpacity
                                     style={styles.button}
                                     onPress={() => navigation.navigate("ReferAndEarn")}
@@ -413,9 +422,10 @@ const Prediction = ({ navigation }) => {
                                             maxLength={5}
                                             autoFocus={true}
                                             keyboardType='numeric'
+                                            inputmode='numeric'
                                             placeholder='-----'
                                             value={predictionNumber}
-                                            onChangeText={(text) => setPredictionNumber(text)}
+                                            onChangeText={(text) => { const cleanedInput = text.replace(/[^0-9]/g, ''); setPredictionNumber(cleanedInput) }}
                                         >
                                         </TextInput>
                                         <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen", textAlign: "center" }}>terms & conditions apply*</Text>
@@ -485,9 +495,10 @@ const Prediction = ({ navigation }) => {
                                                         maxLength={5}
                                                         autoFocus={true}
                                                         keyboardType='numeric'
+                                                        inputmode='numeric'
                                                         placeholder='-----'
                                                         value={predictionNumber}
-                                                        onChangeText={(text) => setPredictionNumber(text)}
+                                                        onChangeText={handleInputChange}
                                                     >
                                                     </TextInput>
                                                     <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen", textAlign: "center" }}>terms & conditions apply*</Text>
@@ -558,7 +569,7 @@ const Prediction = ({ navigation }) => {
             <View style={{ justifyContent: "flex-end" }}>
                 <FooterMenu />
             </View>
-        </SafeAreaView>
+        </SafeAreaView >
     )
 }
 
@@ -596,7 +607,19 @@ const styles = EStyleSheet.create({
         margin: 10,
         backgroundColor: "#00BF63",
         borderRadius: 15,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        width: "50%",
+        alignSelf: "center"
+    },
+    buttonDisable: {
+        margin: 10,
+        backgroundColor: "lightgrey",
+        borderRadius: 15,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        width: "50%",
+        alignSelf: "center"
     },
     editbutton: {
         backgroundColor: "#00BF63",
