@@ -29,6 +29,7 @@ const Signup = ({ navigation }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [name, setName] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [age, setAge] = useState("");
@@ -117,28 +118,29 @@ const Signup = ({ navigation }) => {
       } else if (password.length < 5) {
         Alert.alert("Password should be minimum 5 characters !");
         return;
+      } else {
+        await axios.get("https://api.ipify.org/?format=json").then((res) => {
+          setIp(res.data.ip);
+        });
+
+        const resp = await axios.post(`${BASE_API_URL}api/user/register`, {
+          name,
+          phoneNumber,
+          gender,
+          age,
+          password,
+          ip_address: ip,
+          referralCode
+        });
+
+        setAuthenticatedUser(true);
+
+        setState(resp.data.data);
+
+        await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
+
+        navigation.navigate("Prediction");
       }
-
-      await axios.get("https://api.ipify.org/?format=json").then((res) => {
-        setIp(res.data.ip);
-      });
-
-      const resp = await axios.post(`${BASE_API_URL}api/user/register`, {
-        name,
-        phoneNumber,
-        gender,
-        age,
-        password,
-        ip_address: ip
-      });
-
-      setAuthenticatedUser(true);
-
-      setState(resp.data.data);
-
-      await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
-
-      navigation.navigate("Prediction");
     } catch (error) {
       Alert.alert(error.response.data.message);
     }
@@ -177,7 +179,7 @@ const Signup = ({ navigation }) => {
   //OTP
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-      <View style={{ flex: 1, marginHorizontal: 22 }}>
+      <View style={{ flex: 1, marginHorizontal: 22, justifyContent: "space-between" }}>
         <View style={{ alignItems: "center" }}>
           <Text
             style={{
@@ -200,12 +202,11 @@ const Signup = ({ navigation }) => {
           </Text>
         </View>
 
-        <View style={{ marginBottom: 12, marginTop: 22 }}>
+        <View style={{ marginBottom: 8, marginTop: 8 }}>
           <Text
             style={{
               fontSize: 16,
               fontWeight: 400,
-              marginVertical: 8,
             }}
           >
             Name
@@ -235,7 +236,7 @@ const Signup = ({ navigation }) => {
           </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
+        <View>
           {/* OTP */}
           {!isOtpSent ? (
             // Page to input phone number and send OTP
@@ -244,7 +245,6 @@ const Signup = ({ navigation }) => {
                 style={{
                   fontSize: 16,
                   fontWeight: 400,
-                  marginVertical: 8,
                 }}
               >
                 Mobile Number
@@ -273,7 +273,7 @@ const Signup = ({ navigation }) => {
               />
               <>
                 {verified ?
-                  <Text style={{ color: "green", fontSize: 16, textAlign: "center", marginTop: 10 }}>Mobile Number Verified !</Text>
+                  <Text style={{ color: "green", fontSize: 16, textAlign: "center", marginTop: 8 }}>Mobile Number Verified !</Text>
                   :
                   <TouchableOpacity style={styles.button} onPress={handleVerifyOtp}>
                     <Text style={styles.buttonText}>Verify OTP</Text>
@@ -285,12 +285,11 @@ const Signup = ({ navigation }) => {
 
         </View>
 
-        <View style={{ marginBottom: 12 }}>
+        <View>
           <Text
             style={{
               fontSize: 16,
               fontWeight: 400,
-              marginVertical: 8,
             }}
           >
             Gender
@@ -334,12 +333,11 @@ const Signup = ({ navigation }) => {
           </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
+        <View>
           <Text
             style={{
               fontSize: 16,
               fontWeight: 400,
-              marginVertical: 8,
             }}
           >
             Age
@@ -368,16 +366,14 @@ const Signup = ({ navigation }) => {
               value={age}
               onChangeText={(text) => setAge(text)}
             />
-
           </View>
         </View>
 
-        <View style={{ marginBottom: 12 }}>
+        <View>
           <Text
             style={{
               fontSize: 16,
               fontWeight: 400,
-              marginVertical: 8,
             }}
           >
             Password
@@ -421,11 +417,43 @@ const Signup = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+        <View style={{ marginBottom: 8, marginTop: 8 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: 400,
+            }}
+          >
+            Referral Code
+          </Text>
+
+          <View
+            style={{
+              width: "100%",
+              height: 48,
+              borderColor: COLORS.black,
+              borderWidth: 1,
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingLeft: 22,
+            }}
+          >
+            <TextInput
+              placeholder="Enter referral code"
+              placeholderTextColor={COLORS.black}
+              style={{
+                width: "100%",
+              }}
+              value={referralCode}
+              onChangeText={(text) => setReferralCode(text)}
+            />
+          </View>
+        </View>
 
         <View
           style={{
             flexDirection: "row",
-            marginVertical: 6,
           }}
         >
           <Checkbox
@@ -456,7 +484,6 @@ const Signup = ({ navigation }) => {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginVertical: 20,
           }}
         >
           <View
@@ -517,7 +544,7 @@ const Signup = ({ navigation }) => {
           style={{
             flexDirection: "row",
             justifyContent: "center",
-            marginVertical: 8,
+            marginBottom: 10
           }}
         >
           <Text style={{ fontSize: 16, color: COLORS.black }}>
@@ -543,9 +570,11 @@ const Signup = ({ navigation }) => {
 const styles = StyleSheet.create({
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: 'black',
     borderWidth: 1,
-    marginBottom: 16,
+    marginBottom: 8,
+    paddingLeft: 22,
+    borderRadius: 8,
     paddingHorizontal: 10,
   },
   button: {
