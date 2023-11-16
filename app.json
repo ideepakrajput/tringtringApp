@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Tring Tring",
-    "slug": "tring-tring",
+    "slug": "tringtring",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -32,7 +32,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ideepakrajput.tringtring"
+      "package": "com.northlineindia.tringtring"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,7 +40,7 @@
     "scheme": "myGoogleApp",
     "extra": {
       "eas": {
-        "projectId": "73451e45-27e1-4572-8648-12fe212f8793"
+        "projectId": "d605f9ac-c94e-4260-998d-0fbd381b3e85"
       }
     }
   },
