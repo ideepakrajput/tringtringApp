@@ -220,30 +220,46 @@ const Prediction = ({ navigation }) => {
     async function handleEditPrediction() {
         loadInterstitial();
         setIsLoading(true);
-        await axios.put(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, id }, config);
-        await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 1, adsViewed: 0 }, config).then((res) => {
-            setPredictions(res.data.predictions);
-            setTempPredictions(res.data.tempPredictions);
-            setAddedPredictions(res.data.addedPredictions);
-            setEditedPredictions(res.data.editedPredictions);
-            setAdsViewed(res.data.adsViewed);
-        }).catch((err) => {
-            console.log('====================================');
-            console.log(err.response.data.message);
-            console.log('====================================');
-        });
-        showInterstitial();
-        Alert.alert('Success', `Your entry successfully changed from ${editPN} to ${predictionNumber}`, [
-            {
-                text: 'Share',
-                onPress: () => navigation.navigate("ReferAndEarn"),
-                style: 'cancel',
-            },
-            { text: 'OK', onPress: () => navigation.navigate("Prediction") },
-        ]);
-        setIsLoading(false);
-        setPredictionNumber("");
-        setVisible(false);
+        try {
+            if (predictionNumber && predictionNumber.length == 5) {
+                await axios.put(`${BASE_API_URL}api/winning/user/prediction_number`, { predictionNumber, id }, config);
+                await axios.post(`${BASE_API_URL}api/user/predictions`, { predictions: 0, tempPredictions: 0, addedPredictions: 0, editedPredictions: 1, adsViewed: 0 }, config).then((res) => {
+                    setPredictions(res.data.predictions);
+                    setTempPredictions(res.data.tempPredictions);
+                    setAddedPredictions(res.data.addedPredictions);
+                    setEditedPredictions(res.data.editedPredictions);
+                    setAdsViewed(res.data.adsViewed);
+                }).catch((err) => {
+                    console.log('====================================');
+                    console.log(err.response.data.message);
+                    console.log('====================================');
+                });
+
+                showInterstitial();
+                Alert.alert('Success', `Your entry successfully changed from ${editPN} to ${predictionNumber}`, [
+                    {
+                        text: 'Share',
+                        onPress: () => navigation.navigate("ReferAndEarn"),
+                        style: 'cancel',
+                    },
+                    { text: 'OK', onPress: () => navigation.navigate("Prediction") },
+                ]);
+                setIsLoading(false);
+                setPredictionNumber("");
+                setVisible(false);
+            }
+            else if (!predictionNumber) {
+                setIsLoading(false);
+                Alert.alert("Please enter your prediction number !")
+            }
+            else if (predictionNumber.length < 5) {
+                setIsLoading(false);
+                Alert.alert("Please enter 5 digit number !")
+            }
+        } catch (error) {
+            setIsLoading(false);
+            Alert.alert(error.response.data.message);
+        }
     }
 
     const submitPrediction = async () => {
