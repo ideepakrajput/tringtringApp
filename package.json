@@ -10,6 +10,7 @@
   "dependencies": {
     "@msg91comm/react-native-sendotp": "^2.0.1",
     "@react-native-async-storage/async-storage": "1.17.11",
+    "@react-native-clipboard/clipboard": "^1.12.1",
     "@react-native-google-signin/google-signin": "^10.0.1",
     "@react-navigation/drawer": "^6.6.2",
     "@react-navigation/native": "^6.1.6",
@@ -33,7 +34,6 @@
     "react-native": "0.71.14",
     "react-native-clarity": "^1.0.1",
     "react-native-dialog": "^9.3.0",
-    "react-native-dropdown-picker": "^5.4.6",
     "react-native-element-dropdown": "^2.10.0",
     "react-native-extended-stylesheet": "^0.12.0",
     "react-native-gesture-handler": "~2.9.0",

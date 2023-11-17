@@ -1,18 +1,17 @@
 // InviteFriends.js
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Share, TextInput } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Share, Clipboard, TextInput } from 'react-native';
 import * as Contacts from 'expo-contacts';
 import FooterMenu from '../components/Menus/FooterMenu';
 import { AuthContext } from '../context/authContext';
 import axios from 'axios';
 import { BASE_API_URL } from '../constants/baseApiUrl';
-
-const image = require('../assets/icon.png');
+// import Clipboard from '@react-native-clipboard/clipboard';
 
 const InviteFriends = () => {
     const [contacts, setContacts] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [myreferralcode, setMyReferralCode] = useState("");
+    const [myreferralcode, setMyReferralCode] = useState('');
     const { state } = useContext(AuthContext);
 
     const token = state?.token;
@@ -53,6 +52,16 @@ const InviteFriends = () => {
         (contact) =>
             contact.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const copyToClipboard = () => {
+        Clipboard.setString(myreferralcode);
+        // try {
+        //     Clipboard.setString(myreferralcode);
+        //     Alert.alert('Copied to clipboard!', 'You can now paste the text wherever you want.');
+        // } catch (error) {
+        //     console.error('Error copying to clipboard:', error);
+        // }
+    };
 
     const handleShare = async (myreferralcode) => {
         try {
@@ -124,7 +133,7 @@ const InviteFriends = () => {
                         <TextInput style={[styles.text2, { color: "black", marginLeft: 16 }]} editable={false} value={myreferralcode}></TextInput>
                         <TouchableOpacity
                             style={[styles.shareButton, { alignItems: "flex-end", marginLeft: 16 }]}
-                            onPress={() => handleShare(myreferralcode)}
+                            onPress={copyToClipboard}
                         >
                             <Text style={styles.shareButtonText}>Copy</Text>
                         </TouchableOpacity>
