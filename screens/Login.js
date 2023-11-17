@@ -115,23 +115,32 @@ const Login = ({ navigation }) => {
 				Alert.alert("Please fill the phone number !");
 			} else if (!password) {
 				Alert.alert("please fill the password !");
+			} else {
+				setLoading(false);
+
+				await axios.post(`${BASE_API_URL}api/user/login`, {
+					phoneNumber,
+					password
+				}).then(async (res) => {
+					if (res.status == 201) {
+						Alert.alert("User not found", "Please sign up first");
+						setLoading(true);
+					}
+					if (res.status == 200) {
+						setAuthenticatedUser(true);
+
+						setState(res.data.data);
+
+						await AsyncStorage.setItem("@auth", JSON.stringify(res.data.data));
+
+						navigation.navigate("PrizesData");
+					}
+					if (res.status == 401) {
+						Alert.alert(res.data.message)
+						setLoading(true);
+					}
+				});
 			}
-
-			setLoading(false);
-
-			const resp = await axios.post(`${BASE_API_URL}api/user/login`, {
-				phoneNumber,
-				password
-			});
-
-			setAuthenticatedUser(true);
-
-			setState(resp.data.data);
-
-			await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
-
-			navigation.navigate("PrizesData");
-
 		} catch (error) {
 			setLoading(true);
 			Alert.alert(error.response.data.message);

@@ -109,6 +109,19 @@ const Prediction = ({ navigation }) => {
     }, [isInterstitialLoaded, loadInterstitial, isRewardedLoaded, loadRewarded]);
 
     useEffect(() => {
+        async function loadData() {
+            await axios.get(`${BASE_API_URL}api/user/predictions`, config).then((res) => {
+                setPredictions(res.data.predictions);
+                setTempPredictions(res.data.tempPredictions);
+                setAddedPredictions(res.data.addedPredictions);
+                setEditedPredictions(res.data.editedPredictions);
+                setAdsViewed(res.data.adsViewed);
+            })
+        }
+        loadData();
+    }, [])
+
+    useEffect(() => {
         const incrementPredictions = async () => {
 
             if (isEarnedReward) {

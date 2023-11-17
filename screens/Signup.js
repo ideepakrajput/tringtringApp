@@ -19,8 +19,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-
-import DropDownPicker from 'react-native-dropdown-picker';
+import { Dropdown } from 'react-native-element-dropdown';
 import { AuthContext } from "../context/authContext";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -43,14 +42,11 @@ const Signup = ({ navigation }) => {
   const [otp, setOtp] = useState('');
   const [sentOtp, setSentOtp] = useState('');
   const [verified, setVerified] = useState(false);
-  //OTP
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [items, setItems] = useState([
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
-    { label: 'Others', value: 'others' }
-  ]);
+
+  const data = [{ label: 'Male', value: 'male' },
+  { label: 'Female', value: 'female' },
+  { label: 'Others', value: 'others' }]
+
   const { state, setState } = useContext(AuthContext);
   const { setAuthenticatedUser } = useContext(AuthContext);
 
@@ -294,43 +290,20 @@ const Signup = ({ navigation }) => {
           >
             Gender
           </Text>
-
-          <View
-            style={{
-              width: "100%",
-              height: 48,
-              borderColor: COLORS.black,
-              borderWidth: 1,
-              borderRadius: 8,
-              alignItems: "center",
-              justifyContent: "center",
-              // paddingLeft: 22,
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle} r
+            selectedTextStyle={styles.selectedTextStyle}
+            data={data}
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder="Select your gender"
+            value={gender}
+            onChange={item => {
+              setGender(item.value);
             }}
-          >
-            <DropDownPicker
-              open={open}
-              value={value}
-              items={items}
-              defaultValue={gender}
-              setOpen={setOpen}
-              placeholder="Select your gender"
-              onSelectItem={(item) => {
-                setGender(item.value)
-              }}
-              setValue={setValue}
-              theme="DARK"
-              setItems={setItems}
-            />
-            {/* <TextInput
-              placeholder="Enter your gender"
-              placeholderTextColor={COLORS.black}
-              style={{
-                width: "100%",
-              }}
-              value={gender}
-              onChangeText={(text) => setGender(text)}
-            /> */}
-          </View>
+          />
         </View>
 
         <View>
@@ -578,7 +551,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   button: {
-    backgroundColor: 'blue',
+    backgroundColor: COLORS.primary,
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -586,6 +559,19 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 16,
+  },
+  dropdown: {
+    height: 45,
+    borderWidth: 1,
+    borderRadius: 5
+  },
+  placeholderStyle: {
+    fontSize: 16,
+    paddingLeft: 22
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    paddingLeft: 22
   },
 });
 export default Signup;

@@ -34,6 +34,7 @@
     "react-native-clarity": "^1.0.1",
     "react-native-dialog": "^9.3.0",
     "react-native-dropdown-picker": "^5.4.6",
+    "react-native-element-dropdown": "^2.10.0",
     "react-native-extended-stylesheet": "^0.12.0",
     "react-native-gesture-handler": "~2.9.0",
     "react-native-google-mobile-ads": "^12.3.0",
