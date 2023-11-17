@@ -21,7 +21,6 @@ export default function Settings() {
     setState({ token: "", user: null });
     await AsyncStorage.removeItem("@auth");
     await AsyncStorage.removeItem("@user");
-    alert("logout Successfully");
   };
 
   const handleSelect = (option) => {
@@ -52,6 +51,7 @@ export default function Settings() {
         style={{
           flex: 3,
           alignItems: "center",
+          justifyContent: "space-evenly"
         }}>
         <ProfileDetailsCard />
         <View>
@@ -65,21 +65,21 @@ export default function Settings() {
             <Text style={{ fontSize: 20, fontWeight: "bold", color: "white", textAlign: "center" }}>Save Settings</Text>
           </TouchableOpacity>
         </View>
+        <View style={{ alignItems: "center" }}>
+          <TouchableOpacity style={{ flexDirection: "row", columnGap: 10 }} onPress={handleLogout}>
+            <Text style={{ fontSize: 20, fontWeight: "bold", color: "red", alignSelf: "center" }}>Logout</Text>
+            <FontAwesome5
+              name="sign-out-alt"
+              color={"red"}
+              style={{
+                alignSelf: "center",
+                fontSize: 25,
+              }}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={{ flex: 1, alignItems: "center" }}>
-        <TouchableOpacity style={{ flexDirection: "row", columnGap: 10 }} onPress={handleLogout}>
-          <Text style={{ fontSize: 20, fontWeight: "bold", color: "red", alignSelf: "center" }}>Logout</Text>
-          <FontAwesome5
-            name="sign-out-alt"
-            color={"red"}
-            style={{
-              alignSelf: "center",
-              fontSize: 25,
-            }}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+      <View style={{ justifyContent: "flex-end" }}>
         <FooterMenu />
       </View>
     </>

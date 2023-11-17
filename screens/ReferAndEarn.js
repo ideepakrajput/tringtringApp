@@ -1,17 +1,39 @@
 // InviteFriends.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Share, TextInput } from 'react-native';
 import * as Contacts from 'expo-contacts';
 import FooterMenu from '../components/Menus/FooterMenu';
+import { AuthContext } from '../context/authContext';
+import axios from 'axios';
+import { BASE_API_URL } from '../constants/baseApiUrl';
 
 const image = require('../assets/icon.png');
 
 const InviteFriends = () => {
     const [contacts, setContacts] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const myreferralcode = "takestimetocompletethistask"
+    const [myreferralcode, setMyReferralCode] = useState("");
+    const { state } = useContext(AuthContext);
+
+    const token = state?.token;
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+
+    async function getReferralCode() {
+        await axios.get(`${BASE_API_URL}api/user/user_details`, config).then((foundUser) => {
+            setMyReferralCode(foundUser.data.myReferralCode);
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+
     useEffect(() => {
         getContacts();
+        getReferralCode();
     }, []);
 
     const getContacts = async () => {
@@ -98,10 +120,10 @@ const InviteFriends = () => {
             <View style={styles.container}>
                 <View style={{ backgroundColor: "skyblue", padding: 10, marginBottom: 10 }}>
                     <Text style={styles.text1}>Refer and Gain entries</Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-                        <TextInput style={styles.text2} value={myreferralcode}></TextInput>
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: 50, borderColor: "#4caf50", borderWidth: 1, alignSelf: "center", marginVertical: 8 }}>
+                        <TextInput style={[styles.text2, { color: "black", marginLeft: 16 }]} editable={false} value={myreferralcode}></TextInput>
                         <TouchableOpacity
-                            style={[styles.shareButton, { alignItems: "flex-end" }]}
+                            style={[styles.shareButton, { alignItems: "flex-end", marginLeft: 16 }]}
                             onPress={() => handleShare(myreferralcode)}
                         >
                             <Text style={styles.shareButtonText}>Copy</Text>
@@ -149,7 +171,6 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        paddingTop: 16,
     },
     searchInput: {
         height: 40,
