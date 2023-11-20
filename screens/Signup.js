@@ -37,6 +37,7 @@ const Signup = ({ navigation }) => {
 
   const [token, setToken] = useState("");
   const [userInfo, setUserInfo] = useState(null);
+  const [userExists, setUserExists] = useState(false);
   //OTP
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
@@ -57,7 +58,7 @@ const Signup = ({ navigation }) => {
 
   useEffect(() => {
     handleEffect();
-  }, [response, token]);
+  }, [response]);
 
   async function handleEffect() {
     const user = await getLocalUser();
@@ -65,8 +66,12 @@ const Signup = ({ navigation }) => {
     if (!user) {
       if (response?.type === "success") {
         setToken(response.authentication.accessToken);
-        getUserInfo(response.authentication.accessToken);
-        navigation.navigate("OtpVerificationPage");
+        await getUserInfo(response.authentication.accessToken);
+        if (userExists) {
+          navigation.navigate("Prediction");
+        } else {
+          navigation.navigate("OtpVerificationPage");
+        }
       }
     } else {
       setUserInfo(user);
@@ -91,8 +96,50 @@ const Signup = ({ navigation }) => {
       );
 
       const user = await response.json();
-      await AsyncStorage.setItem("@user", JSON.stringify(user));
-      setUserInfo(user);
+      console.log('====================================');
+      console.log(user);
+      console.log('====================================');
+      const result = await axios.get(`${BASE_API_URL}api/user/users`);
+      const userData = await result.data;
+
+      function doesEmailExists(emailToFind) {
+        return userData.some((user) => user.email == emailToFind);
+      }
+      function findPhoneNumberByEmail(email) {
+        const user = userData.find(user => user.email === email);
+        return user ? user.phoneNumber : null;
+      }
+
+      const phoneNumber = findPhoneNumberByEmail(user.email);
+      const emailExists = await doesEmailExists(user.email);
+      if (emailExists) {
+        setUserExists(true);
+        await axios.post(`${BASE_API_URL}api/user/login`, {
+          phoneNumber,
+          password: "true"
+        }).then(async (res) => {
+          if (res.status == 201) {
+            Alert.alert("User not found", "Please sign up first");
+            setLoading(true);
+          }
+          if (res.status == 200) {
+            setAuthenticatedUser(true);
+
+            setState(res.data.data);
+
+            await AsyncStorage.setItem("@auth", JSON.stringify(res.data.data));
+
+            navigation.navigate("Prediction");
+          }
+          if (res.status == 401) {
+            Alert.alert(res.data.message)
+            setLoading(true);
+          }
+        });
+      } else {
+        await AsyncStorage.setItem("@user", JSON.stringify(user));
+        setUserInfo(user);
+      }
     } catch (error) {
       Alert.alert(error.response.data.message);
     }
@@ -158,6 +205,7 @@ const Signup = ({ navigation }) => {
 
     const fourDigitOTP = ('000' + randomNumber).slice(-4);
     setSentOtp(fourDigitOTP);
+    console.log(fourDigitOTP);
     await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
     setIsOtpSent(true);
   };

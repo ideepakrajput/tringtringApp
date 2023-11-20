@@ -20,11 +20,7 @@ import { BASE_API_URL } from "../constants/baseApiUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-import {
-	GoogleSignin,
-	GoogleSigninButton,
-	statusCodes,
-} from '@react-native-google-signin/google-signin';
+
 WebBrowser.maybeCompleteAuthSession();
 
 const Login = ({ navigation }) => {
@@ -38,53 +34,41 @@ const Login = ({ navigation }) => {
 
 	const [token, setToken] = useState("");
 	const [userInfo, setUserInfo] = useState(null);
-	GoogleSignin.configure({
-		scopes: ['https://www.googleapis.com/auth/drive.readonly'], // what API you want to access on behalf of the user, default is email and profile
-		webClientId: '463746785862-a1r667n088f5p85tvl31qltsgsfrsr70.apps.googleusercontent.com', // client ID of type WEB for your server (needed to verify user ID and offline access). Required to get the `idToken` on the user object!
+
+	const [userExists, setUserExists] = useState(false);
+	//OTP
+	const [isOtpSent, setIsOtpSent] = useState(false);
+	const [otp, setOtp] = useState('');
+	const [sentOtp, setSentOtp] = useState('');
+	const [verified, setVerified] = useState(false);
+
+	const data = [{ label: 'Male', value: 'male' },
+	{ label: 'Female', value: 'female' },
+	{ label: 'Others', value: 'others' }]
+
+	const [request, response, promptAsync] = Google.useAuthRequest({
+		androidClientId: "641271354850-s3s89c9101j3pv63i4ult965gv7uncsp.apps.googleusercontent.com",
+		expoClientId: "641271354850-5jd5i3o6kial8kps5mm412bg4ki82lrl.apps.googleusercontent.com",
 	});
-	// const [request, response, promptAsync] = Google.useAuthRequest({
-	// 	androidClientId: "641271354850-s3s89c9101j3pv63i4ult965gv7uncsp.apps.googleusercontent.com",
-	// 	expoClientId: "641271354850-5jd5i3o6kial8kps5mm412bg4ki82lrl.apps.googleusercontent.com",
-	// });
 
-	// useEffect(() => {
-	// 	handleEffect();
-	// }, [response, token]);
+	useEffect(() => {
+		handleEffect();
+	}, [response]);
 
-	// async function handleEffect() {
-	// 	const user = await getLocalUser();
-	// 	if (!user) {
-	// 		if (response?.type === "success") {
-	// 			setToken(response.authentication.accessToken);
-	// 			getUserInfo(response.authentication.accessToken);
-	// 		}
-	// 	} else {
-	// 		setUserInfo(user);
-	// 	}
-	// }
-	async function googleLogin() {
-		try {
-			await GoogleSignin.hasPlayServices();
-			const userInfo = await GoogleSignin.signIn();
-			// console.log(userInfo)
-			if (userInfo.idToken) {
-				setToken(userInfo.idToken)
+	async function handleEffect() {
+		const user = await getLocalUser();
+		console.log("user", user);
+		if (!user) {
+			if (response?.type === "success") {
+				setToken(response.authentication.accessToken);
+				await getUserInfo(response.authentication.accessToken);
 			}
-			else {
-				throw new Error("no token ID")
-			}
-		} catch (error) {
-			if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-				console.log("cancelled")
-			} else if (error.code === statusCodes.IN_PROGRESS) {
-				console.log("In progress")
-			} else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-				console.log("Gplay services not enabled")
-			} else {
-				console.log("something went wrong")
-			}
+		} else {
+			setUserInfo(user);
+			console.log("loaded locally");
 		}
 	}
+
 	const getLocalUser = async () => {
 		const data = await AsyncStorage.getItem("@user");
 		if (!data) return null;
@@ -102,13 +86,55 @@ const Login = ({ navigation }) => {
 			);
 
 			const user = await response.json();
-			await AsyncStorage.setItem("@user", JSON.stringify(user));
-			setUserInfo(user);
+			console.log('====================================');
+			console.log(user);
+			console.log('====================================');
+			const result = await axios.get(`${BASE_API_URL}api/user/users`);
+			const userData = await result.data;
+
+			function doesEmailExists(emailToFind) {
+				return userData.some((user) => user.email == emailToFind);
+			}
+			function findPhoneNumberByEmail(email) {
+				const user = userData.find(user => user.email === email);
+				return user ? user.phoneNumber : null;
+			}
+
+			const phoneNumber = findPhoneNumberByEmail(user.email);
+			const emailExists = await doesEmailExists(user.email);
+			if (emailExists) {
+				setUserExists(true);
+				await axios.post(`${BASE_API_URL}api/user/login`, {
+					phoneNumber,
+					password: "true"
+				}).then(async (res) => {
+					if (res.status == 201) {
+						Alert.alert("User not found", "Please sign up first");
+						setLoading(true);
+					}
+					if (res.status == 200) {
+						setAuthenticatedUser(true);
+
+						setState(res.data.data);
+
+						await AsyncStorage.setItem("@auth", JSON.stringify(res.data.data));
+
+						navigation.navigate("Prediction");
+					}
+					if (res.status == 401) {
+						Alert.alert(res.data.message)
+						setLoading(true);
+					}
+				});
+			} else {
+				await AsyncStorage.setItem("@user", JSON.stringify(user));
+				setUserInfo(user);
+				navigation.navigate("OtpVerificationPage");
+			}
 		} catch (error) {
 			Alert.alert(error.response.data.message);
 		}
 	};
-
 	const handleLogin = async () => {
 		try {
 			if (!phoneNumber) {
@@ -326,7 +352,7 @@ const Login = ({ navigation }) => {
 				>
 
 					<TouchableOpacity
-						onPress={() => googleLogin()}
+						onPress={() => promptAsync()}
 						style={{
 							flex: 1,
 							alignItems: "center",
