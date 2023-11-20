@@ -36,8 +36,7 @@ const Signup = ({ navigation }) => {
   const [ip, setIp] = useState("");
 
   const [token, setToken] = useState("");
-  const [userInfo, setUserInfo] = useState(null);
-  const [userExists, setUserExists] = useState(false);
+
   //OTP
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
@@ -61,29 +60,11 @@ const Signup = ({ navigation }) => {
   }, [response]);
 
   async function handleEffect() {
-    const user = await getLocalUser();
-    console.log("user", user);
-    if (!user) {
-      if (response?.type === "success") {
-        setToken(response.authentication.accessToken);
-        await getUserInfo(response.authentication.accessToken);
-        if (userExists) {
-          navigation.navigate("Prediction");
-        } else {
-          navigation.navigate("OtpVerificationPage");
-        }
-      }
-    } else {
-      setUserInfo(user);
-      console.log("loaded locally");
+    if (response?.type === "success") {
+      setToken(response.authentication.accessToken);
+      await getUserInfo(response.authentication.accessToken);
     }
   }
-
-  const getLocalUser = async () => {
-    const data = await AsyncStorage.getItem("@user");
-    if (!data) return null;
-    return JSON.parse(data);
-  };
 
   const getUserInfo = async (token) => {
     if (!token) return;
@@ -96,9 +77,6 @@ const Signup = ({ navigation }) => {
       );
 
       const user = await response.json();
-      console.log('====================================');
-      console.log(user);
-      console.log('====================================');
       const result = await axios.get(`${BASE_API_URL}api/user/users`);
       const userData = await result.data;
 
@@ -113,15 +91,10 @@ const Signup = ({ navigation }) => {
       const phoneNumber = findPhoneNumberByEmail(user.email);
       const emailExists = await doesEmailExists(user.email);
       if (emailExists) {
-        setUserExists(true);
         await axios.post(`${BASE_API_URL}api/user/login`, {
           phoneNumber,
           password: "true"
         }).then(async (res) => {
-          if (res.status == 201) {
-            Alert.alert("User not found", "Please sign up first");
-            setLoading(true);
-          }
           if (res.status == 200) {
             setAuthenticatedUser(true);
 
@@ -138,13 +111,12 @@ const Signup = ({ navigation }) => {
         });
       } else {
         await AsyncStorage.setItem("@user", JSON.stringify(user));
-        setUserInfo(user);
+        navigation.navigate("OtpVerificationPage");
       }
     } catch (error) {
       Alert.alert(error.response.data.message);
     }
   };
-
 
   const handleSignup = async () => {
     try {
@@ -176,11 +148,9 @@ const Signup = ({ navigation }) => {
           referralCode
         });
 
-        setAuthenticatedUser(true);
-
-        setState(resp.data.data);
-
         await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
+        setState(resp.data.data);
+        setAuthenticatedUser(true);
 
         navigation.navigate("Prediction");
       }

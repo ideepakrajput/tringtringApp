@@ -36,7 +36,7 @@ const OtpVerificationPage = ({ navigation }) => {
             const fourDigitOTP = ('000' + randomNumber).slice(-4);
             setSentOtp(fourDigitOTP);
             console.log(fourDigitOTP);
-            // await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
+            await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
             setIsOtpSent(true);
         } else if (phoneNumberExists) {
             Alert.alert("Eror", "Phone Number already registered, Try With Another Phone Number !");
@@ -71,20 +71,19 @@ const OtpVerificationPage = ({ navigation }) => {
 
             const user = await getLocalUser();
 
-            const resp = await axios.post(`${BASE_API_URL}api/user/register`, {
+            await axios.post(`${BASE_API_URL}api/user/register`, {
                 name: user.name,
                 phoneNumber,
                 email: user.email,
                 password: "true",
                 ip_address: ip
+            }).then(async (res) => {
+                await AsyncStorage.setItem("@auth", JSON.stringify(res.data.data));
+                setState(res.data.data);
+                setAuthenticatedUser(true);
+
+                navigation.navigate("Prediction");
             });
-            setAuthenticatedUser(true);
-
-            setState(resp.data.data);
-
-            await AsyncStorage.setItem("@auth", JSON.stringify(resp.data.data));
-
-            navigation.navigate("Prediction");
         } catch (error) {
             Alert.alert(error.response.data.message);
         }

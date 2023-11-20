@@ -31,21 +31,7 @@ const Login = ({ navigation }) => {
 	const [isChecked, setIsChecked] = useState(false);
 	const [phoneNumber, setPhoneNumber] = useState("");
 	const [password, setPassword] = useState("");
-
 	const [token, setToken] = useState("");
-	const [userInfo, setUserInfo] = useState(null);
-
-	const [userExists, setUserExists] = useState(false);
-	//OTP
-	const [isOtpSent, setIsOtpSent] = useState(false);
-	const [otp, setOtp] = useState('');
-	const [sentOtp, setSentOtp] = useState('');
-	const [verified, setVerified] = useState(false);
-
-	const data = [{ label: 'Male', value: 'male' },
-	{ label: 'Female', value: 'female' },
-	{ label: 'Others', value: 'others' }]
-
 	const [request, response, promptAsync] = Google.useAuthRequest({
 		androidClientId: "641271354850-s3s89c9101j3pv63i4ult965gv7uncsp.apps.googleusercontent.com",
 		expoClientId: "641271354850-5jd5i3o6kial8kps5mm412bg4ki82lrl.apps.googleusercontent.com",
@@ -56,24 +42,11 @@ const Login = ({ navigation }) => {
 	}, [response]);
 
 	async function handleEffect() {
-		const user = await getLocalUser();
-		console.log("user", user);
-		if (!user) {
-			if (response?.type === "success") {
-				setToken(response.authentication.accessToken);
-				await getUserInfo(response.authentication.accessToken);
-			}
-		} else {
-			setUserInfo(user);
-			console.log("loaded locally");
+		if (response?.type === "success") {
+			setToken(response.authentication.accessToken);
+			await getUserInfo(response.authentication.accessToken);
 		}
 	}
-
-	const getLocalUser = async () => {
-		const data = await AsyncStorage.getItem("@user");
-		if (!data) return null;
-		return JSON.parse(data);
-	};
 
 	const getUserInfo = async (token) => {
 		if (!token) return;
@@ -86,9 +59,6 @@ const Login = ({ navigation }) => {
 			);
 
 			const user = await response.json();
-			console.log('====================================');
-			console.log(user);
-			console.log('====================================');
 			const result = await axios.get(`${BASE_API_URL}api/user/users`);
 			const userData = await result.data;
 
@@ -103,21 +73,14 @@ const Login = ({ navigation }) => {
 			const phoneNumber = findPhoneNumberByEmail(user.email);
 			const emailExists = await doesEmailExists(user.email);
 			if (emailExists) {
-				setUserExists(true);
 				await axios.post(`${BASE_API_URL}api/user/login`, {
 					phoneNumber,
 					password: "true"
 				}).then(async (res) => {
-					if (res.status == 201) {
-						Alert.alert("User not found", "Please sign up first");
-						setLoading(true);
-					}
 					if (res.status == 200) {
-						setAuthenticatedUser(true);
-
-						setState(res.data.data);
-
 						await AsyncStorage.setItem("@auth", JSON.stringify(res.data.data));
+						setState(res.data.data);
+						setAuthenticatedUser(true);
 
 						navigation.navigate("Prediction");
 					}
@@ -128,13 +91,13 @@ const Login = ({ navigation }) => {
 				});
 			} else {
 				await AsyncStorage.setItem("@user", JSON.stringify(user));
-				setUserInfo(user);
 				navigation.navigate("OtpVerificationPage");
 			}
 		} catch (error) {
 			Alert.alert(error.response.data.message);
 		}
 	};
+
 	const handleLogin = async () => {
 		try {
 			if (!phoneNumber) {
@@ -153,13 +116,11 @@ const Login = ({ navigation }) => {
 						setLoading(true);
 					}
 					if (res.status == 200) {
+						await AsyncStorage.setItem("@auth", JSON.stringify(res.data.data));
+						setState(res.data.data);
 						setAuthenticatedUser(true);
 
-						setState(res.data.data);
-
-						await AsyncStorage.setItem("@auth", JSON.stringify(res.data.data));
-
-						navigation.navigate("PrizesData");
+						navigation.navigate("Prediction");
 					}
 					if (res.status == 401) {
 						Alert.alert(res.data.message)
