@@ -8,10 +8,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { AntDesign } from '@expo/vector-icons';
 
 let entireScreenWidth = Dimensions.get('window').width;
+EStyleSheet.build({ $rem: entireScreenWidth > 340 ? 18 : 16 });
 
 SplashScreen.preventAutoHideAsync();
-
-EStyleSheet.build({ $rem: entireScreenWidth > 340 ? 18 : 16 });
 
 const Welcome = ({ navigation }) => {
     const [isLoaded] = useFonts({
@@ -39,7 +38,6 @@ const Welcome = ({ navigation }) => {
             <View style={styles.container} onLayout={handleOnLayout}>
                 <View>
                     <Text style={[styles.text, { color: COLORS.black }]}>Welcome <Text style={[styles.text, { color: COLORS.primary }]}>Onboard!</Text></Text>
-
                 </View>
                 <View>
                     <Text style={[styles.text2]}>
@@ -63,7 +61,7 @@ const Welcome = ({ navigation }) => {
 
 const styles = EStyleSheet.create({
     container: {
-        padding: "1rem",
+        paddingHorizontal: "1rem",
         paddingTop: "4rem",
     },
     text: {

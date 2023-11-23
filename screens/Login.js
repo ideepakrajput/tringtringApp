@@ -7,8 +7,9 @@ import {
 	TouchableOpacity,
 	Alert,
 	ActivityIndicator,
+	Dimensions
 } from "react-native";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from "../constants/colors";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,8 +21,12 @@ import { BASE_API_URL } from "../constants/baseApiUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
+import EStyleSheet from 'react-native-extended-stylesheet';
+import { useFonts } from 'expo-font';
 
 WebBrowser.maybeCompleteAuthSession();
+let entireScreenWidth = Dimensions.get('window').width;
+EStyleSheet.build({ $rem: entireScreenWidth > 340 ? 18 : 16 });
 
 const Login = ({ navigation }) => {
 	const { state, setState } = useContext(AuthContext);
@@ -36,6 +41,22 @@ const Login = ({ navigation }) => {
 		androidClientId: "641271354850-s3s89c9101j3pv63i4ult965gv7uncsp.apps.googleusercontent.com",
 		expoClientId: "641271354850-5jd5i3o6kial8kps5mm412bg4ki82lrl.apps.googleusercontent.com",
 	});
+
+	const [isLoaded] = useFonts({
+		"lato-reg": require("../assets/fonts/Lato/Lato-Regular.ttf"),
+		"lato-light": require("../assets/fonts/Lato/Lato-Light.ttf"),
+		"lato-bold": require("../assets/fonts/Lato/Lato-Bold.ttf"),
+	});
+
+	const handleOnLayout = useCallback(async () => {
+		if (isLoaded) {
+			await SplashScreen.hideAsync(); //hide the splashscreen
+		}
+	}, [isLoaded]);
+
+	if (!isLoaded) {
+		return null;
+	}
 
 	useEffect(() => {
 		handleEffect();
@@ -101,9 +122,9 @@ const Login = ({ navigation }) => {
 	const handleLogin = async () => {
 		try {
 			if (!phoneNumber) {
-				Alert.alert("Please fill the phone number !");
+				Alert.alert("Error", "Please fill the phone number !");
 			} else if (!password) {
-				Alert.alert("please fill the password !");
+				Alert.alert("Error", "please fill the password !");
 			} else {
 				setLoading(false);
 
@@ -112,7 +133,7 @@ const Login = ({ navigation }) => {
 					password
 				}).then(async (res) => {
 					if (res.status == 201) {
-						Alert.alert("User not found", "Please sign up first");
+						Alert.alert("Error", "User not found, Please sign up first");
 						setLoading(true);
 					}
 					if (res.status == 200) {
@@ -123,112 +144,58 @@ const Login = ({ navigation }) => {
 						navigation.navigate("Prediction");
 					}
 					if (res.status == 401) {
-						Alert.alert(res.data.message)
+						Alert.alert("Error", "User not found, Please sign up first")
 						setLoading(true);
 					}
 				});
 			}
 		} catch (error) {
 			setLoading(true);
-			Alert.alert(error.response.data.message);
+			Alert.alert("Error", error.response.data.message);
 		}
 	}
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-			<View style={{ flex: 1, marginHorizontal: 22 }}>
-				<View style={{ alignItems: "center" }}>
-					<Text
-						style={{
-							fontSize: 22,
-							fontWeight: "bold",
-							marginTop: 20,
-							color: COLORS.black,
-						}}
-					>
-						Hi, Welcome!
-					</Text>
+		<SafeAreaView>
+			<View style={styles.container} onLayout={handleOnLayout}>
+				<View style={{ marginBottom: 16 }}>
+					<Text style={[styles.text, { color: COLORS.black }]}>Let's <Text style={[styles.text, { color: COLORS.primary }]}>get you in</Text></Text>
 				</View>
 
-				<View style={{ marginBottom: 12, marginTop: 22 }}>
-					<Text
-						style={{
-							fontSize: 16,
-							fontWeight: 400,
-							marginVertical: 8,
-						}}
-					>
-						Mobile Number
-					</Text>
-
-					<View
-						style={{
-							width: "100%",
-							height: 48,
-							borderColor: COLORS.black,
-							borderWidth: 1,
-							borderRadius: 8,
-							alignItems: "center",
-							flexDirection: "row",
-							justifyContent: "space-between",
-							paddingLeft: 22,
-						}}
-					>
+				<View>
+					<Text style={styles.label}>Mobile Number</Text>
+					<View style={styles.inputView}>
 						<TextInput
 							placeholder="+91"
 							placeholderTextColor={COLORS.black}
 							keyboardType="numeric"
 							style={{
-								width: "12%",
-								borderRightWidth: 1,
-								borderLeftColor: COLORS.grey,
-								height: "100%",
+								fontSize: 22,
+								fontWeight: "500",
+								borderLeftColor: COLORS.secondary,
 							}}
 						/>
 
 						<TextInput
-							placeholder="Enter your phone number"
-							placeholderTextColor={COLORS.black}
+							placeholder="Enter your Mobile No"
+							placeholderTextColor={COLORS.secondary}
 							keyboardType="numeric"
-							style={{
-								width: "80%",
-							}}
+							style={[styles.inputBox, { width: "89%" }]}
 							value={phoneNumber}
 							onChangeText={(text) => setPhoneNumber(text)}
 						/>
 					</View>
 				</View>
 
-				<View style={{ marginBottom: 12 }}>
-					<Text
-						style={{
-							fontSize: 16,
-							fontWeight: 400,
-							marginVertical: 8,
-						}}
-					>
-						Password
-					</Text>
+				<View>
+					<Text style={styles.label}>Password</Text>
 
-					<View
-						style={{
-							width: "100%",
-							height: 48,
-							borderColor: COLORS.black,
-							borderWidth: 1,
-							borderRadius: 8,
-							alignItems: "center",
-							justifyContent: "center",
-							paddingLeft: 22,
-						}}
-					>
+					<View style={styles.inputView}>
 						<TextInput
-							placeholder="Enter your password"
-							placeholderTextColor={COLORS.black}
+							placeholder="Enter your Password"
+							placeholderTextColor={COLORS.se}
 							secureTextEntry={isPasswordShown}
-							style={{
-								width: "100%",
-							}}
+							style={styles.inputBox}
 							value={password}
 							onChangeText={(text) => setPassword(text)}
 						/>
@@ -249,12 +216,7 @@ const Login = ({ navigation }) => {
 					</View>
 				</View>
 
-				<View
-					style={{
-						flexDirection: "row",
-						marginVertical: 6,
-					}}
-				>
+				<View style={[styles.label, { flexDirection: "row" }]}>
 					<Checkbox
 						style={{ marginRight: 8 }}
 						value={isChecked}
@@ -262,7 +224,7 @@ const Login = ({ navigation }) => {
 						color={isChecked ? COLORS.primary : undefined}
 					/>
 
-					<Text>Remember Me</Text>
+					<Text style={{ fontSize: 16, fontFamily: "lato-reg", fontWeight: "500", marginBottom: 20 }}>Remember Me</Text>
 				</View>
 
 				{loading ?
@@ -283,7 +245,7 @@ const Login = ({ navigation }) => {
 					style={{
 						flexDirection: "row",
 						alignItems: "center",
-						marginVertical: 20,
+						marginVertical: 24,
 					}}
 				>
 					<View
@@ -294,7 +256,7 @@ const Login = ({ navigation }) => {
 							marginHorizontal: 10,
 						}}
 					/>
-					<Text style={{ fontSize: 14 }}>Or Login with</Text>
+					<Text style={{ fontSize: 16 }}>Or Login with</Text>
 					<View
 						style={{
 							flex: 1,
@@ -344,51 +306,80 @@ const Login = ({ navigation }) => {
 					style={{
 						flexDirection: "row",
 						justifyContent: "center",
-						marginVertical: 22,
+						marginVertical: 24,
 					}}
 				>
 					<Text style={{ fontSize: 16, color: COLORS.black }}>
-						Don't have an account ?{" "}
+						Don't Have an Account ?{" "}
 					</Text>
 					<Pressable onPress={() => navigation.navigate("Signup")}>
-						<Text
-							style={{
-								fontSize: 16,
-								color: COLORS.primary,
-								fontWeight: "bold",
-								marginLeft: 6,
-							}}
-						>
-							Register
-						</Text>
+						<Text style={styles.text3}>Register</Text>
 					</Pressable>
 				</View>
 				<View
 					style={{
 						flexDirection: "row",
 						justifyContent: "center",
-						marginVertical: 16,
 					}}
 				>
 					<Text style={{ fontSize: 16, color: COLORS.black }}>
 						Forgot Password ?{" "}
 					</Text>
 					<Pressable onPress={() => navigation.navigate("ForgetPassword")}>
-						<Text
-							style={{
-								fontSize: 16,
-								color: COLORS.primary,
-								fontWeight: "bold",
-								marginLeft: 6,
-							}}
-						>
-							Forgot Password
-						</Text>
+						<Text style={styles.text3}>Create New Pasword</Text>
 					</Pressable>
 				</View>
 			</View>
 		</SafeAreaView>
 	);
 };
+
+const styles = EStyleSheet.create({
+	container: {
+		paddingHorizontal: "1rem",
+		paddingTop: "4rem",
+	},
+	text: {
+		fontSize: "2rem",
+		fontWeight: 800,
+		fontFamily: "lato-reg"
+	},
+	text2: {
+		fontSize: "1rem",
+		fontWeight: 800,
+		fontFamily: "lato-light",
+		color: COLORS.secondary,
+	},
+	label: {
+		fontSize: "1rem",
+		fontFamily: "lato-reg",
+		fontWeight: 500,
+		marginTop: 16,
+		marginBottom: 8,
+	},
+	inputView: {
+		width: "100%",
+		height: 48,
+		borderColor: COLORS.black,
+		borderWidth: 1,
+		borderRadius: 8,
+		alignItems: "center",
+		flexDirection: "row",
+		justifyContent: "space-between",
+		padding: 8
+	},
+	inputBox: {
+		fontSize: "1rem",
+		fontWeight: "500"
+	},
+	text3: {
+		fontSize: 16,
+		fontWeight: 500,
+		fontFamily: "lato-reg",
+		color: COLORS.primary,
+		fontWeight: "bold",
+		marginLeft: 2,
+	}
+})
 
 export default Login;
