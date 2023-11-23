@@ -15,6 +15,7 @@ import { Image } from "react-native";
 import ReferAndEarn from "../../screens/ReferAndEarn";
 import ForgetPassword from "../../screens/ForgetPassword";
 import OtpVerificationPage from "../../screens/OtpVerification";
+import Welcome from "../../screens/Welcome";
 
 const ScreenMenu = () => {
   //global state
@@ -74,6 +75,11 @@ const ScreenMenu = () => {
         </>
       ) : (
         <>
+          <Stack.Screen
+            name="Welcome"
+            component={Welcome}
+            options={{ headerShown: false }}
+          />
           <Stack.Screen
             name="Login"
             component={Login}
