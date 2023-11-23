@@ -81,7 +81,8 @@ const styles = EStyleSheet.create({
         width: 328,
         height: 328,
         marginTop: 32,
-        marginBottom: 48
+        marginBottom: 48,
+        alignSelf: "center"
     },
     icon: {
         justifyContent: "flex-end",
