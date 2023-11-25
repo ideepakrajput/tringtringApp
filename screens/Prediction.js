@@ -462,23 +462,14 @@ const Prediction = ({ navigation }) => {
                                     </>
                                     :
                                     <>
-                                        <Text style={styles.text2}>Your {numberToOrdinal(addedPredictions + 1)} Prediction</Text>
-                                        <TextInput
-                                            style={[styles.textInput, { alignSelf: "center" }]}
-                                            maxLength={5}
-                                            autoFocus={true}
-                                            keyboardType='numeric'
-                                            inputmode='numeric'
-                                            placeholder='-----'
-                                            value={predictionNumber}
-                                            onChangeText={(text) => { const cleanedInput = text.replace(/[^0-9]/g, ''); setPredictionNumber(cleanedInput) }}
-                                        >
-                                        </TextInput>
+                                        {/* <Text style={styles.text2}>Your {numberToOrdinal(addedPredictions + 1)} Prediction</Text> */}
+                                        <Text style={styles.text2}>Enter Your Prediction</Text>
+                                        <Text style={{ textAlign: "center", fontSize: 48, fontWeight: "bold", marginTop: 8 }} onPress={() => navigation.navigate("InputNumber")}> - - - - -</Text>
                                         {/* <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen", textAlign: "center" }}>terms & conditions apply*</Text> */}
                                         {
                                             isloading ? <ActivityIndicator></ActivityIndicator> :
                                                 <TouchableOpacity
-                                                    style={styles.button}
+                                                    style={[styles.button, { marginTop: 0 }]}
                                                     onPress={submitPrediction}
                                                 >
                                                     <Text style={{ color: "white", fontFamily: "lato-reg", fontWeight: 800, fontSize: 16 }}>Submit</Text>

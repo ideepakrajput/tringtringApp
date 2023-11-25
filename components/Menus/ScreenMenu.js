@@ -16,6 +16,7 @@ import ReferAndEarn from "../../screens/ReferAndEarn";
 import ForgetPassword from "../../screens/ForgetPassword";
 import OtpVerificationPage from "../../screens/OtpVerification";
 import Welcome from "../../screens/Welcome";
+import InputNumber from "../../screens/InputNumber";
 
 const ScreenMenu = () => {
   //global state
@@ -66,6 +67,15 @@ const ScreenMenu = () => {
           <Stack.Screen
             name="UserHistory"
             component={UserHistory}
+            options={{
+              headerTitle: "",
+              headerLeft: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
+              headerRight: () => <HeaderMenu />,
+            }}
+          />
+          <Stack.Screen
+            name="InputNumber"
+            component={InputNumber}
             options={{
               headerTitle: "",
               headerLeft: () => <Image style={{ width: 80, height: 50 }} source={icon} />,
