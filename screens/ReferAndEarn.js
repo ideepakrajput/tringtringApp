@@ -6,6 +6,8 @@ import FooterMenu from '../components/Menus/FooterMenu';
 import { AuthContext } from '../context/authContext';
 import axios from 'axios';
 import { BASE_API_URL } from '../constants/baseApiUrl';
+import COLORS from '../constants/colors';
+import { EvilIcons, Ionicons } from '@expo/vector-icons';
 // import Clipboard from '@react-native-clipboard/clipboard';
 
 const InviteFriends = () => {
@@ -127,37 +129,41 @@ const InviteFriends = () => {
     return (
         <>
             <View style={styles.container}>
-                <View style={{ backgroundColor: "skyblue", padding: 10, marginBottom: 10 }}>
+                <View style={{ backgroundColor: "black", paddingHorizontal: 24, paddingVertical: 16, marginBottom: 24, borderRadius: 8 }}>
                     <Text style={styles.text1}>Refer and Gain entries</Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderRadius: 50, borderColor: "#4caf50", borderWidth: 1, alignSelf: "center", marginVertical: 8 }}>
-                        <TextInput style={[styles.text2, { color: "black", marginLeft: 16 }]} editable={false} value={myreferralcode}></TextInput>
-                        <TouchableOpacity
-                            style={[styles.shareButton, { alignItems: "flex-end", marginLeft: 16 }]}
-                            onPress={copyToClipboard}
-                        >
-                            <Text style={styles.shareButtonText}>Copy</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ alignItems: "center" }}>
-                        <TouchableOpacity
-                            style={[styles.shareButton, { width: 100 }]}
-                            onPress={() => handleShare(myreferralcode)}
-                        >
-                            <Text style={styles.shareButtonText}>Share</Text>
-                        </TouchableOpacity>
+                    <View style={{ flexDirection: "row", gap: 8, justifyContent: "space-around" }}>
+                        <View style={{ flexDirection: "row", borderRadius: 8, borderColor: COLORS.primary, borderWidth: 1, alignSelf: "center", marginVertical: 8 }}>
+                            <TextInput style={[styles.text2, { color: "white", paddingLeft: 8 }]} editable={false} value={myreferralcode}></TextInput>
+                            <TouchableOpacity
+                                style={[styles.shareButton, { alignItems: "flex-end", marginLeft: 8 }]}
+                                onPress={copyToClipboard}
+                            >
+                                <Text style={styles.shareButtonText}>Copy <Ionicons name="copy-outline" size={14} color="white" /></Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{ marginVertical: 8 }}>
+                            <TouchableOpacity
+                                style={[styles.shareButton]}
+                                onPress={() => handleShare(myreferralcode)}
+                            >
+                                <Text style={styles.shareButtonText}>Share</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search by Name"
-                    value={searchQuery}
-                    onChangeText={(text) => setSearchQuery(text)}
-                />
+                <Text style={{ fontSize: 16, fontFamily: "lato-reg", fontWeight: 900 }}>Contacts</Text>
+                <View style={styles.searchInputBox}>
+                    <EvilIcons name="search" size={24} color="black" />
+                    <TextInput
+                        placeholder="Search"
+                        value={searchQuery}
+                        onChangeText={(text) => setSearchQuery(text)}
+                    />
+                </View>
                 <FlatList
                     data={filteredContacts}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderItem}
-                    contentContainerStyle={styles.contactList}
                 />
             </View >
             <View style={{ flex: 0.1, justifyContent: "flex-end" }}>
@@ -169,29 +175,31 @@ const InviteFriends = () => {
 
 const styles = StyleSheet.create({
     text1: {
-        fontSize: 24,
+        fontSize: 16,
+        fontFamily: "lato-reg",
+        color: "white",
         fontWeight: "bold",
         textAlign: "center",
     },
     text2: {
-        fontSize: 20,
+        fontFamily: "lato-reg",
+        fontSize: 16,
         fontWeight: "bold",
         textAlign: "center"
     },
     container: {
         flex: 1,
-    },
-    searchInput: {
-        height: 40,
-        borderColor: 'green',
-        borderRadius: 25,
-        borderWidth: 1,
-        marginBottom: 16,
-        paddingLeft: 16,
-        marginHorizontal: 24,
-    },
-    contactList: {
         paddingHorizontal: 16,
+        paddingTop: 24,
+    },
+    searchInputBox: {
+        padding: 8,
+        flexDirection: "row",
+        gap: 8,
+        borderColor: "black",
+        borderRadius: 8,
+        borderWidth: 1,
+        marginBottom: 12
     },
     contactItem: {
         flexDirection: 'row',
@@ -199,27 +207,31 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         marginBottom: 16,
         padding: 10,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: COLORS.white,
         borderRadius: 8,
     },
     contactImage: {
-        width: 50,
-        height: 50,
+        width: 30,
+        height: 30,
         borderRadius: 25,
         marginRight: 10,
+        alignSelf: "center"
     },
     contactName: {
-        fontSize: 16,
+        fontSize: 12,
     },
     contactNumber: {
-        fontSize: 16
+        fontSize: 12
     },
     shareButton: {
-        backgroundColor: '#4caf50',
-        padding: 8,
-        borderRadius: 50,
+        backgroundColor: COLORS.primary,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        paddingVertical: 8
     },
     shareButtonText: {
+        fontFamily: "lato-reg",
+        fontSize: 16,
         color: '#fff',
         textAlign: "center"
     },
