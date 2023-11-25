@@ -14,9 +14,9 @@ SplashScreen.preventAutoHideAsync();
 
 const Welcome = ({ navigation }) => {
     const [isLoaded] = useFonts({
-        "lato-reg": require("../assets/fonts/Lato/Lato-Regular.ttf"),
-        "lato-light": require("../assets/fonts/Lato/Lato-Light.ttf"),
-        "lato-bold": require("../assets/fonts/Lato/Lato-Bold.ttf"),
+        "lato-reg": require("../assets/Fonts/Lato/Lato-Regular.ttf"),
+        "lato-light": require("../assets/Fonts/Lato/Lato-Light.ttf"),
+        "lato-bold": require("../assets/Fonts/Lato/Lato-Bold.ttf"),
     });
 
     const handleOnLayout = useCallback(async () => {

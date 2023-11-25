@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import COLORS from "../../constants/colors";
 
 const FooterMenu = () => {
   // hooks
@@ -10,41 +11,41 @@ const FooterMenu = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={[route.name === "PrizesData" ? { backgroundColor: "#00BF63", padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("PrizesData")}>
+      <TouchableOpacity style={[route.name === "PrizesData" ? { padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("PrizesData")}>
         <MaterialCommunityIcons
           name="cash-multiple"
-          style={styles.iconStyle}
+          style={[route.name === "PrizesData" ? styles.active : styles.iconStyle]}
         />
-        <Text style={styles.textStyle}>Prizes</Text>
+        <Text style={[route.name === "PrizesData" ? styles.activeTextStyle : styles.textStyle]}>Prizes</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[route.name === "UserHistory" ? { backgroundColor: "#00BF63", padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("UserHistory")}>
+      <TouchableOpacity style={[route.name === "UserHistory" ? { padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("UserHistory")}>
         <FontAwesome5
           name="history"
-          style={styles.iconStyle}
+          style={[route.name === "UserHistory" ? styles.active : styles.iconStyle]}
         />
-        <Text style={styles.textStyle}>History</Text>
+        <Text style={[route.name === "UserHistory" ? styles.activeTextStyle : styles.textStyle]}>History</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[route.name === "Prediction" ? { backgroundColor: "#00BF63", padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("Prediction")}>
+      <TouchableOpacity style={[route.name === "Prediction" ? { backgroundColor: COLORS.primary, borderRadius: 50, padding: 15 } : { backgroundColor: COLORS.primary, borderRadius: 50, padding: 15 }]} onPress={() => navigation.navigate("Prediction")}>
         <FontAwesome5
           name="home"
-          style={styles.iconStyle}
+          style={[styles.iconStyle, { color: "white" }]}
         />
-        <Text style={styles.textStyle}>Home</Text>
+        <Text style={[styles.textStyle, { color: "white" }]}>Home</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[route.name === "ReferAndEarn" ? { backgroundColor: "#00BF63", padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("ReferAndEarn")}>
+      <TouchableOpacity style={[route.name === "ReferAndEarn" ? { padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("ReferAndEarn")}>
         <FontAwesome5
           name="share-square"
-          style={styles.iconStyle}
+          style={[route.name === "ReferAndEarn" ? styles.active : styles.iconStyle]}
         />
-        <Text style={styles.textStyle}>Share</Text>
+        <Text style={[route.name === "ReferAndEarn" ? styles.activeTextStyle : styles.textStyle]}>Share</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[route.name === "Settings" ? { backgroundColor: "#00BF63", padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("Settings")}>
+      <TouchableOpacity style={[route.name === "Settings" ? { padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("Settings")}>
         <FontAwesome5
           name="user"
-          style={styles.iconStyle}
+          style={[route.name === "Settings" ? styles.active : styles.iconStyle]} activeTextStyle
           color={!route.name === "Settings" ? "#00BF63" : "white"}
         />
-        <Text style={[styles.textStyle]}>Account</Text>
+        <Text style={[route.name === "Settings" ? styles.activeTextStyle : styles.textStyle]}>Account</Text>
       </TouchableOpacity>
     </View>
   );
@@ -52,21 +53,33 @@ const FooterMenu = () => {
 
 const styles = StyleSheet.create({
   container: {
+    borderTopColor: "#D1D5DB",
+    borderTopWidth: 1,
+    paddingTop: 8,
     flexDirection: "row",
-    backgroundColor: "#111111",
+    backgroundColor: "white",
     justifyContent: "space-between",
   },
   iconStyle: {
-    marginBottom: 3,
     alignSelf: "center",
-    fontSize: 25,
-    color: "white"
+    fontSize: 24,
+    color: "black"
+  },
+  active: {
+    alignSelf: "center",
+    fontSize: 24,
+    color: COLORS.primary
   },
   textStyle: {
-    fontWeight: "bold",
-    color: "white",
+    fontFamily: "lato-reg",
+    color: "black",
     textAlign: "center"
   },
+  activeTextStyle: {
+    fontFamily: "lato-reg",
+    color: COLORS.primary,
+    textAlign: "center"
+  }
 });
 
 export default FooterMenu;

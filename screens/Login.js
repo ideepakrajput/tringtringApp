@@ -22,7 +22,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import EStyleSheet from 'react-native-extended-stylesheet';
-import { useFonts } from 'expo-font';
 
 WebBrowser.maybeCompleteAuthSession();
 let entireScreenWidth = Dimensions.get('window').width;
@@ -42,21 +41,6 @@ const Login = ({ navigation }) => {
 		expoClientId: "641271354850-5jd5i3o6kial8kps5mm412bg4ki82lrl.apps.googleusercontent.com",
 	});
 
-	const [isLoaded] = useFonts({
-		"lato-reg": require("../assets/fonts/Lato/Lato-Regular.ttf"),
-		"lato-light": require("../assets/fonts/Lato/Lato-Light.ttf"),
-		"lato-bold": require("../assets/fonts/Lato/Lato-Bold.ttf"),
-	});
-
-	const handleOnLayout = useCallback(async () => {
-		if (isLoaded) {
-			await SplashScreen.hideAsync(); //hide the splashscreen
-		}
-	}, [isLoaded]);
-
-	if (!isLoaded) {
-		return null;
-	}
 
 	useEffect(() => {
 		handleEffect();
@@ -157,7 +141,7 @@ const Login = ({ navigation }) => {
 
 	return (
 		<SafeAreaView>
-			<View style={styles.container} onLayout={handleOnLayout}>
+			<View style={styles.container}>
 				<View style={{ marginBottom: 16 }}>
 					<Text style={[styles.text, { color: COLORS.black }]}>Let's <Text style={[styles.text, { color: COLORS.primary }]}>get you in</Text></Text>
 				</View>

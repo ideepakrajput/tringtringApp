@@ -8,6 +8,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { PredictionContext } from "../../context/predictionContext";
 import axios from "axios";
 import { BASE_API_URL } from "../../constants/baseApiUrl";
+import COLORS from "../../constants/colors";
 
 const adUnitId = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-6067634275916377/1879585158';
 
@@ -62,23 +63,21 @@ const HeaderMenu = () => {
 
 
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 5, columnGap: 20, borderRadius: 50, backgroundColor: "#00BF63" }}>
-      <View>
-        <Text style={styles.text2}>{predictions + tempPredictions}</Text>
-        {(predictions + tempPredictions) > 1 ? <Text style={styles.text2}>Entries</Text> : <Text style={styles.text2}>Entry</Text>}
-      </View>
+    <View style={{ flexDirection: "row", alignItems: "center", padding: 4, borderRadius: 50, borderColor: "#D1D5DB", borderWidth: 1 }}>
+      <Text style={styles.text2}>{predictions + tempPredictions} Entries</Text>
       <TouchableOpacity onPress={() => { showAds(); }}>
-        <AntDesign name="pluscircleo" size={30} color="white" />
+        <AntDesign name="pluscircle" size={30} color={COLORS.primary} />
       </TouchableOpacity>
     </View>
   );
 };
 const styles = EStyleSheet.create({
   text2: {
-    fontSize: "15rem",
+    fontSize: 12,
     fontWeight: "bold",
-    color: "white",
-    marginLeft: 20,
+    marginLeft: 12,
+    paddingRight: 8,
+    color: COLORS.black,
     textAlign: "center"
   },
 });

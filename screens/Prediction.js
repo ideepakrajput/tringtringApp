@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image, Modal, Animated, Dimensions, Alert, Share, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Modal, Animated, Dimensions, Alert, Share, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import React, { useContext, useState, useEffect } from 'react';
 import COLORS from "../constants/colors";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,12 +12,12 @@ import FooterMenu from '../components/Menus/FooterMenu';
 import { openYouTubeLink } from '../constants/openYouTubeLink';
 import { useRewardedAd, useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 import { PredictionContext } from '../context/predictionContext';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, AntDesign } from '@expo/vector-icons';
+import * as SplashScreen from 'expo-splash-screen';
 
+SplashScreen.hideAsync();
 let entireScreenWidth = Dimensions.get('window').width;
-
-EStyleSheet.build({ $rem: entireScreenWidth / 380 });
-
+EStyleSheet.build({ $rem: entireScreenWidth > 340 ? 18 : 16 });
 
 const interstitialAdUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-6067634275916377/4705877289';
 const rewardedAdUnitId = __DEV__ ? TestIds.REWARDED : 'ca-app-pub-6067634275916377/1879585158';
@@ -74,6 +74,8 @@ const Prediction = ({ navigation }) => {
     const { addedPredictions, setAddedPredictions } = useContext(PredictionContext);
     const { editedPredictions, setEditedPredictions } = useContext(PredictionContext);
     const { adsViewed, setAdsViewed } = useContext(PredictionContext);
+
+    const [tooltipVisible, setTooltipVisible] = useState(false);
 
     const { state } = useContext(AuthContext);
     const token = state?.token;
@@ -387,61 +389,76 @@ const Prediction = ({ navigation }) => {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <View style={{ flex: 1, justifyContent: "space-between" }}>
-                <View style={{ marginTop: 28 }}>
-                    <Text style={{ fontSize: 16, textAlign: "center", fontWeight: "900" }}>
-                        ENTER 5 DIGIT NUMBER AND WIN 1 LAC RUPEES EVERY DAY BEFORE 9 PM
-                    </Text>
-                    {
-                        announced ?
-                            <Text style={styles.text2}>
-                                {"("}FOR {ordinalDateFormat(tomorrowDate)}, DRAW @ TOMORROW 9 PM IST{")"}
-                            </Text>
-                            :
-                            <Text style={styles.text2}>
-                                {"("}FOR {ordinalDateFormat(new Date())}, DRAW @ 9 PM IST{")"}
-                            </Text>
-                    }
-                    <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
-                        <Text style={{ color: "#00BF63", textAlign: "center", fontSize: 16, marginBottom: 20 }}>view all prizes</Text>
-                    </TouchableOpacity>
+            <View style={{ flex: 1, justifyContent: "space-between", paddingVertical: 28, paddingHorizontal: 20 }}>
+                <View style={{ paddingHorizontal: 28, paddingVertical: 24, backgroundColor: COLORS.black, borderRadius: 16, flexDirection: 'row', justifyContent: "space-between" }}>
+                    <View style={{ gap: 8 }}>
+                        <Text style={{ fontSize: 12, color: "white", fontFamily: "lato-reg", fontWeight: "800", width: 140 }}>
+                            Enter a 5 digit number and stand a chance to win <Text style={{ color: "#B09300" }}>1 LAKH</Text> rupees daily {" "}
+                            <AntDesign onPress={() => setTooltipVisible(true)} name="infocirlceo" size={12} color="#B09300" />
+                        </Text>
+                        <Modal
+                            transparent={true}
+                            animationType="slide"
+                            visible={tooltipVisible}
+                            onRequestClose={() => setTooltipVisible(false)}
+                        >
+                            <TouchableWithoutFeedback onPress={() => setTooltipVisible(false)}>
+                                <View style={styles.tooltip}>
+                                    <View style={styles.modalContent}>
+                                        <Text style={{ color: "white", fontSize: 8, fontFamily: "lato-reg", }}>Enter a 5 digit number</Text>
+                                        <Text style={{ color: "white", fontSize: 8, fontFamily: "lato-reg", }}>Draw @9pm everyday</Text>
+                                        <Text style={{ color: "white", fontSize: 8, fontFamily: "lato-reg", }}>Prediction for next day starts after 9pm each day</Text>
+                                    </View>
+                                </View>
+                            </TouchableWithoutFeedback>
+                        </Modal>
+
+                        <TouchableOpacity onPress={() => navigation.navigate("PrizesData")}>
+                            <Text style={{ color: COLORS.primary, fontSize: 12, fontFamily: "lato-reg", fontWeight: "700", textDecorationLine: "underline" }}>View all Prizes</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ flexDirection: "row" }}>
+                        <View style={{ backgroundColor: "white", width: 60, height: 60, borderRadius: 50, position: "relative", marginTop: 8 }}></View>
+                        <Image style={{ height: 40, width: 100, resizeMode: "contain", position: "absolute", top: 18, right: 1 }} source={require("../assets/coins.png")}></Image>
+                    </View>
                 </View>
                 <View>
                     {
                         (predictions + tempPredictions) <= 0 ?
                             <>
-                                <Text style={styles.text1}><Text style={{ color: "red" }}>You have no more entries left</Text></Text>
-                                <Text style={styles.text2}>Earn more entries</Text>
-                                {adsViewed >= 2 ?
-                                    <TouchableOpacity
-                                        disabled={true}
-                                        style={styles.buttonDisable}
-                                        onPress={() => showAds()}
-                                    >
-                                        <Text style={{ color: "black", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
-                                    </TouchableOpacity>
-                                    :
+                                <Text style={[styles.text1, { fontFamily: "lato-reg", fontWeight: 800, }]}>Your Entries are completed</Text>
+                                <Text style={{ color: "black", fontFamily: "lato-reg", fontWeight: 600, textAlign: "center", fontSize: 14, paddingHorizontal: 24 }}>*Watch an Ad or Refer the app to your friends to gain entries</Text>
+                                <View style={{ flexDirection: "row", justifyContent: "center", gap: 8 }}>
+                                    {adsViewed >= 2 ?
+                                        <TouchableOpacity
+                                            disabled={true}
+                                            style={styles.buttonDisable}
+                                            onPress={() => showAds()}
+                                        >
+                                            <Text style={{ color: "black", fontFamily: "lato-reg", fontWeight: 600, textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
+                                        </TouchableOpacity>
+                                        :
+                                        <TouchableOpacity
+                                            style={styles.button}
+                                            onPress={() => showAds()}
+                                        >
+                                            <Text style={{ color: "white", fontFamily: "lato-reg", fontWeight: 600, textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
+                                        </TouchableOpacity>
+                                    }
                                     <TouchableOpacity
                                         style={styles.button}
-                                        onPress={() => showAds()}
+                                        onPress={() => navigation.navigate("ReferAndEarn")}
                                     >
-                                        <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Watch Ads</Text>
+                                        <Text style={{ color: "white", fontFamily: "lato-reg", fontWeight: 600, textAlign: "center", fontSize: 16 }}>Refer a Friend</Text>
                                     </TouchableOpacity>
-                                }
-                                <Text style={{ textAlign: "center" }}>OR</Text>
-                                <TouchableOpacity
-                                    style={styles.button}
-                                    onPress={() => navigation.navigate("ReferAndEarn")}
-                                >
-                                    <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>Share with friends</Text>
-                                </TouchableOpacity>
+                                </View>
                             </>
                             :
                             <>
                                 {addedPredictions >= 3 ?
                                     <>
-                                        <Text style={styles.text1}><Text style={{ color: "red" }}>You have reached the limit to make entries for today</Text></Text>
-                                        <Text style={styles.text2}><Text style={{ color: "grey" }}>(maximum 3 entries per day)</Text></Text>
+                                        <Text style={[styles.text1, { fontFamily: "lato-reg", fontWeight: 800, }]}>You have reached the limit to make entries for today</Text>
+                                        <Text style={{ color: "black", fontFamily: "lato-reg", fontWeight: 600, textAlign: "center", fontSize: 14, paddingHorizontal: 24 }}>(maximum 3 entries per day)</Text>
                                     </>
                                     :
                                     <>
@@ -457,14 +474,14 @@ const Prediction = ({ navigation }) => {
                                             onChangeText={(text) => { const cleanedInput = text.replace(/[^0-9]/g, ''); setPredictionNumber(cleanedInput) }}
                                         >
                                         </TextInput>
-                                        <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen", textAlign: "center" }}>terms & conditions apply*</Text>
+                                        {/* <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen", textAlign: "center" }}>terms & conditions apply*</Text> */}
                                         {
                                             isloading ? <ActivityIndicator></ActivityIndicator> :
                                                 <TouchableOpacity
                                                     style={styles.button}
                                                     onPress={submitPrediction}
                                                 >
-                                                    <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
+                                                    <Text style={{ color: "white", fontFamily: "lato-reg", fontWeight: 800, fontSize: 16 }}>Submit</Text>
                                                 </TouchableOpacity>
                                         }
                                     </>
@@ -473,8 +490,18 @@ const Prediction = ({ navigation }) => {
                     }
                 </View>
                 <View>
-                    <Text style={[styles.text1, styles.green]}>Today's Entries</Text>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginLeft: 10, justifyContent: "center" }}>
+                    <Text style={[styles.text1, { fontFamily: "lato-reg", fontWeight: 800, }]}>Your Current Predictions</Text>
+                    {
+                        announced ?
+                            <Text style={{ fontFamily: "lato-reg", fontWeight: 600, fontSize: 12, color: COLORS.secondary, textAlign: "center" }}>
+                                {"("}Draw @ {ordinalDate(tomorrowDate)} 9 PM{")"}
+                            </Text>
+                            :
+                            <Text style={{ fontFamily: "lato-reg", fontWeight: 600, fontSize: 12, color: COLORS.secondary, textAlign: "center" }}>
+                                {"("}Draw @ {ordinalDate(new Date())} 9 PM{")"}
+                            </Text>
+                    }
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: "center" }}>
                         {predictionData.map((item, index) => (
                             <View key={item._id} style={{ flexDirection: 'row', alignContent: 'center', justifyContent: "center", alignItems: "center" }}>
                                 {
@@ -485,26 +512,25 @@ const Prediction = ({ navigation }) => {
                                                 style={{
                                                     borderRadius: 15,
                                                     marginVertical: 5,
-                                                    paddingHorizontal: 10,
+                                                    paddingHorizontal: 8,
                                                 }}
                                                 onPress={() => Alert.alert("No edit left.")}
                                             >
-                                                <MaterialIcons name="edit-off" size={20} color="grey" />
+                                                <MaterialIcons name="edit-off" size={16} color={COLORS.secondary} />
                                             </TouchableOpacity></>
                                         :
                                         <>
-                                            <Text style={styles.text2}>{item.prediction_number}</Text>
+                                            <Text style={{ fontFamily: "lato-reg", fontWeight: 400, fontSize: 16, color: COLORS.secondary, textAlign: "center" }}>{item.prediction_number}</Text>
                                             <TouchableOpacity
                                                 style={{
                                                     borderRadius: 15,
                                                     marginVertical: 5,
-                                                    paddingHorizontal: 10,
+                                                    paddingHorizontal: 8,
                                                 }}
                                                 onPress={() => showDialog(item.prediction_number, item._id)}
                                             >
-                                                <MaterialIcons name="mode-edit" size={20} color="#00BF63" />
+                                                <MaterialIcons name="mode-edit" size={16} color={COLORS.primary} />
                                             </TouchableOpacity>
-                                            <Text>{"| "}</Text>
                                             <View style={styles.containerD}>
                                                 <ModalPoup visible={visible}>
                                                     <View style={{ alignItems: 'center' }}>
@@ -546,8 +572,8 @@ const Prediction = ({ navigation }) => {
                         ))}
                     </View>
                 </View>
-                <View style={{ marginBottom: 8 }}>
-                    {
+                <View style={{ paddingHorizontal: 16, paddingVertical: 12, borderWidth: 1, borderColor: COLORS.black, borderRadius: 8, gap: 16 }}>
+                    {/* {
                         announced ?
                             <Text style={[styles.text1, styles.green]}>
                                 {ordinalDate(new Date())} Draw Result
@@ -556,42 +582,40 @@ const Prediction = ({ navigation }) => {
                             <Text style={[styles.text1, styles.green]}>
                                 {ordinalDate(yesterdayDate)} Draw Result
                             </Text>
-                    }
-                    <View style={{ flexDirection: "row", backgroundColor: "#00BF63", alignItems: "center", justifyContent: "space-around", borderRadius: 25 }}>
-                        <View>
-                            <Text style={styles.text2}>Your Entries</Text>
-                            {yesterdayPredictionsData.length === 0 ?
-                                <Text style={styles.winning_number}>{" - "}</Text>
-                                :
-                                <>
-                                    <View style={{ flexDirection: "row" }}>
-                                        {
-                                            yesterdayPredictionsData.map((item, index) => (
-                                                <View key={item._id}>
-                                                    <Text style={{ textAlign: "center", color: "white", fontWeight: "bold", fontSize: 16, paddingVertical: 10 }}>{item.prediction_number}
-                                                        {index != yesterdayPredictionsData.length - 1 ? <Text style={{ textAlign: "center", color: "white", fontWeight: "bold" }}>{","}</Text> : <></>}
-                                                    </Text>
-                                                </View>
-                                            ))
-                                        }
-                                    </View>
-                                </>
-                            }
-                        </View>
+                    } */}
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <Text style={{ fontFamily: "lato-reg", fontWeight: 900, fontSize: 14, color: COLORS.black }}>🏆 Previous Winning Number</Text>
                         <TouchableOpacity onPress={() => openYouTubeLink(yesterdayWinningURL)}>
                             <Image
                                 source={require("../assets/utubelogo.png")}
                                 style={{
-                                    height: 60,
-                                    width: 60,
+                                    height: 24,
+                                    width: 24,
                                 }}
                             >
                             </Image>
                         </TouchableOpacity>
-                        <View>
-                            <Text style={styles.text2}>Winning Number</Text>
-                            <Text style={styles.winning_number}>{yesterdayWinningNumber || " - "}</Text>
-                        </View>
+                        <Text style={styles.winning_number}>{yesterdayWinningNumber || " - "}</Text>
+                    </View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <Text style={{ fontFamily: "lato-reg", fontWeight: 900, fontSize: 12, color: COLORS.black }}>Your Previous Prediction</Text>
+                        {yesterdayPredictionsData.length === 0 ?
+                            <Text style={styles.winning_number}>{" - "}</Text>
+                            :
+                            <>
+                                <View style={{ flexDirection: "row" }}>
+                                    {
+                                        yesterdayPredictionsData.map((item, index) => (
+                                            <View key={item._id}>
+                                                <Text style={{ textAlign: "center", fontFamily: "lato-reg", color: COLORS.secondary, fontWeight: 400, fontSize: 12, }}>{item.prediction_number}
+                                                    {index != yesterdayPredictionsData.length - 1 ? <Text style={{ textAlign: "center", color: COLORS.secondary, fontWeight: "bold" }}>{","}</Text> : <></>}
+                                                </Text>
+                                            </View>
+                                        ))
+                                    }
+                                </View>
+                            </>
+                        }
                     </View>
                 </View>
             </View>
@@ -605,57 +629,44 @@ const Prediction = ({ navigation }) => {
 
 const styles = EStyleSheet.create({
     text1: {
-        fontSize: "21rem",
-        fontWeight: "bold",
+        fontSize: "1rem",
+        fontFamily: "lato-reg", fontWeight: 800,
         color: COLORS.black,
         textAlign: "center",
     },
     text2: {
-        fontSize: "15rem",
-        fontWeight: "bold",
+        fontSize: "1rem",
+        fontFamily: "lato-reg", fontWeight: 600,
         color: COLORS.black,
         textAlign: "center"
     },
     winning_number: {
-        fontSize: "25rem",
+        fontSize: 14,
         fontWeight: "bold",
-        color: COLORS.white,
-        padding: "7rem",
+        fontStyle: "italic",
+        color: COLORS.black,
         textAlign: "center",
     },
     text3: {
-        fontSize: "30rem",
+        fontSize: "1rem",
         fontWeight: "bold",
         color: COLORS.black,
         textAlign: "center"
     },
-    green: {
-        color: "#00BF63",
-    },
     button: {
-        margin: 10,
-        backgroundColor: "#00BF63",
-        borderRadius: 15,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        width: "50%",
+        marginTop: 8,
+        backgroundColor: COLORS.primary,
+        borderRadius: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
         alignSelf: "center"
     },
     buttonDisable: {
-        margin: 10,
         backgroundColor: "lightgrey",
-        borderRadius: 15,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        width: "50%",
+        borderRadius: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
         alignSelf: "center"
-    },
-    editbutton: {
-        backgroundColor: "#00BF63",
-        borderRadius: 15,
-        marginVertical: 5,
-        marginLeft: 5,
-        paddingHorizontal: 10,
     },
     containerD: {
         flex: 1,
@@ -663,11 +674,8 @@ const styles = EStyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
-    container: {
-        flex: 1, flexDirection: "column", justifyContent: "space-around", backgroundColor: COLORS.white
-    },
     textInput: {
-        color: "green", fontSize: "36rem", borderWidth: 2, marginVertical: 10, paddingHorizontal: 10, width: "150rem", borderRadius: 15, borderColor: "green",
+        color: "green", fontSize: "1rem",
         textAlign: "center",
     },
     modalBackGround: {
@@ -688,6 +696,19 @@ const styles = EStyleSheet.create({
         height: 40,
         alignItems: 'flex-end',
         justifyContent: 'center',
+    },
+    tooltip: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: COLORS.black,
+        position: "absolute",
+        top: 150,
+        left: 139,
+        padding: 16,
+        borderRadius: 8,
+        elevation: 5,
     },
 });
 
