@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { MaterialCommunityIcons, FontAwesome5, AntDesign } from '@expo/vector-icons';
 import COLORS from "../../constants/colors";
 
 const FooterMenu = () => {
@@ -26,7 +26,7 @@ const FooterMenu = () => {
         <Text style={[route.name === "UserHistory" ? styles.activeTextStyle : styles.textStyle]}>History</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[route.name === "Prediction" ? { backgroundColor: COLORS.primary, borderRadius: 50, padding: 15 } : { backgroundColor: COLORS.primary, borderRadius: 50, padding: 15 }]} onPress={() => navigation.navigate("Prediction")}>
-        <FontAwesome5
+        <AntDesign
           name="home"
           style={[styles.iconStyle, { color: "white" }]}
         />
