@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, FlatList, TouchableOpacity, ActivityIndicator, Image, ScrollView } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, TouchableOpacity, ActivityIndicator, Image, ScrollView } from 'react-native';
 import React, { useContext, useState } from 'react';
 import COLORS from "../constants/colors";
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -13,7 +13,7 @@ let entireScreenWidth = Dimensions.get('window').width;
 
 EStyleSheet.build({ $rem: entireScreenWidth / 380 });
 
-const UserHistory = ({ navigation }) => {
+const UserHistory = () => {
     const [data, setData] = useState({});
     const [isData, setIsData] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -65,32 +65,32 @@ const UserHistory = ({ navigation }) => {
                 <Text style={styles.text1}>History</Text>
                 <View style={styles.headerRow}>
                     <Text style={styles.headerCell}>Created On</Text>
-                    <Text style={[styles.headerCell, { textAlign: "center" }]}>Prediction Number</Text>
-                    <Text style={[styles.headerCell, { textAlign: "center" }]}>Winning Number Info</Text>
+                    <Text style={[styles.headerCell, { textAlign: "center", marginLeft: 20 }]}>Prediction No</Text>
+                    <Text style={[styles.headerCell, { textAlign: "right" }]}>Winning No Info</Text>
                 </View>
                 {loading ?
                     <ActivityIndicator size="large"></ActivityIndicator>
                     :
-                    <ScrollView style={{ marginBottom: 10 }}>
+                    <ScrollView style={{ marginBottom: 40 }}>
                         {isData ?
                             <>
                                 {Object.entries(data).map(([date, items]) => (
-                                    <View style={{ flexDirection: "column", backgroundColor: 'skyblue', marginTop: 10, minHeight: 120 }} key={date}>
+                                    <View style={{ flexDirection: "column", borderRadius: 8, backgroundColor: COLORS.history, marginTop: 16, minHeight: 90 }} key={date}>
                                         {items.map((item, index) => (
-                                            <View style={{ flexDirection: "row", marginTop: 10, paddingRight: 10, paddingVertical: 5, height: 30 }} key={item._id}>
-                                                <Text style={[styles.cell, { fontSize: 15 }]}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
-                                                <Text style={[styles.cell, { marginLeft: 50 }]}>{item.prediction_number}</Text>
+                                            <View style={{ flexDirection: "row", padding: 8, height: 30 }} key={item._id}>
+                                                <Text style={[styles.cell, { fontSize: 12, marginRight: 40 }]}>{formatTimestampToTimeDate(item.created_date_time)}</Text>
+                                                <Text style={[styles.cell, { fontSize: 12, textAlign: "center" }]}>{item.prediction_number}</Text>
                                                 <View style={{ marginLeft: 'auto' }}>
                                                     {index === 0 ?
-                                                        <View>
+                                                        <View style={{ gap: 8 }}>
                                                             <Text style={styles.cell}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
-                                                            <Text style={[styles.cell, { fontSize: 28 }]}>{item.winning_number || " - "}</Text>
+                                                            <Text style={[styles.cell, { fontSize: 16, textAlign: "center" }]}>{item.winning_number || " 55555 "}</Text>
                                                             <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)} style={styles.cell}>
                                                                 <Image
                                                                     source={require("../assets/utubelogo.png")}
                                                                     style={{
-                                                                        height: 40,
-                                                                        width: 40,
+                                                                        height: 30,
+                                                                        width: 30,
                                                                         alignSelf: "center"
                                                                     }}
                                                                 >
@@ -120,29 +120,28 @@ const UserHistory = ({ navigation }) => {
     );
 };
 
-const styles = EStyleSheet.create({
+const styles = StyleSheet.create({
     text1: {
-        fontSize: "30rem",
+        fontSize: 20,
         fontWeight: "bold",
         color: COLORS.black,
-        marginTop: 10,
-        marginBottom: 10,
+        marginTop: 32,
+        marginBottom: 24,
         textAlign: "center"
     },
     container: {
         flex: 1,
-        padding: 10,
+        paddingHorizontal: 16,
     },
     headerRow: {
         flexDirection: 'row',
-        backgroundColor: '#303030',
-        padding: 5,
-
     },
     headerCell: {
+        textTransform: "uppercase",
         flex: 1,
-        fontWeight: 'bold',
-        color: 'white'
+        fontSize: 14,
+        fontFamily: "lato-reg",
+        color: COLORS.secondary
     },
     row: {
         flexDirection: 'row',
@@ -151,8 +150,8 @@ const styles = EStyleSheet.create({
         padding: 5,
     },
     cell: {
-        textAlign: 'center',
-        marginLeft: 10
+        fontFamily: "lato-reg",
+        color: "#4B5563",
     },
 });
 

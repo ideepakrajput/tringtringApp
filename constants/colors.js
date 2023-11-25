@@ -5,6 +5,7 @@ const COLORS = {
     secondary: "#6B7280",
     grey: "#1F2937",
     footer: "#D1D5DB",
+    history: "#D7F8F2",
 }
 
 export default COLORS;
