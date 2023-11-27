@@ -37,7 +37,8 @@ const Welcome = ({ navigation }) => {
         <SafeAreaView>
             <View style={styles.container} onLayout={handleOnLayout}>
                 <View>
-                    <Text style={[styles.text, { color: COLORS.black }]}>Welcome <Text style={[styles.text, { color: COLORS.primary }]}>Onboard!</Text></Text>
+                    <Text style={[styles.text, { color: COLORS.black }]}>Welcome to </Text>
+                    <Text style={[styles.text, { color: COLORS.primary }]}>Tring-Tring</Text>
                 </View>
                 <View>
                     <Text style={[styles.text2]}>

@@ -39,13 +39,13 @@ const FooterMenu = () => {
         />
         <Text style={[route.name === "ReferAndEarn" ? styles.activeTextStyle : styles.textStyle]}>Share</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[route.name === "Settings" ? { padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("Settings")}>
+      <TouchableOpacity style={[route.name === "Accounts" ? { padding: 15 } : { padding: 15 }]} onPress={() => navigation.navigate("Accounts")}>
         <FontAwesome5
           name="user"
-          style={[route.name === "Settings" ? styles.active : styles.iconStyle]} activeTextStyle
-          color={!route.name === "Settings" ? "#00BF63" : "white"}
+          style={[route.name === "Accounts" ? styles.active : styles.iconStyle]} activeTextStyle
+          color={!route.name === "Accounts" ? "#00BF63" : "white"}
         />
-        <Text style={[route.name === "Settings" ? styles.activeTextStyle : styles.textStyle]}>Account</Text>
+        <Text style={[route.name === "Accounts" ? styles.activeTextStyle : styles.textStyle]}>Account</Text>
       </TouchableOpacity>
     </View>
   );

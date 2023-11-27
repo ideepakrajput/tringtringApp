@@ -17,7 +17,7 @@ const Button = (props) => {
             }}
             onPress={props.onPress}
         >
-            <Text style={{ fontSize: 18, ... { color: textColor } }}>{props.title}</Text>
+            <Text style={{ fontFamily: "lato-reg", fontSize: 18, ... { color: textColor } }}>{props.title}</Text>
         </TouchableOpacity>
     )
 }
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderColor: COLORS.primary,
         borderWidth: 2,
-        borderRadius: 12,
+        borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center'
     }
