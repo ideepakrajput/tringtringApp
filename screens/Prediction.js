@@ -481,7 +481,11 @@ const Prediction = ({ navigation }) => {
                     }
                 </View>
                 <View>
-                    <Text style={[styles.text1, { fontFamily: "lato-reg", fontWeight: 800, }]}>Your Current Predictions</Text>
+                    {addedPredictions === 0 ?
+                        <Text style={[styles.text1, { fontFamily: "lato-reg", fontWeight: 600 }]}>You haven{"'"}t made any predictions yet</Text>
+                        :
+                        <Text style={[styles.text1, { fontFamily: "lato-reg", fontWeight: 600 }]}>Your Current Predictions</Text>
+                    }
                     {
                         announced ?
                             <Text style={{ fontFamily: "lato-reg", fontWeight: 600, fontSize: 12, color: COLORS.secondary, textAlign: "center" }}>
