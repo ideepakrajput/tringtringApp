@@ -5,7 +5,8 @@ const COLORS = {
     secondary: "#6B7280",
     grey: "#1F2937",
     footer: "#D1D5DB",
-    history: "#D7F8F2",
+    history: "#F3F3F3",
+    winning: "#F6FFC2",
 }
 
 export default COLORS;
