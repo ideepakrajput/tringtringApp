@@ -7,6 +7,7 @@ const COLORS = {
     footer: "#D1D5DB",
     history: "#F3F3F3",
     winning: "#F6FFC2",
+    prize: "#D7F8F2",
 }
 
 export default COLORS;

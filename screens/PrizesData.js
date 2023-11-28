@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet, ScrollView, Image } from 'react-native';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { FontAwesome } from '@expo/vector-icons';
 import FooterMenu from '../components/Menus/FooterMenu';
+import COLORS from '../constants/colors';
 const PrizesData = () => {
 
     const [showComponent, setShowComponent] = useState('A');
@@ -23,7 +24,7 @@ const PrizesData = () => {
         case 'A':
             content = (
                 <>
-                    <View style={styles.table}>
+                    {/* <View style={styles.table}>
                         <View style={styles.row}>
                             <View style={styles.headCell}>
                                 <Text style={styles.headCellText}>Match</Text>
@@ -71,7 +72,32 @@ const PrizesData = () => {
                                 <Text style={styles.cellText}>250 Rupees BookMyShow</Text>
                             </View>
                         </View>
-                    </View>
+                    </View> */}
+
+                    <ScrollView horizontal={true}>
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 16 }}>
+                            <View style={{ width: 170, height: 150, paddingVertical: 12, paddingHorizontal: 5, backgroundColor: COLORS.prize, borderRadius: 8 }}>
+                                <Image style={{ height: 38, resizeMode: "contain", alignSelf: "center", paddingBottom: 12 }} source={require("../assets/trophy.png")}></Image>
+                                <Text style={styles.prizeHeading}>Winner</Text>
+                                <Text style={{ fontSize: 8, fontFamily: "lato-bold", fontWeight: 600, textAlign: "center" }}>(5 numbers match)</Text>
+                                <View style={styles.cell}>
+                                    <Text style={styles.cellTextInput}>
+                                        <FontAwesome name="circle" size={12} color={COLORS.primary} />
+                                        <FontAwesome name="circle" size={12} color={COLORS.primary} />
+                                        <FontAwesome name="circle" size={12} color={COLORS.primary} />
+                                        <FontAwesome name="circle" size={12} color={COLORS.primary} />
+                                        <FontAwesome name="circle" size={12} color={COLORS.primary} />
+                                    </Text>
+                                </View>
+                                <View>
+                                    <Text></Text>
+                                </View>
+                            </View>
+                            <Image source={require("../assets/Second.png")}></Image>
+                            <Image source={require("../assets/Winner.png")}></Image>
+                            <Image source={require("../assets/Third.png")}></Image>
+                        </View>
+                    </ScrollView>
                     <View>
                         <Text style={styles.text3}>Terms & Conditions Apply:</Text>
                         <Text style={styles.text2}>*1st Prize if more than 1 user predicts same number the amount would be split equally.</Text>
@@ -97,32 +123,33 @@ const PrizesData = () => {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <View style={{ alignItems: "center" }}>
-                <Text style={styles.text3}>List of Prizes you can win !</Text>
+        <SafeAreaView style={{ flex: 1, }}>
+            <View style={{ paddingHorizontal: 16, paddingVertical: 24 }}>
+                <View style={{ alignItems: "center" }}>
+                    <Text style={styles.text3}>List of Prizes you can win !</Text>
+                </View>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 20 }}>
+                    <TouchableOpacity
+                        onPress={handleComponentA}
+                        style={[showComponent === 'A' ? styles.activeTabStyle : styles.inactiveTabStyle]}
+                    >
+                        <Text style={[styles.text1, showComponent === 'A' ? styles.activeTextStyle : styles.inactiveTextStyle]}>DAILY</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={handleComponentB}
+                        style={[showComponent === 'B' ? styles.activeTabStyle : styles.inactiveTabStyle]}
+                    >
+                        <Text style={[styles.text1, showComponent === 'B' ? styles.activeTextStyle : styles.inactiveTextStyle]}>MONTHLY</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={handleComponentC}
+                        style={[showComponent === 'C' ? styles.activeTabStyle : styles.inactiveTabStyle]}
+                    >
+                        <Text style={[styles.text1, showComponent === 'C' ? styles.activeTextStyle : styles.inactiveTextStyle]}>YEARLY</Text>
+                    </TouchableOpacity>
+                </View>
+                {content}
             </View>
-            <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginVertical: 20 }}>
-                <TouchableOpacity
-                    onPress={handleComponentA}
-                    style={[styles.button, showComponent === 'A' ? styles.activeTabStyle : styles.inactiveTabStyle]}
-                >
-                    <Text style={[styles.text1, showComponent === 'A' ? styles.activeTextStyle : styles.inactiveTextStyle]}>DAILY</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={handleComponentB}
-                    style={[styles.button, showComponent === 'B' ? styles.activeTabStyle : styles.inactiveTabStyle]}
-                >
-                    <Text style={[styles.text1, showComponent === 'B' ? styles.activeTextStyle : styles.inactiveTextStyle]}>MONTHLY</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={handleComponentC}
-                    style={[styles.button, showComponent === 'C' ? styles.activeTabStyle : styles.inactiveTabStyle]}
-                >
-                    <Text style={[styles.text1, showComponent === 'C' ? styles.activeTextStyle : styles.inactiveTextStyle]}>YEARLY</Text>
-                </TouchableOpacity>
-
-            </View>
-            {content}
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
                 <FooterMenu />
             </View>
@@ -132,24 +159,19 @@ const PrizesData = () => {
 
 const styles = EStyleSheet.create({
     text1: {
-        fontSize: "15rem",
+        fontSize: "1rem",
         fontWeight: "bold",
         color: "black",
-        padding: "5rem",
     },
     text2: {
-        fontSize: "20rem",
+        fontSize: "1rem",
         fontWeight: "bold",
         color: "black",
-        padding: "4rem",
-        marginLeft: 15
     },
     text3: {
-        fontSize: "25rem",
+        fontSize: "1rem",
         fontWeight: "bold",
         color: "black",
-        padding: "4rem",
-        marginHorizontal: 15
     },
     button:
     {
@@ -161,7 +183,6 @@ const styles = EStyleSheet.create({
         borderWidth: 1,
         borderColor: '#000',
         marginBottom: 10,
-        marginHorizontal: 15
     },
     row: {
         flexDirection: 'row',
@@ -174,43 +195,51 @@ const styles = EStyleSheet.create({
     },
     cell: {
         flex: 1,
-        borderWidth: 1,
-        borderColor: '#000',
-        padding: 10,
-        justifyContent: "center"
+        justifyContent: "center",
+        alignSelf: "center"
     },
     headCellText: {
         textAlign: 'center',
         fontWeight: 'bold',
         color: "white",
-        fontSize: "21rem",
+        fontSize: "1rem",
     },
     cellTextInput: {
         textAlign: 'left',
         fontWeight: 'bold',
         letterSpacing: 5,
-        marginLeft: 10
     },
     cellText: {
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: "20rem"
+        fontSize: "1rem"
     },
     activeTabStyle: {
-        backgroundColor: 'green', // Example active tab background color
-        color: 'white', // Example active tab text color
+        color: COLORS.primary,
+        borderBottomColor: COLORS.primary,
+        borderBottomWidth: 2
     },
     activeTextStyle: {
-        color: 'white', // Example active tab text color
+        color: COLORS.primary
     },
     inactiveTextStyle: {
         color: 'black', // Example active tab text color
     },
     inactiveTabStyle: {
-        borderWidth: 2,
         textAlign: "center",
-        borderRadius: 10,
+    },
+    prizeHeading: {
+        fontFamily: "lato-reg",
+        fontSize: 20,
+        fontWeight: 800,
+        textAlign: "center"
     }
 });
+
+const styless = StyleSheet.create({
+    activeTabStyle: {
+    }
+})
+
 
 export default PrizesData;

@@ -182,7 +182,8 @@ const styles = StyleSheet.create({
     },
     placeholderStyle: {
         fontSize: 16,
-        paddingLeft: 16
+        paddingLeft: 16,
+        color: COLORS.primary
     },
     selectedTextStyle: {
         fontSize: 16,
