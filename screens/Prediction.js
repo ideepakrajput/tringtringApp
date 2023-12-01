@@ -539,7 +539,7 @@ const Prediction = ({ navigation }) => {
                                                         </View>
                                                     </View>
                                                     <Text style={styles.text2}>Your existing number : {editPN}</Text>
-                                                    <Text style={[styles.text2, { fontWeight: "bold" }]}>Enter New Number </Text>
+                                                    <Text style={[styles.text2]}>Enter New Number </Text>
                                                     <TextInput
                                                         style={[styles.textInput, { alignSelf: "center" }]}
                                                         maxLength={5}
@@ -551,10 +551,10 @@ const Prediction = ({ navigation }) => {
                                                         onChangeText={handleInputChange}
                                                     >
                                                     </TextInput>
-                                                    <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen", textAlign: "center" }}>terms & conditions apply*</Text>
+                                                    {/* <Text style={{ marginTop: -5, fontWeight: "bold", color: "lightgreen", textAlign: "center" }}>terms & conditions apply*</Text> */}
 
                                                     <TouchableOpacity
-                                                        style={styles.button}
+                                                        style={[styles.button, { marginBottom: 16 }]}
                                                         onPress={handleEditPrediction}
                                                     >
                                                         <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>Submit</Text>
@@ -657,6 +657,7 @@ const styles = EStyleSheet.create({
         alignSelf: "center"
     },
     buttonDisable: {
+        marginTop: 8,
         backgroundColor: "lightgrey",
         borderRadius: 8,
         paddingHorizontal: 16,
@@ -670,7 +671,8 @@ const styles = EStyleSheet.create({
         justifyContent: "center",
     },
     textInput: {
-        color: "green", fontSize: "1rem",
+        color: COLORS.primary, fontSize: 25,
+        paddingVertical: 16,
         textAlign: "center",
     },
     modalBackGround: {
