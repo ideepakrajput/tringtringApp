@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   iconStyle: {
-    backgroundColor: COLORS.history,
+    backgroundColor: COLORS.prize,
     borderRadius: 50,
     padding: 14
   },
