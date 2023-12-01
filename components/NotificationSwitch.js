@@ -50,7 +50,13 @@ const NotificationSwitch = () => {
         }
     };
 
-    const toggleSwitch = (value) => {
+    const toggleSwitch = async (value) => {
+        await axios.get(`${BASE_API_URL}api/user/user_details`, { notificationsEnabled: value }, config).then((res) => {
+            setIsEnabled(res.notificationsEnabled);
+            saveNotificationPreference(res.notificationsEnabled);
+        }).catch((error) => {
+            console.log(error.response.data.message);
+        })
         setIsEnabled(value);
         saveNotificationPreference(value);
     };

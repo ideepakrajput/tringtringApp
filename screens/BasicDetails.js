@@ -32,6 +32,16 @@ export default function BasicDetails() {
         fetchData();
     }, [])
 
+    const saveDetails = async () => {
+        await axios.post(`${BASE_API_URL}api/user/user_details`, { name, email, phoneNumber }, config).then((res) => {
+            setName(res.data.name);
+            setPhoneNumber(res.data.phoneNumber.toString());
+            setEmail(res.data.email)
+        }).catch((error) => {
+            console.log(error.response.data.message);
+        })
+    }
+
     return (
         <View style={{ paddingHorizontal: 16, paddingVertical: 24 }}>
             <View style={{ marginBottom: 8, marginTop: 8 }}>
@@ -137,7 +147,7 @@ export default function BasicDetails() {
                 style={{
                     marginTop: 16,
                 }}
-            // onPress={}
+                onPress={saveDetails}
             />
         </View>
     )
