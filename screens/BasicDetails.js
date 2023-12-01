@@ -12,14 +12,14 @@ export default function BasicDetails() {
     const [phoneNumber, setPhoneNumber] = useState("");
     const { state } = useContext(AuthContext);
 
-    useEffect(() => {
-        const token = state?.token;
+    const token = state?.token;
 
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        };
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+    useEffect(() => {
         async function fetchData() {
             await axios.get(`${BASE_API_URL}api/user/user_details`, config).then((res) => {
                 setName(res.data.name);

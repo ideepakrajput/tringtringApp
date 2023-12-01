@@ -177,7 +177,7 @@ const Login = ({ navigation }) => {
 					<View style={styles.inputView}>
 						<TextInput
 							placeholder="Enter your Password"
-							placeholderTextColor={COLORS.se}
+							placeholderTextColor={COLORS.secondary}
 							secureTextEntry={isPasswordShown}
 							style={styles.inputBox}
 							value={password}

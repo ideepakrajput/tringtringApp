@@ -18,6 +18,7 @@ const ForgetPassword = ({ navigation }) => {
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [password, setPassword] = useState("");
+    const [Cpassword, setCPassword] = useState("");
     //OTP
     const [isOtpSent, setIsOtpSent] = useState(false);
     const [otp, setOtp] = useState('');
@@ -26,14 +27,19 @@ const ForgetPassword = ({ navigation }) => {
     //OTP
 
     const handleResetPassword = async () => {
-        try {
-            await axios.post(`${BASE_API_URL}api/user/reset_password`, {
-                phoneNumber,
-                password,
-            });
-            navigation.navigate("Login");
-        } catch (error) {
-            Alert.alert(error.response.data.message);
+        if (password === Cpassword) {
+            try {
+                await axios.post(`${BASE_API_URL}api/user/reset_password`, {
+                    phoneNumber,
+                    password,
+                });
+                navigation.navigate("Login");
+                Alert.alert('Success', 'Password Changed Successfully!');
+            } catch (error) {
+                Alert.alert(error.response.data.message);
+            }
+        } else {
+            Alert.alert("Mismatch", "Password didn't match !")
         }
     };
     //OTP
@@ -57,6 +63,7 @@ const ForgetPassword = ({ navigation }) => {
 
             const fourDigitOTP = ('000' + randomNumber).slice(-4);
             setSentOtp(fourDigitOTP);
+            console.log(fourDigitOTP);
 
             await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
             setIsOtpSent(true);
@@ -69,7 +76,7 @@ const ForgetPassword = ({ navigation }) => {
         // Simulate OTP verification logic
         const expectedOtp = sentOtp; // Replace with the actual OTP received or generated
         if (otp === expectedOtp) {
-            Alert.alert('Success', 'OTP verified successfully!');
+            Alert.alert('Success', 'OTP verification successful!');
             setVerified(true);
         } else {
             Alert.alert('Error', 'Incorrect OTP. Please try again.');
@@ -77,128 +84,150 @@ const ForgetPassword = ({ navigation }) => {
     };
     //OTP
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
-            <View style={{ flex: 1, marginHorizontal: 22 }}>
-                <View style={{ alignItems: "center" }}>
-                    <Text
-                        style={{
-                            fontSize: 22,
-                            fontWeight: "bold",
-                            marginTop: 20,
-                            color: COLORS.black,
-                        }}
-                    >
-                        Reset Password
-                    </Text>
-                </View>
-                {verified ?
-                    <View style={{ marginBottom: 12 }}>
-                        <Text
-                            style={{
-                                fontSize: 16,
-                                fontWeight: 400,
-                                marginVertical: 22,
-                            }}
-                        >
-                            Password
-                        </Text>
+        <SafeAreaView style={{ flex: 1, }}>
+            <View style={styles.container}>
+                {isOtpSent
+                    ?
+                    <>
+                        {verified
+                            ?
+                            <View>
+                                <View style={{ marginBottom: 32 }}>
+                                    <Text style={[styles.text, { color: COLORS.black }]}>Change <Text style={[styles.text, { color: COLORS.primary }]}>Password</Text></Text>
+                                </View>
 
-                        <View
-                            style={{
-                                width: "100%",
-                                height: 48,
-                                borderColor: COLORS.black,
-                                borderWidth: 1,
-                                borderRadius: 8,
-                                alignItems: "center",
-                                justifyContent: "center",
-                                paddingLeft: 22,
-                            }}
-                        >
+                                <View>
+                                    <Text style={styles.label}>Password</Text>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            placeholder="Enter your Password"
+                                            placeholderTextColor={COLORS.secondary}
+                                            secureTextEntry={isPasswordShown}
+                                            style={styles.inputBox}
+                                            value={password}
+                                            onChangeText={(text) => setPassword(text)}
+                                        />
+
+                                        <TouchableOpacity
+                                            onPress={() => setIsPasswordShown(!isPasswordShown)}
+                                            style={{
+                                                position: "absolute",
+                                                right: 12,
+                                            }}
+                                        >
+                                            {isPasswordShown == true ? (
+                                                <Ionicons name="eye-off" size={24} color={COLORS.black} />
+                                            ) : (
+                                                <Ionicons name="eye" size={24} color={COLORS.black} />
+                                            )}
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                                <View>
+                                    <Text style={styles.label}>Confirm Password</Text>
+
+                                    <View style={styles.inputView}>
+                                        <TextInput
+                                            placeholder="Re-Enter your Password"
+                                            placeholderTextColor={COLORS.secondary}
+                                            secureTextEntry={isPasswordShown}
+                                            style={styles.inputBox}
+                                            value={Cpassword}
+                                            onChangeText={(text) => setCPassword(text)}
+                                        />
+
+                                        <TouchableOpacity
+                                            onPress={() => setIsPasswordShown(!isPasswordShown)}
+                                            style={{
+                                                position: "absolute",
+                                                right: 12,
+                                            }}
+                                        >
+                                            {isPasswordShown == true ? (
+                                                <Ionicons name="eye-off" size={24} color={COLORS.black} />
+                                            ) : (
+                                                <Ionicons name="eye" size={24} color={COLORS.black} />
+                                            )}
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                                <Button
+                                    title="Change Password"
+                                    filled
+                                    style={{
+                                        marginTop: 18,
+                                        marginBottom: 4,
+                                    }}
+                                    onPress={handleResetPassword}
+                                />
+                            </View>
+                            :
+                            <View>
+                                <View style={{ marginBottom: 32 }}>
+                                    <Text style={[styles.text, { color: COLORS.black }]}>Verification</Text>
+                                    <Text style={{ fontFamily: "lato-reg", fontSize: 16 }}>We’ve sent a code to +91 {phoneNumber}</Text>
+                                </View>
+                                <View>
+                                    <TextInput
+                                        placeholder=" - - - - "
+                                        placeholderTextColor={COLORS.secondary}
+                                        keyboardType="numeric"
+                                        maxLength={4}
+                                        style={{ textAlign: "center", fontSize: 40, color: COLORS.primary }}
+                                        value={otp}
+                                        onChangeText={(text) => setOtp(text)}
+                                    />
+
+                                    <Text style={[styles.label, { textAlign: "center" }]}>Didn’t get a code? <Text onPress={handleSendOtp} style={{ color: COLORS.primary }}>Resend</Text></Text>
+                                </View>
+                                <Button
+                                    title="Continue"
+                                    filled
+                                    style={{
+                                        marginTop: 20,
+                                        marginBottom: 4,
+                                    }}
+                                    onPress={handleVerifyOtp}
+                                />
+                            </View>
+                        }
+                    </>
+                    :
+                    <View>
+                        <View style={{ marginBottom: 32 }}>
+                            <Text style={[styles.text, { color: COLORS.black }]}>Change <Text style={[styles.text, { color: COLORS.primary }]}>Password</Text></Text>
+                        </View>
+                        <Text style={styles.label}>Mobile Number</Text>
+                        <View style={styles.inputView}>
                             <TextInput
-                                placeholder="Enter your password"
+                                placeholder="+91"
                                 placeholderTextColor={COLORS.black}
-                                secureTextEntry={isPasswordShown}
+                                keyboardType="numeric"
                                 style={{
-                                    width: "100%",
+                                    fontSize: 22,
+                                    fontWeight: "500",
+                                    borderLeftColor: COLORS.secondary,
                                 }}
-                                value={password}
-                                onChangeText={(text) => setPassword(text)}
                             />
-
-                            <TouchableOpacity
-                                onPress={() => setIsPasswordShown(!isPasswordShown)}
-                                style={{
-                                    position: "absolute",
-                                    right: 12,
-                                }}
-                            >
-                                {isPasswordShown == true ? (
-                                    <Ionicons name="eye-off" size={24} color={COLORS.black} />
-                                ) : (
-                                    <Ionicons name="eye" size={24} color={COLORS.black} />
-                                )}
-                            </TouchableOpacity>
+                            <TextInput
+                                placeholder="Enter your Mobile No"
+                                placeholderTextColor={COLORS.secondary}
+                                keyboardType="numeric"
+                                style={[styles.inputBox, { width: "89%" }]}
+                                value={phoneNumber}
+                                onChangeText={(text) => setPhoneNumber(text)}
+                            />
                         </View>
                         <Button
-                            onPress={handleResetPassword}
-                            title="Change Your Password"
+                            title="Send OTP"
                             filled
                             style={{
-                                marginTop: 18,
+                                marginTop: 20,
                                 marginBottom: 4,
-                                marginVertical: 20
                             }}
+                            onPress={handleSendOtp}
                         />
-                    </View>
-                    :
-                    <View style={{ marginBottom: 12 }}>
-                        {/* OTP */}
-                        {!isOtpSent ? (
-                            // Page to input phone number and send OTP
-                            <View>
-                                <Text
-                                    style={{
-                                        fontSize: 16,
-                                        fontWeight: 400,
-                                        marginVertical: 22,
-                                    }}
-                                >
-                                    Mobile Number
-                                </Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Phone Number"
-                                    keyboardType="phone-pad"
-                                    value={phoneNumber}
-                                    onChangeText={setPhoneNumber}
-                                />
-                                <TouchableOpacity style={styles.button} onPress={handleSendOtp}>
-                                    <Text style={styles.buttonText}>Send OTP</Text>
-                                </TouchableOpacity>
-                            </View>
-                        ) : (
-                            // Page with OTP input
-                            <View>
-                                <Text style={styles.title}>Enter OTP</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Enter OTP"
-                                    keyboardType="numeric"
-                                    value={otp}
-                                    onChangeText={setOtp}
-                                />
-                                <>
-                                    {verified ?
-                                        <Text style={{ color: "green", fontSize: 16, textAlign: "center", marginTop: 10 }}>Mobile Number Verified !</Text>
-                                        :
-                                        <TouchableOpacity style={styles.button} onPress={handleVerifyOtp}>
-                                            <Text style={styles.buttonText}>Verify OTP</Text>
-                                        </TouchableOpacity>
-                                    }
-                                </>
-                            </View>
-                        )}
                     </View>
                 }
             </View>
@@ -206,22 +235,33 @@ const ForgetPassword = ({ navigation }) => {
     );
 };
 const styles = StyleSheet.create({
-    input: {
-        height: 40,
-        borderColor: 'gray',
+    container: {
+        paddingHorizontal: 16,
+        paddingTop: 64,
+    },
+    text: {
+        fontSize: 32,
+        fontWeight: 800,
+        fontFamily: "lato-bold"
+    },
+    label: {
+        fontSize: 16,
+        fontFamily: "lato-bold",
+        fontWeight: 500,
+        marginTop: 16,
+        marginBottom: 8,
+    },
+    inputView: {
+        height: 48,
+        borderColor: COLORS.black,
         borderWidth: 1,
-        marginBottom: 16,
-        paddingHorizontal: 10,
+        borderRadius: 8,
+        alignItems: "center",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        padding: 8
     },
-    button: {
-        backgroundColor: 'blue',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginVertical: 16
-    },
-    buttonText: {
-        color: 'white',
+    inputBox: {
         fontSize: 16,
     },
 });
