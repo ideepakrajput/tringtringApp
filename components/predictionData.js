@@ -64,7 +64,7 @@ const PredictionData = ({ navigation }) => {
                 setYesterdayPredictionNumber(yesterdayPredictionNumbers[yesterdayPredictionNumbers.length - 1]);
 
             }).catch((err) => {
-                console.log(err);
+                console.log(err,"Test2");
             });
 
             await axios.get(`${BASE_API_URL}api/winning/winning_numbers`)
@@ -91,7 +91,7 @@ const PredictionData = ({ navigation }) => {
                     setYesterdayWinningNumber(yesterdayWinningNumber);
                 })
                 .catch(err => {
-                    Alert.alert(err);
+                    Alert.alert(err,"Test");
                 });
         }
         fetchData();

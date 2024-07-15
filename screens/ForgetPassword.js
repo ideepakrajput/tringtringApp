@@ -65,7 +65,7 @@ const ForgetPassword = ({ navigation }) => {
             setSentOtp(fourDigitOTP);
             console.log(fourDigitOTP);
 
-            await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
+            // await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
             setIsOtpSent(true);
         } else {
             Alert.alert("User doesn't exits.");
@@ -167,6 +167,7 @@ const ForgetPassword = ({ navigation }) => {
                                 <View style={{ marginBottom: 32 }}>
                                     <Text style={[styles.text, { color: COLORS.black }]}>Verification</Text>
                                     <Text style={{ fontFamily: "lato-reg", fontSize: 16 }}>We’ve sent a code to +91 {phoneNumber}</Text>
+                                    <Text style={{ fontFamily: "lato-reg", fontSize: 12, textAlign:"center" }}>OTP:{sentOtp}</Text>
                                 </View>
                                 <View>
                                     <TextInput

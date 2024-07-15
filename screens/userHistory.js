@@ -106,7 +106,7 @@ const UserHistory = () => {
                                                     {index === 0 ?
                                                         <View style={{ gap: 8 }}>
                                                             <Text style={styles.cell}>{formatDateToDDMMYYYY(item.transaction_date)}</Text>
-                                                            <Text style={[styles.cell, { fontSize: 16, textAlign: "center" }]}>{item.winning_number || " 55555 "}</Text>
+                                                            <Text style={[styles.cell, { fontSize: 16, textAlign: "center" }]}>{item.winning_number || " ----- "}</Text>
                                                             <TouchableOpacity onPress={() => openYouTubeLink(item.youtube_url)} style={styles.cell}>
                                                                 <Image
                                                                     source={require("../assets/utubelogo.png")}

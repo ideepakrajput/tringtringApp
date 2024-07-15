@@ -129,9 +129,11 @@ const Signup = ({ navigation }) => {
         Alert.alert("Please fill the phone number !");
       } else if (!password) {
         Alert.alert("Please create your password !");
-      } else if (password === Cpassword) {
-        Alert.alert("Password didnt match !")
-      } else if (password.length < 5) {
+      } 
+      // else if (password == Cpassword) {
+      //   Alert.alert("Password didnt match !")
+      // } 
+      else if (password.length < 5) {
         Alert.alert("Password should be minimum 5 characters !");
         return;
       } else {
@@ -179,7 +181,7 @@ const Signup = ({ navigation }) => {
       const fourDigitOTP = ('000' + randomNumber).slice(-4);
       setSentOtp(fourDigitOTP);
       console.log(fourDigitOTP);
-      await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
+      // await axios.get(`https://smslogin.co/v3/api.php?username=JKDEVI&apikey=0c3d970adcb15c0f85fc&mobile=${phoneNumber}&senderid=IPEMAA&message=Here+is+your+OTP+${fourDigitOTP}+for+Knowledge+Day+Registration+at+Poultry+India+2023.`);
       setIsOtpSent(true);
     } else if (phoneNumberExists) {
       Alert.alert("Eror", "Phone Number already registered, Try With Another Phone Number !");
@@ -318,6 +320,7 @@ const Signup = ({ navigation }) => {
                 <View style={{ marginBottom: 32 }}>
                   <Text style={[styles.text, { color: COLORS.black }]}>Verification</Text>
                   <Text style={{ fontFamily: "lato-reg", fontSize: 16 }}>We’ve sent a code to +91 {phoneNumber}</Text>
+                  <Text style={{ fontFamily: "lato-reg", fontSize: 12,textAlign:"center" }}>OTP is {sentOtp}</Text>
                 </View>
                 <View>
                   <TextInput
