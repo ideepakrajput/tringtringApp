@@ -26,7 +26,7 @@ export default function BasicDetails() {
                 setPhoneNumber(res.data.phoneNumber.toString());
                 setEmail(res.data.email)
             }).catch((error) => {
-                console.log(error.response.data.message);
+                console.log(error.response.data.message,"Test5");
             })
         }
         fetchData();
@@ -38,7 +38,7 @@ export default function BasicDetails() {
             setPhoneNumber(res.data.phoneNumber.toString());
             setEmail(res.data.email)
         }).catch((error) => {
-            console.log(error.response.data.message);
+            console.log(error.response.data.message,"Test6");
         })
     }
 

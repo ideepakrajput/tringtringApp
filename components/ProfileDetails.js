@@ -22,7 +22,7 @@ const ProfileDetailsCard = () => {
                 setName(res.data.name);
                 setPhoneNumber(res.data.phoneNumber);
             }).catch((error) => {
-                console.log(error.response.data.message);
+                console.log(error.response.data.message,"Test4");
             })
         }
         fetchData();

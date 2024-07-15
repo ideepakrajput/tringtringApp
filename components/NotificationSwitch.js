@@ -55,7 +55,7 @@ const NotificationSwitch = () => {
             setIsEnabled(res.notificationsEnabled);
             saveNotificationPreference(res.notificationsEnabled);
         }).catch((error) => {
-            console.log(error.response.data.message);
+            console.log(error.response.data.message,"Test3");
         })
         setIsEnabled(value);
         saveNotificationPreference(value);

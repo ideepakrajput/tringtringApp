@@ -34,16 +34,16 @@ const PredictionProvider = ({ children }) => {
                     setAddedPredictions(res.data.addedPredictions);
                     setEditedPredictions(res.data.editedPredictions);
                     setAdsViewed(res.data.adsViewed);
-                    console.log("Predictions:", res.data.predictions);
-                    console.log("Predictions:", predictions);
-                    console.log("Temp Predictions:", res.data.tempPredictions);
-                    console.log("Temp Predictions:", tempPredictions);
-                    console.log("Added Predictions:", res.data.addedPredictions);
-                    console.log("Added Predictions:", addedPredictions);
-                    console.log("Edited Predictions:", res.data.editedPredictions);
-                    console.log("Edited Predictions:", editedPredictions);
-                    console.log("Ads Viewed:", res.data.adsViewed);
-                    console.log("Ads Viewed:", adsViewed);
+                    // console.log("Predictions:", res.data.predictions);
+                    // console.log("Predictions:", predictions);
+                    // console.log("Temp Predictions:", res.data.tempPredictions);
+                    // console.log("Temp Predictions:", tempPredictions);
+                    // console.log("Added Predictions:", res.data.addedPredictions);
+                    // console.log("Added Predictions:", addedPredictions);
+                    // console.log("Edited Predictions:", res.data.editedPredictions);
+                    // console.log("Edited Predictions:", editedPredictions);
+                    // console.log("Ads Viewed:", res.data.adsViewed);
+                    // console.log("Ads Viewed:", adsViewed);
                 })
             }
         };
